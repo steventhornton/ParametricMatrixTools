@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Oct. 24/2016                                                #
+# UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -30,18 +30,26 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export ParametricSmithForm;
+    export isUnder;
     
     local ModuleLoad,
           loadTypes,
           allComb,
+          containsParameters,
+          InitialByVar,
           isConstantMatrix,
+          isEqualOverCS,
           isGreatestVariable,
-          isUnder,
+          isNonZeroOverCS,
+          isNonZeroOverRS,
           isZeroMatrix,
           isZeroOverCS,
           isZeroOverRS,
-          Intersection;
+          ListIntersection,
+          matrixContainsParameters,
+          splitConstructibleSet,
+          TailByVar,
+          VanishingConstructibleSet;
     
     # This function is run when the package is loaded.
     ModuleLoad := proc()
@@ -54,14 +62,21 @@ ParametricMatrixTools := module()
 $include "types.mpl"
 
 $include "Extra/allComb.mpl"
-$include "Extra/Intersection.mpl"
+$include "Extra/containsParameters.mpl"
+$include "Extra/InitialByVar.mpl"
 $include "Extra/isConstantMatrix.mpl"
+$include "Extra/isEqualOverCS.mpl"
 $include "Extra/isGreatestVariable.mpl"
+$include "Extra/isNonZeroOverCS.mpl"
+$include "Extra/isNonZeroOverRS.mpl"
 $include "Extra/isUnder.mpl"
 $include "Extra/isZeroMatrix.mpl"
 $include "Extra/isZeroOverCS.mpl"
 $include "Extra/isZeroOverRS.mpl"
-
-$include "SmithForm/ParametricSmithForm.mpl"
+$include "Extra/ListIntersection.mpl"
+$include "Extra/matrixContainsParameters.mpl"
+$include "Extra/splitConstructibleSet.mpl"
+$include "Extra/TailByVar.mpl"
+$include "Extra/VanishingConstructibleSet.mpl"
 
 end module:

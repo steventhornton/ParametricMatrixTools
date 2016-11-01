@@ -1,7 +1,7 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# isGreatestVariable.mpl                                                  #
+# InitialByVar.mpl                                                        #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
@@ -9,24 +9,36 @@
 # EMAIL ..... sthornt7@uwo.ca                                             #
 # UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
-# Determine if a variable is the largest variable in a polynomial ring.   #
+# Returns the initial of a polynomial w.r.t a given variable.             #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
-#   isGreatestVariable(v, R)                                              #
+#   InitialByVar(p, v, R)                                                 #
 #                                                                         #
 # INPUT                                                                   #
-#   v ... variable                                                        #
+#   p ... Polynomial                                                      #
+#   v ... Variable                                                        #
 #   R ... Polynomial ring                                                 #
 #                                                                         #
 # OUTPUT                                                                  #
-#   True if v is the largest variable of R, false otherwise.              #
+#   The coefficient in p of the term of largest degree in v.              #
 #                                                                         #
 # EXAMPLE                                                                 #
 #   > R := PolynomialRing([x, a, b]):                                     #
-#   > isGreatestVariable(x, R);                                           #
-#         true                                                            #
-#   > isGreatestVariable(b, R);                                           #
-#         false                                                           #
+#   > p := x^2 + 2x + 1:                                                  #
+#   > InitialByVar(p, x, R);                                              #
+#         1                                                               #
+#   > p := 10:                                                            #
+#   > InitialByVar(p, x, R);                                              #
+#         10                                                              #
+#   > p := 10a^2 + 13b^3 + a*b - 4:                                       #
+#   > InitialByVar(p, x, R);                                              #
+#         10a^2 + 13b^3 + a*b - 4                                         #
+#   > p := (a^2 + b)x^3 + (a*b + a^2 - b^2 -1)x - 20:                     #
+#   > InitialByVar(p, x, R);                                              #
+#         a^2 + b                                                         #
+#   > p := 0:                                                             #
+#   > InitialByVar(p, x, R);                                              #
+#         0                                                               #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -43,11 +55,11 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-isGreatestVariable := proc(v::name, R::TRDring, $) :: truefalse;
+InitialByVar := proc(p::polynom, v::name, R::TRDring, $) :: polynom;
     
-    # Ensure v is a variable of R
-    ASSERT(evalb(v in R['variables']), "v is not a variable of R");
+    # p must be a polynomial in R
+    ASSERT(RC:-TRDis_poly(p, R), "p must be a polynomial in R");
     
-    return evalb(R['variables'][1] = v);
+    return coeff(p, v, degree(p, v));
     
 end proc;

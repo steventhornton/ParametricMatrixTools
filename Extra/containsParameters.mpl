@@ -1,7 +1,7 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# isGreatestVariable.mpl                                                  #
+# containsParameters.mpl                                                  #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
@@ -9,24 +9,37 @@
 # EMAIL ..... sthornt7@uwo.ca                                             #
 # UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
-# Determine if a variable is the largest variable in a polynomial ring.   #
+# Determine if a parametric univariate polynomial contains parameters.    #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
-#   isGreatestVariable(v, R)                                              #
+#   containsParameters(p, v, R)                                           #
 #                                                                         #
 # INPUT                                                                   #
-#   v ... variable                                                        #
+#   p ... Polynomial                                                      #
+#   v ... Variable                                                        #
 #   R ... Polynomial ring                                                 #
 #                                                                         #
 # OUTPUT                                                                  #
-#   True if v is the largest variable of R, false otherwise.              #
+#   - True if p contains indeterminants other than just v                 #
+#   - False if p has no indeterminants or v is the only indeterminant     #
 #                                                                         #
 # EXAMPLE                                                                 #
 #   > R := PolynomialRing([x, a, b]):                                     #
-#   > isGreatestVariable(x, R);                                           #
-#         true                                                            #
-#   > isGreatestVariable(b, R);                                           #
+#   > p := x^2 + 2x + 1:                                                  #
+#   > containsParameters(p, x, R);                                        #
 #         false                                                           #
+#   > p := 10:                                                            #
+#   > containsParameters(p, x, R);                                        #
+#         false                                                           #
+#   > p := 10a^2 + 13b^3 + a*b - 4:                                       #
+#   > containsParameters(p, x, R);                                        #
+#         true                                                            #
+#   > p := (a^2 + b)x^3 + (a*b + a^2 - b^2 -1)x - 20:                     #
+#   > containsParameters(p, x, R);                                        #
+#         true                                                            #
+#                                                                         #
+# ASSUMPTIONS                                                             #
+#   v is the greatest variable of R                                       #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -43,11 +56,22 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-isGreatestVariable := proc(v::name, R::TRDring, $) :: truefalse;
+containsParameters := proc(p::polynom, v::name, R::TRDring, $) :: truefalse;
     
-    # Ensure v is a variable of R
-    ASSERT(evalb(v in R['variables']), "v is not a variable of R");
+    # v must be the greatest variable of R
+    ASSERT(isGreatestVariable(v, R), "v must be the greatest variable of R");
     
-    return evalb(R['variables'][1] = v);
+    # p must be a polynomial in R
+    ASSERT(RC:-TRDis_poly(p, R), "p must be a polynomial in R");
+    
+    if nops(indets(p)) > 1 then
+        return true;
+    elif nops(indets(p)) = 1 then
+        if not v in indets(p) then
+            return true;
+        end if;
+    end if;
+    
+    return false;
     
 end proc;

@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Oct. 24/2016                                                #
+# UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
 # Determine if all polynomials in a regular system or constructible set   #
 # (including inequations) only contain variables that are strictly less   #
@@ -28,6 +28,14 @@
 #   variables of R  strictly less that v, false otherwise.                #
 #                                                                         #
 # EXAMPLE                                                                 #
+#   > R := PolynomialRing([x, a, b]):                                     #
+#   >                                                                     #
+#   > cs := GeneralConstruct([a*x+b^2], [a, b], R):                       #
+#   > isUnder(cs, x, R);                                                  #
+#         false                                                           #
+#   > cs := GeneralConstruct([a-1], [a-1], R):                            #
+#   > isUnder(cs, x, R);                                                  #
+#         true                                                            #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #

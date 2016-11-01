@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Oct. 24/2016                                                #
+# UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
 # Compute all ordered combinations of the elements of a list of lists.    #
 #                                                                         #
@@ -85,4 +85,4 @@ allComb := module()
 
     end proc;
     
-end module:
+end module;

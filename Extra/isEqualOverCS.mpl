@@ -1,7 +1,7 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# isGreatestVariable.mpl                                                  #
+# isEqualOverCS.mpl                                                       #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
@@ -9,24 +9,25 @@
 # EMAIL ..... sthornt7@uwo.ca                                             #
 # UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
-# Determine if a variable is the largest variable in a polynomial ring.   #
-#                                                                         #
-# CALLING SEQUENCE                                                        #
-#   isGreatestVariable(v, R)                                              #
+# Determine if two polynomials are equal at all points in a constructible #
+# set.                                                                    #
 #                                                                         #
 # INPUT                                                                   #
-#   v ... variable                                                        #
-#   R ... Polynomial ring                                                 #
+#   p1 ... Polynomial                                                     #
+#   p2 ... Polynomial                                                     #
+#   cs ... Constructible set                                              #
+#   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   True if v is the largest variable of R, false otherwise.              #
+#   True if p1 = p2 at all points in cs. False otherwise.                 #
 #                                                                         #
 # EXAMPLE                                                                 #
-#   > R := PolynomialRing([x, a, b]):                                     #
-#   > isGreatestVariable(x, R);                                           #
+#   > R := PolynomialRing([x, a]);                                        #
+#   > p1 := 2*x^2 - 12:                                                   #
+#   > p2 := (a-1)*x^2 - 4*a:                                              #
+#   > cs := GeneralConstruct([a-3], [], R):                               #
+#   > isEqualOverCS(p1, p2, cs, R);                                       #
 #         true                                                            #
-#   > isGreatestVariable(b, R);                                           #
-#         false                                                           #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -43,11 +44,14 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-isGreatestVariable := proc(v::name, R::TRDring, $) :: truefalse;
+isEqualOverCS := proc(p1::polynom, p2::polynom, cs::TRDcs, R::TRDring, $) :: truefalse;
     
-    # Ensure v is a variable of R
-    ASSERT(evalb(v in R['variables']), "v is not a variable of R");
+    # p1 must be a polynomial in R
+    ASSERT(RC:-TRDis_poly(p1, R), "p1 must be a polynomial in R");
     
-    return evalb(R['variables'][1] = v);
+    # p2 must be a polynomial in R
+    ASSERT(RC:-TRDis_poly(p2, R), "p2 must be a polynomial in R");
+    
+    return isZeroOverCS(p1 - p2, cs, R);
     
 end proc;

@@ -1,32 +1,45 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# Intersection.mpl                                                        #
+# matrixContainsParameters.mpl                                            #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Oct. 24/2016                                                #
+# UPDATED ... Nov. 1/2016                                                 #
 #                                                                         #
-# Computes the intersection of all elements in a list or set of           #
-# constructible sets.                                                     #
+# Determine if a matrix of parametric univariate polynomial contains      #
+# parameters.                                                             #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
-#   Intersection(csList, R)                                               #
-#   Intersection(csSet, R)                                                #
-#   Intersection(csArray, R)                                              #
+#   matrixContainsParameters(A, v, R)                                     #
 #                                                                         #
 # INPUT                                                                   #
-#   csList .... List or constructible sets                                #
-#   csSet ..... Set or constructible sets                                 #
-#   csArray ... Array or constructible sets                               #
-#   R ......... Polynomial ring                                           #
+#   A ... Matrix                                                          #
+#   v ... Variable                                                        #
+#   R ... Polynomial ring                                                 #
 #                                                                         #
 # OUTPUT                                                                  #
-#   A constructible set representing the intersection of all input sets   #
+#   - True if an entry exists in A that has an indeterminant other than v #
+#   - False otherwise.                                                    #
 #                                                                         #
 # EXAMPLE                                                                 #
+#   > R := PolynomialRing([x, a, b]):                                     #
+#   > A := Matrix(4, 5):                                                  #
+#   > matrixContainsParameters(A, x, R);                                  #
+#         false                                                           #
+#   > A := RandomMatrix(4) + x*RandomMatrix(4):                           #
+#   > matrixContainsParameters(A, x, R);                                  #
+#         false                                                           #
+#   > A := a*RandomMatrix(4) + b*RandomMatrix(4):                         #
+#   > matrixContainsParameters(A, x, R);                                  #
+#         true                                                            #
+#   > A := Matrix(4, 5):                                                  #
+#   > A[2, 2] := x:                                                       #
+#   > A[3, 2] := a+4*b-2*x:                                               #
+#   > matrixContainsParameters(A, x, R);                                  #
+#         true                                                            #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -43,52 +56,22 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-Intersection := overload(
-    [
-        proc(csList::list(TRDcs), R::TRDring, $) :: TRDcs; 
-            option overload;
-            userinfo(2, 'ParametricMatrixTools', "Calling Intersection with a list of constructible sets.");
-            return Intersection(convert(csList, Array), R);
-        end,
+matrixContainsParameters := proc(A::Matrix, v::name, R::TRDring, $) :: truefalse;
 
-        proc(csSet::set(TRDcs), R::TRDring, $) :: TRDcs; 
-            option overload;
-            userinfo(2, 'ParametricMatrixTools', "Calling Intersection with a set of constructible sets.");
-            return Intersection(convert(csSet, Array), R);
-        end,
-        
-        
-        proc(csArray::Array(TRDcs), R::TRDring, $) :: TRDcs; 
-            
-            option overload;
-            
-            local n :: nonnegint,
-                  i :: posint,
-                  cs :: TRDcs;
-            
-            userinfo(2, 'ParametricMatrixTools', "Calling Intersection with an array of constructible sets.");
-            
-            n := ArrayNumElems(csArray);
-            
-            if n = 1 then
-                return csArray[1];
+    local i::posint,
+          j::posint;
+
+    # v must be the greatest variable of R
+    ASSERT(isGreatestVariable(v, R), "v must be the greatest variable of R");
+    
+    for i to LA:-RowDimension(A) do
+        for j to LA:-ColumnDimension(A) do
+            if containsParameters(A[i,j], v, R) then
+                return true;
             end if;
-            
-            # If any of the constructible sets are empty, the intersection
-            # of all constructible sets must be empty.
-            for cs in csArray do
-                if RC_CST:-IsEmpty(cs, R) then
-                    return RC:-TRDempty_constructible_set();
-                end if;
-            end do;
-            
-            cs := csArray[1];
-            
-            for i from 2 to n do
-                cs := RC_CST:-Intersection(cs, csArray[i], R);
-            end do;
-            
-            return cs;
-        end
-    ]
-);
+        end do;
+    end do;
+    
+    return false;
+    
+end proc;
