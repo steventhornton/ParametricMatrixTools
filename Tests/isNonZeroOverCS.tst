@@ -8,7 +8,9 @@ test := module()
           test4,
           test5,
           test6,
-          test7;
+          test7,
+          test8,
+          test9;
 
     uses ParametricMatrixTools, 
          RegularChains, 
@@ -18,9 +20,9 @@ test := module()
     
         local passCount, failCount, test, testList; 
         
-        testList := ['test1','test2', 'test3', 'test4', 'test5', 'test6', 'test7'];
+        testList := ['test1','test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9'];
         
-        printf("Testing isUnder\n");
+        printf("Testing isNonZeroOverCS\n");
         
         passCount, failCount := 0, 0;
         
@@ -42,14 +44,14 @@ test := module()
 
     test1 := proc($)
         
-        local R, cs, result, correct;
+        local R, p, cs, result, correct;
         
-        R := PolynomialRing([x, a, b]);
-        
-        cs := GeneralConstruct([a^2 + a*b - 2], [b-1], R);
+        R := PolynomialRing([x, y]);
+        cs := GeneralConstruct([x + y], [], R);
+        p := x + y + 1;
         
         try
-            result := ParametricMatrixTools:-isUnder(cs, x, R);
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -67,76 +69,18 @@ test := module()
         end if;
 
     end proc;
-
-
+    
+    
     test2 := proc($)
         
-        local R, cs, result, correct;
+        local R, p, cs, result, correct;
         
-        R := PolynomialRing([x, a, b]);
-        
-        cs := GeneralConstruct([], [], R);
-        
-        try
-            result := ParametricMatrixTools:-isUnder(cs, x, R);
-        catch:
-            printf("\b\b\bFAIL: Error\n");
-            return false;
-        end try;
-        
-        correct := true;
-        
-        printf("\b\b\b");
-        if evalb(result = correct) then
-            printf("Pass\n");
-            return true;
-        else
-            printf("FAIL: Incorrect result\n");
-            return false;
-        end if;
-
-    end proc;
-
-
-    test3 := proc($)
-        
-        local R, cs, result, correct;
-        
-        R := PolynomialRing([x, a, b]);
-        
-        cs := GeneralConstruct([a-1], [a-1], R);
+        R := PolynomialRing([a, b, c]);
+        cs := GeneralConstruct([a + b], [], R);
+        p := (a^3)*(a + b + 1);
         
         try
-            result := ParametricMatrixTools:-isUnder(cs, x, R);
-        catch:
-            printf("\b\b\bFAIL: Error\n");
-            return false;
-        end try;
-        
-        correct := true;
-        
-        printf("\b\b\b");
-        if evalb(result = correct) then
-            printf("Pass\n");
-            return true;
-        else
-            printf("FAIL: Incorrect result\n");
-            return false;
-        end if;
-
-    end proc;
-
-
-    test4 := proc($)
-        
-        local R, cs, result, correct;
-        
-        R := PolynomialRing([x, a, b]);
-        
-        cs := GeneralConstruct([a*x+b^2], [a, b], R);
-        
-        try
-            result := ParametricMatrixTools:-isUnder(cs, x, R);
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -152,20 +96,78 @@ test := module()
             printf("FAIL: Incorrect result\n");
             return false;
         end if;
-
+        
+    end proc;
+    
+    
+    test3 := proc($)
+        
+        local R, p, cs, result, correct;
+        
+        R := PolynomialRing([x, y]);
+        cs := GeneralConstruct([(x+y)^2], [], R);
+        p := x + y + y^2;
+        
+        try
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := false;
+        
+        printf("\b\b\b");
+        if evalb(result = correct) then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test4 := proc($)
+        
+        local R, p, cs, result, correct;
+        
+        R := PolynomialRing([x, y]);
+        cs := GeneralConstruct([(x+y)^2], [], R);
+        p := x + y + 1;
+        
+        try
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := true;
+        
+        printf("\b\b\b");
+        if evalb(result = correct) then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
     end proc;
     
     
     test5 := proc($)
         
-        local R, cs, result, correct;
+        local R, p, cs, result, correct;
         
-        R := PolynomialRing([x, a, b]);
-        
-        cs := GeneralConstruct([(x+1)*(x+2)*(x+a)*(x+b)], [], R);
+        R := PolynomialRing([x, a]);
+        cs := GeneralConstruct([], [x+1], R);
+        p := (x+1)*(x^2 + 2*x - a);
         
         try
-            result := ParametricMatrixTools:-isUnder(cs, x, R);
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -187,16 +189,43 @@ test := module()
     
     test6 := proc($)
         
-        local R, rc, rs, result, correct;
+        local R, p, cs, result, correct;
         
-        R := PolynomialRing([x, a, b, c]);
-        
-        rc := Triangularize([a*x^2 + b*x + c], R)[1];
-        
-        rs := RegularSystem(rc, R);
+        R := PolynomialRing([x, a]);
+        cs := GeneralConstruct([], [(x+1)*(x^2+2*x-a)*(x^2+4)], R);
+        p := (x+1)^2*(x^2-a+2*x);
         
         try
-            result := ParametricMatrixTools:-isUnder(rs, x, R);
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := true;
+        
+        printf("\b\b\b");
+        if evalb(result = correct) then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test7 := proc($)
+        
+        local R, p, cs, result, correct;
+        
+        R := PolynomialRing([x, y, z]);
+        cs := GeneralConstruct([(z+1)*(z+2), y^2+z, (x-z)*(x-y)], [], R);
+        p := z-x;
+        
+        try
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -216,18 +245,45 @@ test := module()
     end proc;
     
     
-    test7 := proc($)
+    test8 := proc($)
         
-        local R, rc, rs, result, correct;
+        local R, p, cs, result, correct;
         
-        R := PolynomialRing([x, a, b, c]);
-        
-        rc := Triangularize([a^2 + b^2 - 1], R)[1];
-        
-        rs := RegularSystem(rc, R);
+        R := PolynomialRing([x, y, z]);
+        cs := GeneralConstruct([(z+1)*(z+2),y^2+z,(x-z)*(x-y)], [], R);
+        p := (z+1)*(x^3+5);
         
         try
-            result := ParametricMatrixTools:-isUnder(rs, x, R);
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := false;
+        
+        printf("\b\b\b");
+        if evalb(result = correct) then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test9 := proc($)
+        
+        local R, p, cs, result, correct;
+        
+        R := PolynomialRing([x, y, z]);
+        cs := GeneralConstruct([(z+1)*(z+2), y^2+z, (x-z)*(x-y)], [], R);
+        p := x+y+z;
+        
+        try
+            result := ParametricMatrixTools:-isNonZeroOverCS(p, cs, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -245,5 +301,6 @@ test := module()
         end if;
     
     end proc;
-
+    
+    
 end module:

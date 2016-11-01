@@ -5,17 +5,19 @@ test := module()
     local test1,
           test2,
           test3,
-          test4;
-    
-    uses ParametricMatrixTools;
-    
+          test4,
+          test5;
+
+    uses ParametricMatrixTools, 
+         RegularChains;
+
     ModuleApply := proc($)
     
         local passCount, failCount, test, testList; 
         
-        testList := ['test1', 'test2', 'test3', 'test4'];
+        testList := ['test1','test2', 'test3', 'test4', 'test5'];
         
-        printf("Testing allComb\n");
+        printf("Testing InitialByVar\n");
         
         passCount, failCount := 0, 0;
         
@@ -37,19 +39,21 @@ test := module()
 
     test1 := proc($)
 
-        local l, result, correct;
-        
-        l := [[1, 2, 3], [a, b, c], [x, y]];
-        
+        local R, p, result, correct;
+
+        R := PolynomialRing([x, a, b]);
+
+        p := x^2 + 2*x + 1;
+
         try
-            result := ParametricMatrixTools:-allComb(l);
+            result := ParametricMatrixTools:-InitialByVar(p, x, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
         end try;
-        
-        correct := [[1, a, x], [2, a, x], [3, a, x], [1, b, x], [2, b, x], [3, b, x], [1, c, x], [2, c, x], [3, c, x], [1, a, y], [2, a, y], [3, a, y], [1, b, y], [2, b, y], [3, b, y], [1, c, y], [2, c, y], [3, c, y]];
-        
+    
+        correct := 1;
+    
         printf("\b\b\b");
         if evalb(result = correct) then
             printf("Pass\n");
@@ -58,25 +62,28 @@ test := module()
             printf("FAIL: Incorrect result\n");
             return false;
         end if;
-        
+
+
     end proc;
-    
-    
+
+
     test2 := proc($)
-    
-        local l, result, correct;
-        
-        l := [[1], [2], [3], [4]];
-        
+
+        local R, p, result, correct;
+
+        R := PolynomialRing([x, a, b]);
+
+        p := 10;
+
         try
-            result := ParametricMatrixTools:-allComb(l);
+            result := ParametricMatrixTools:-InitialByVar(p, x, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
         end try;
         
-        correct := [[1, 2, 3, 4]];
-        
+        correct := 10;
+
         printf("\b\b\b");
         if evalb(result = correct) then
             printf("Pass\n");
@@ -85,25 +92,27 @@ test := module()
             printf("FAIL: Incorrect result\n");
             return false;
         end if;
-        
+
     end proc;
-    
-    
+
+
     test3 := proc($)
-    
-        local l, result, correct;
-        
-        l := [[1, 2, 3, 4]];
-        
+
+        local R, p, result, correct;
+
+        R := PolynomialRing([x, a, b]);
+
+        p := 10*a^2 + 13*b^3 + a*b - 4;
+
         try
-            result := ParametricMatrixTools:-allComb(l);
+            result := ParametricMatrixTools:-InitialByVar(p, x, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
         end try;
-        
-        correct := [[1], [2], [3], [4]];
-        
+
+        correct := 10*a^2 + 13*b^3 + a*b - 4;
+
         printf("\b\b\b");
         if evalb(result = correct) then
             printf("Pass\n");
@@ -112,25 +121,56 @@ test := module()
             printf("FAIL: Incorrect result\n");
             return false;
         end if;
-        
+
     end proc;
-    
-    
+
+
     test4 := proc($)
-    
-        local l, result, correct;
-        
-        l := [[1, 2, 3, 4, 5], [x]];
-        
+
+        local R, p, result, correct;
+
+        R := PolynomialRing([x, a, b]);
+
+        p := (a^2 + b)*x^3 + (a*b + a^2 - b^2 -1)*x - 20;
+
         try
-            result := ParametricMatrixTools:-allComb(l);
+            result := ParametricMatrixTools:-InitialByVar(p, x, R);
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
         end try;
-        
-        correct := [[1, x], [2, x], [3, x], [4, x], [5, x]];
-        
+
+        correct := a^2 + b;
+
+        printf("\b\b\b");
+        if evalb(result = correct) then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+
+    end proc;
+    
+    
+    test5 := proc($)
+    
+        local R, p, result, correct;
+    
+        R := PolynomialRing([x, a, b]);
+    
+        p := 0;
+    
+        try
+            result := ParametricMatrixTools:-InitialByVar(p, x, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := 0;
+    
         printf("\b\b\b");
         if evalb(result = correct) then
             printf("Pass\n");
@@ -141,5 +181,6 @@ test := module()
         end if;
         
     end proc;
-    
+
+
 end module:
