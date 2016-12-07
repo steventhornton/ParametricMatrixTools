@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 6/2016                                                 #
+# UPDATED ... Dec. 7/2016                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -50,6 +50,7 @@ ParametricMatrixTools := module()
           matrixContainsParameters,
           TailByVar,
           TRDdifference_intersect_cs_p,
+          TRDdifference_intersect_rs_p,
           VanishingConstructibleSet;
     
     # This function is run when the package is loaded.
@@ -78,6 +79,7 @@ $include "Extra/ListIntersection.mpl"
 $include "Extra/matrixContainsParameters.mpl"
 $include "Extra/TailByVar.mpl"
 $include "Extra/TRDdifference_intersect_cs_p.mpl"
+$include "Extra/TRDdifference_intersect_rs_p.mpl"
 $include "Extra/VanishingConstructibleSet.mpl"
 
 $include "Gcd/ParametricGcd.mpl"
