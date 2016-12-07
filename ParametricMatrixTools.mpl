@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 1/2016                                                 #
+# UPDATED ... Dec. 6/2016                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -30,7 +30,7 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export isUnder;
+    export ParametricGcd;
     
     local ModuleLoad,
           loadTypes,
@@ -42,13 +42,14 @@ ParametricMatrixTools := module()
           isGreatestVariable,
           isNonZeroOverCS,
           isNonZeroOverRS,
+          isUnder,
           isZeroMatrix,
           isZeroOverCS,
           isZeroOverRS,
           ListIntersection,
           matrixContainsParameters,
-          splitConstructibleSet,
           TailByVar,
+          TRDdifference_intersect_cs_p,
           VanishingConstructibleSet;
     
     # This function is run when the package is loaded.
@@ -75,8 +76,10 @@ $include "Extra/isZeroOverCS.mpl"
 $include "Extra/isZeroOverRS.mpl"
 $include "Extra/ListIntersection.mpl"
 $include "Extra/matrixContainsParameters.mpl"
-$include "Extra/splitConstructibleSet.mpl"
 $include "Extra/TailByVar.mpl"
+$include "Extra/TRDdifference_intersect_cs_p.mpl"
 $include "Extra/VanishingConstructibleSet.mpl"
+
+$include "Gcd/ParametricGcd.mpl"
 
 end module:
