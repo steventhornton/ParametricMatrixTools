@@ -21,8 +21,8 @@ for testFile in testFiles do
 end do:
 
 # Print a summary of the tests
-if passCount <> 0 then mP := ceil(log10(passCount)) else mP := 1 end if:
-if failCount <> 0 then mF := ceil(log10(failCount)) else mF := 1 end if:
+if passCount <> 0 then mP := ceil(log10(passCount+1)) else mP := 1 end if:
+if failCount <> 0 then mF := ceil(log10(failCount+1)) else mF := 1 end if:
 m := max(mP, mF):
 printf(cat("%", m, "d Passed\n"), passCount);
 printf(cat("%", m, "d Failed\n"), failCount);
