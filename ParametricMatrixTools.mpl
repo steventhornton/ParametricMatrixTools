@@ -34,24 +34,15 @@ ParametricMatrixTools := module()
     
     local ModuleLoad,
           loadTypes,
-          allComb,
-          containsParameters,
-          InitialByVar,
-          isConstantMatrix,
-          isEqualOverCS,
           isGreatestVariable,
           isNonZeroOverCS,
           isNonZeroOverRS,
           isUnder,
-          isZeroMatrix,
           isZeroOverCS,
           isZeroOverRS,
           ListIntersection,
-          matrixContainsParameters,
-          TailByVar,
-          TRDdifference_intersect_cs_p,
-          TRDdifference_intersect_rs_p,
-          VanishingConstructibleSet;
+          ListUnion,
+          TRDdifference_intersect_cs_p;
     
     # This function is run when the package is loaded.
     ModuleLoad := proc()
@@ -63,24 +54,15 @@ ParametricMatrixTools := module()
 # External Files
 $include "types.mpl"
 
-$include "Extra/allComb.mpl"
-$include "Extra/containsParameters.mpl"
-$include "Extra/InitialByVar.mpl"
-$include "Extra/isConstantMatrix.mpl"
-$include "Extra/isEqualOverCS.mpl"
 $include "Extra/isGreatestVariable.mpl"
+$include "Extra/isUnder.mpl"
 $include "Extra/isNonZeroOverCS.mpl"
 $include "Extra/isNonZeroOverRS.mpl"
-$include "Extra/isUnder.mpl"
-$include "Extra/isZeroMatrix.mpl"
 $include "Extra/isZeroOverCS.mpl"
 $include "Extra/isZeroOverRS.mpl"
 $include "Extra/ListIntersection.mpl"
-$include "Extra/matrixContainsParameters.mpl"
-$include "Extra/TailByVar.mpl"
+$include "Extra/ListUnion.mpl"
 $include "Extra/TRDdifference_intersect_cs_p.mpl"
-$include "Extra/TRDdifference_intersect_rs_p.mpl"
-$include "Extra/VanishingConstructibleSet.mpl"
 
 $include "Gcd/ParametricGcd.mpl"
 
