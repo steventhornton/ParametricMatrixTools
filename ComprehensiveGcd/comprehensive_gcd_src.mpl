@@ -1,3 +1,53 @@
+# ======================================================================= #
+# ======================================================================= #
+#                                                                         #
+# comprehensive_gcd_src.mpl                                               #
+#                                                                         #
+# AUTHOR .... Steven E. Thornton                                          #
+#                Under the supervision of                                 #
+#                Robert M. Corless & Marc Moreno Maza                     #
+# EMAIL ..... sthornt7@uwo.ca                                             #
+# UPDATED ... Dec. 9/2016                                                 #
+#                                                                         #
+# Computes the gcd of two parametric univariate polynomials in the sense  #
+# of Lazard. Computation is done over a constructible set.                #
+#                                                                         #
+# INPUT                                                                   #
+#   p1 ... Polynomial                                                     #
+#   p2 ... Polynomial                                                     #
+#   v .... Variable                                                       #
+#   cs ... Constructible set                                              #
+#   R .... Polynomial ring                                                #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A sequence gcdList, cs_zero where gcd_list is a list of pairs of the  #
+#   form:                                                                 #
+#       [g_i, cs_i]                                                       #
+#   where g_i is the gcd of p1 and p2 for all values in the zero set of   #
+#   cs_i. cs_zero is the constructible set where both p1 and p2 vanish    #
+#   for all values in its zero set. The set {cs_1, cs_2, ..., cs_zero}    #
+#   forms a partition of the input constructible set.                     #
+#                                                                         #
+# REFERENCES                                                              #
+#                                                                         #
+# TO DO                                                                   #
+#   - Move cs_zero to one call                                            #
+#                                                                         #
+# LICENSE                                                                 #
+#   This program is free software: you can redistribute it and/or modify  #
+#   it under the terms of the GNU General Public License as published by  #
+#   the Free Software Foundation, either version 3 of the License, or     #
+#   any later version.                                                    #
+#                                                                         #
+#   This program is distributed in the hope that it will be useful,       #
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#   GNU General Public License for more details.                          #
+#                                                                         #
+#   You should have received a copy of the GNU General Public License     #
+#   along with this program.  If not, see http://www.gnu.org/licenses/.   #
+# ======================================================================= #
+# ======================================================================= #
 comprehensive_gcd_src := module()
 
     export ModuleApply;
@@ -8,7 +58,7 @@ comprehensive_gcd_src := module()
           hasZeroPoly,
           gcd_for_constants,
           missingMainVar,
-          get_gcd_p1_p2,
+          get_gcd_no_subresultant,
           gcd_by_subresultant_non_vanishing_initals;
 
     ModuleApply := proc(p1::depends(polyInRing(R)), 
@@ -256,7 +306,7 @@ gcd_by_subresultant_non_vanishing_initals := proc(p1::depends(polyInRing(R)), p2
     end do;
     
     # If cs is non-empty, either p1 or p2 is the gcd
-    result_tmp, cs_zero := get_gcd_p1_p2(p1, p2, v, cs, R);
+    result_tmp, cs_zero := get_gcd_no_subresultant(p1, p2, v, cs, R);
     result := [op(result), op(result_tmp)];
     return result, cs_zero;
 
@@ -264,14 +314,16 @@ end proc:
 
 
 # ----------------------------------------------------------------------- #
-# get_gcd_p1_p2                                                           #
+# get_gcd_no_subresultant                                                 #
 #                                                                         #
-# [Description]                                                           #
+# Get the gcd of p1 and p2 when none of the subresultants of p1 and p2    #
+# have an initial that does not vanish in the zero set of a constructible #
+# set. In this case, either p1 or p2 is the gcd.                          #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#                                                                         #
+#   Same as comprehensive_gcd_src                                         #
 # ----------------------------------------------------------------------- #
-get_gcd_p1_p2 := proc(p1, p2, v, es, R)
+get_gcd_no_subresultant := proc(p1, p2, v, cs, R)
     
     local g::polynom,
           cs_p1 :: TRDcs,
@@ -284,7 +336,7 @@ get_gcd_p1_p2 := proc(p1, p2, v, es, R)
           cs_nz_z :: TRDcs,
           cs_nz_nz :: TRDcs;
     
-    if RC:-TRDis_empty_constructible_set(es, R) then
+    if RC:-TRDis_empty_constructible_set(cs, R) then
         return [[]], RC:-TRDempty_constructible_set();
     end if;
     
@@ -299,8 +351,8 @@ get_gcd_p1_p2 := proc(p1, p2, v, es, R)
     cs_p1 := RC_CST:-GeneralConstruct([coeffs(p1, v)], [], R);
     cs_p2 := RC_CST:-GeneralConstruct([coeffs(p2, v)], [], R);
     
-    cs_p1_nz, cs_p1_z := RC:-TRDdifference_intersect_cs_cs(es, cs_p1, R);
-    cs_p2_nz := RC_CST:-Difference(es, cs_p2, R);
+    cs_p1_nz, cs_p1_z := RC:-TRDdifference_intersect_cs_cs(cs, cs_p1, R);
+    cs_p2_nz := RC_CST:-Difference(cs, cs_p2, R);
     
     cs_z_z, cs_z_nz := RC:-TRDdifference_intersect_cs_cs(cs_p1_z, cs_p2_nz, R);
     cs_nz_z, cs_nz_nz := RC:-TRDdifference_intersect_cs_cs(cs_p1_nz, cs_p2_nz, R);
@@ -313,10 +365,11 @@ end proc;
 # ----------------------------------------------------------------------- #
 # hasZeroPoly                                                             #
 #                                                                         #
-# [Description]                                                           #
+# Compute the gcd of p1 and p2 given that one of either p1 or p2 vanishes #
+# everywhere in the zero set of a constructible set.                      #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#                                                                         #
+#   Same as comprehensive_gcd_src                                         #
 # ----------------------------------------------------------------------- #
 hasZeroPoly := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), cs::TRDcs, R::TRDring, $)
     
@@ -325,7 +378,7 @@ hasZeroPoly := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), cs::
     ASSERT(RC:-TRDis_expanded(p1));
     ASSERT(RC:-TRDis_expanded(p2));
     ASSERT(evalb(not RC:-TRDis_empty_constructible_set(cs, R)), "cs must not be empty.");
-    # print(p1, p2, RC:-Display(cs, R));
+    
     p1_z := isZeroOverCS(p1, cs, R);
     p2_z := isZeroOverCS(p2, cs, R);
     
@@ -345,12 +398,12 @@ end proc;
 # ----------------------------------------------------------------------- #
 # gcd_for_constants                                                       #
 #                                                                         #
-# [Description]                                                           #
+# Compute the gcd of p1 and p2 when one of either p1 or p2 contains       #
+# no indeterminants.                                                      #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#                                                                         #
+#   Same as comprehensive_gcd_src                                         #
 # ----------------------------------------------------------------------- #
-# Either p1 or p2 (or both) is constant. A recursive call is made to ensure p2 is constant, p1 may or may not be constant.
 gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
     
     local cs_p1 :: TRDcs,
@@ -363,6 +416,8 @@ gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R))
     
     # Ensure p2 contains no variables
     if not RC:-TRDis_constant(p2, R) then
+        #A recursive call is made to ensure p2 is constant, p1 may or may 
+        # not be constant.
         return gcd_for_constants(p2, p1, v, cs, R);
     end if;
     
@@ -399,13 +454,13 @@ end proc;
 # ----------------------------------------------------------------------- #
 # missingMainVar                                                          #
 #                                                                         #
-# [Description]                                                           #
+# Compute the gcd of p1 and p2 when one of either p1 or p2 does not       #
+# contain the variable the gcd is being computed w.r.t.                   #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#                                                                         #
+#   Same as comprehensive_gcd_src                                         #
 # ----------------------------------------------------------------------- #
-# v >= mvar(p1) > mvar(p2);
-missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v, cs::TRDcs, R::TRDring, $)
+missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
 
     local cs_p1_coeff::TRDcs,
           cs_p2::TRDcs,
