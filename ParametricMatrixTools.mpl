@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 7/2016                                                 #
+# UPDATED ... Dec. 8/2016                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -30,7 +30,7 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export ParametricGcd;
+    export ComprehensiveGcd;
     
     local ModuleLoad,
           loadTypes,
@@ -64,6 +64,6 @@ $include "Extra/ListIntersection.mpl"
 $include "Extra/ListUnion.mpl"
 $include "Extra/TRDdifference_intersect_cs_p.mpl"
 
-$include "Gcd/ParametricGcd.mpl"
+$include "ComprehensiveGcd/ComprehensiveGcd.mpl"
 
 end module:
