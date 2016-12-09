@@ -20,7 +20,7 @@
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   A sequence gcdList, cs_zero where gcd_list is a list of pairs of the  #
+#   A sequence gcdList, cs_zero where gcdList is a list of pairs of the   #
 #   form:                                                                 #
 #       [g_i, cs_i]                                                       #
 #   where g_i is the gcd of p1 and p2 for all values in the zero set of   #
@@ -29,9 +29,6 @@
 #   forms a partition of the input constructible set.                     #
 #                                                                         #
 # REFERENCES                                                              #
-#                                                                         #
-# TO DO                                                                   #
-#   - Move cs_zero to one call                                            #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -52,7 +49,8 @@ comprehensive_gcd_src := module()
 
     export ModuleApply;
 
-    local implementation,
+    local pre_compute,
+          implementation,
           gcd_for_zero_resultant_cs,
           gcd_for_zero_resultant_rs,
           hasZeroPoly,
@@ -61,42 +59,70 @@ comprehensive_gcd_src := module()
           get_gcd_no_subresultant,
           gcd_by_subresultant_non_vanishing_initals;
 
-    ModuleApply := proc(p1::depends(polyInRing(R)), 
-                        p2::depends(polyInRing(R)), 
-                        v::name, 
-                        cs::TRDcs,
-                        R::TRDring, $)::list([polynom, TRDcs]), TRDcs;
-        
-        local result, cs_zero;
-        
-        # Compute the gcd
-        result, cs_zero := implementation(p1, p2, v, cs, R);
-        
-        # Remove empty elements and entries with empty constructible sets
-        result := remove(x -> nops(x) = 0, result);
-        result := remove(x -> RC:-TRDis_empty_constructible_set(x[2],R), result);
-        
-        return result, cs_zero;
-        
+    ModuleApply := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)::list([polynom, TRDcs]), TRDcs;
+        return pre_compute(p1, p2, v, cs, R);
     end proc;
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # METHODS
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+
 # ----------------------------------------------------------------------- #
-# implementation                                                          #
+# pre_compute                                                             #
 #                                                                         #
-# Compute the gcd of two polynomials over a constructible set.            #
+# Prepare the computation and clean the result.                           #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
 #    Same as comprehensive_gcd_src                                        #
 # ----------------------------------------------------------------------- #
-implementation := proc(p1, p2, v, cs, R)
+pre_compute := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+    
+    local cs_zero_polys :: TRDcs,
+          cs_zero :: TRDcs,
+          es :: TRDcs,
+          result;
+    
+    # Separate cs into two cases:
+    #   cs_zero ... p1 and p2 simultaneously vanish at all points in the 
+    #               zero set of cs_zero.
+    #   es ........ p1 and p2 never simultaneously vanish for any point in 
+    #               the zero set of es
+    cs_zero_polys := RC_CST:-GeneralConstruct([coeffs(p1, v), coeffs(p2, v)], [], R);
+    es, cs_zero := RC:-TRDdifference_intersect_cs_cs(cs, cs_zero_polys, R);
+    
+    result := implementation(p1, p2, v, es, R);
+    
+    # Remove empty elements and entries with empty constructible sets
+    result := remove(x -> nops(x) = 0, result);
+    result := remove(x -> RC:-TRDis_empty_constructible_set(x[2],R), result);
+    
+    return result, cs_zero;
+    
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# implementation                                                          #
+#                                                                         #
+# Compute the gcd of two polynomials over a constructible set. It is      #
+# assumed that the zero set of the input constructible set does not       #
+# contain any points where p1 and p2 simultaneously vanish.               #
+#                                                                         #
+# INPUT                                                                   #
+#   Same as comprehensive_gcd_src                                         #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A list gcdList where gcdList is a list of pairs of the form:          #
+#       [g_i, cs_i]                                                       #
+#   where g_i is the gcd of p1 and p2 for all values in the zero set of   #
+#   cs_i. The set {cs_1, cs_2, ...} forms a partition of the input        #
+#   constructible set.                                                    #
+# ----------------------------------------------------------------------- #
+implementation := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
     
     local cs_nz :: TRDcs,
           cs_z :: TRDcs,
-          cs_zero :: TRDcs,
           result :: list({[polynom, TRDcs], []}),
           result_tmp :: list({[polynom, TRDcs], []}),
           r :: polynom,
@@ -105,9 +131,10 @@ implementation := proc(p1, p2, v, cs, R)
     ASSERT(RC:-TRDis_expanded(p1));
     ASSERT(RC:-TRDis_expanded(p2));
     
+    
     # Check if cs is an empty constructible set
     if RC:-TRDis_empty_constructible_set(cs, R) then
-        return [[]], RC:-TRDempty_constructible_set();
+        return [[]];
     end if;
     
     # Check if one of p1 or p2 contain no variables
@@ -139,10 +166,8 @@ implementation := proc(p1, p2, v, cs, R)
     
     # Call method for the case where res(p1, p2) vanishes at all points in 
     # the zero set of cs.
-    result_tmp, cs_zero := gcd_for_zero_resultant_cs(p1, p2, src, v, cs_z, R);
-    result := [op(result), op(result_tmp)];
-    
-    return result, cs_zero;
+    result_tmp := gcd_for_zero_resultant_cs(p1, p2, src, v, cs_z, R);
+    return [op(result), op(result_tmp)];
     
 end proc;
 
@@ -155,16 +180,14 @@ end proc;
 # constructible set.                                                      #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#    Same as comprehensive_gcd_src                                        #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 gcd_for_zero_resultant_cs := proc(p1, p2, src, v, cs, R, $)
     
     local lrs::TRDlrs,
           rs::TRDrs, 
           result :: list({[polynom, TRDcs], []}),
-          cs_zero::TRDcs, 
           result_tmp :: list({[polynom, TRDcs], []}),
-          cs_tmp::TRDcs, 
           cs_disjoint::TRDcs;
     
     ASSERT(RC:-TRDis_expanded(p1));
@@ -172,7 +195,6 @@ gcd_for_zero_resultant_cs := proc(p1, p2, src, v, cs, R, $)
     
     # Initialize the output
     result := [];
-    cs_zero := RC:-TRDempty_constructible_set();
     
     # Make cs disjoint (may not be neccessary)
     cs_disjoint := RC:-TRDconstructible_set_make_pairwise_disjoint(cs, R);
@@ -180,12 +202,11 @@ gcd_for_zero_resultant_cs := proc(p1, p2, src, v, cs, R, $)
     # Call gcd_for_zero_resultant_rs on each regular system in cs
     lrs := RC:-TRDregular_systems(cs_disjoint, R);
     for rs in lrs do
-        result_tmp, cs_tmp := gcd_for_zero_resultant_rs(p1, p2, src, v, rs, R);
+        result_tmp := gcd_for_zero_resultant_rs(p1, p2, src, v, rs, R);
         result := [op(result), op(result_tmp)];
-        cs_zero := RC_CST:-Union(cs_zero, cs_tmp, R);
     end do;
     
-    return result, cs_zero;
+    return result;
     
 end proc;
 
@@ -206,7 +227,7 @@ end proc;
 #   R ..... Polynomial ring                                               #
 #                                                                         #
 # OUTPUT                                                                  #
-#    Same as comprehensive_gcd_src                                        #
+#   Same as implementation                                                #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   deg(p1, v) > 0                                                        #
@@ -224,9 +245,7 @@ gcd_for_zero_resultant_rs := proc(p1::depends(polyInRing(R)), p2::depends(polyIn
           p1_tail::polynom,
           p2_tail::polynom,
           result::list({[polynom, TRDcs], []}),
-          result_tmp::list({[polynom, TRDcs], []}),
-          cs_zero::TRDcs,
-          cs_zero_tmp::TRDcs;
+          result_tmp::list({[polynom, TRDcs], []});
     
     ASSERT(RC:-TRDis_expanded(p1));
     ASSERT(RC:-TRDis_expanded(p2));
@@ -246,16 +265,12 @@ gcd_for_zero_resultant_rs := proc(p1::depends(polyInRing(R)), p2::depends(polyIn
     # Recursive call on Tail(p1), Tail(p2)
     p1_tail := RC:-TRDuniv_tail(p1, v);
     p2_tail := RC:-TRDuniv_tail(p2, v);
-    result, cs_zero := comprehensive_gcd_src(p1_tail, p2_tail, v, cs_z, R);
+    result := implementation(p1_tail, p2_tail, v, cs_z, R);
     
     # Get the resultant in the case where the initials of p1 and p2 don't 
     # simultaneously vanish
-    result_tmp, cs_zero_tmp := gcd_by_subresultant_non_vanishing_initals(p1, p2, src, v, cs_nz, R);
-    result := [op(result), op(result_tmp)];
-    
-    cs_zero := RC_CST:-Union(cs_zero, cs_zero_tmp, R);
-    
-    return result, cs_zero;
+    result_tmp := gcd_by_subresultant_non_vanishing_initals(p1, p2, src, v, cs_nz, R);
+    return [op(result), op(result_tmp)];
     
 end proc;
 
@@ -269,7 +284,7 @@ end proc;
 # don't simultaneously vanish.                                            #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#    Same as comprehensive_gcd_src                                        #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 gcd_by_subresultant_non_vanishing_initals := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), src::TRDsrc, v::name, cs_in::TRDcs, R::TRDring, $)
     
@@ -279,7 +294,6 @@ gcd_by_subresultant_non_vanishing_initals := proc(p1::depends(polyInRing(R)), p2
           init_g::polynom,
           cs_nz::TRDcs,
           result::list({[polynom, TRDcs], []}),
-          cs_zero::TRDcs,
           result_tmp::list({[polynom, TRDcs], []});
     
     cs := RC:-TRDrename_constructible_set(copy(cs_in));
@@ -306,9 +320,8 @@ gcd_by_subresultant_non_vanishing_initals := proc(p1::depends(polyInRing(R)), p2
     end do;
     
     # If cs is non-empty, either p1 or p2 is the gcd
-    result_tmp, cs_zero := get_gcd_no_subresultant(p1, p2, v, cs, R);
-    result := [op(result), op(result_tmp)];
-    return result, cs_zero;
+    result_tmp := get_gcd_no_subresultant(p1, p2, v, cs, R);
+    return [op(result), op(result_tmp)];
 
 end proc:
 
@@ -321,7 +334,7 @@ end proc:
 # set. In this case, either p1 or p2 is the gcd.                          #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as comprehensive_gcd_src                                         #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 get_gcd_no_subresultant := proc(p1, p2, v, cs, R)
     
@@ -331,13 +344,12 @@ get_gcd_no_subresultant := proc(p1, p2, v, cs, R)
           cs_p1_nz :: TRDcs,
           cs_p1_z :: TRDcs,
           cs_p2_nz :: TRDcs,
-          cs_z_z :: TRDcs,
           cs_z_nz :: TRDcs,
           cs_nz_z :: TRDcs,
           cs_nz_nz :: TRDcs;
     
     if RC:-TRDis_empty_constructible_set(cs, R) then
-        return [[]], RC:-TRDempty_constructible_set();
+        return [[]];
     end if;
     
     # Need to ensure neither p1 nor p2 are zero.
@@ -354,10 +366,11 @@ get_gcd_no_subresultant := proc(p1, p2, v, cs, R)
     cs_p1_nz, cs_p1_z := RC:-TRDdifference_intersect_cs_cs(cs, cs_p1, R);
     cs_p2_nz := RC_CST:-Difference(cs, cs_p2, R);
     
-    cs_z_z, cs_z_nz := RC:-TRDdifference_intersect_cs_cs(cs_p1_z, cs_p2_nz, R);
+    cs_z_nz := RC_CST:-Intersection(cs_p1_z, cs_p2_nz, R);
+    
     cs_nz_z, cs_nz_nz := RC:-TRDdifference_intersect_cs_cs(cs_p1_nz, cs_p2_nz, R);
     
-    return [[g, cs_nz_nz], [p1, cs_nz_z], [p2, cs_z_nz]], cs_z_z;
+    return [[g, cs_nz_nz], [p1, cs_nz_z], [p2, cs_z_nz]];
     
 end proc;
 
@@ -369,7 +382,7 @@ end proc;
 # everywhere in the zero set of a constructible set.                      #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as comprehensive_gcd_src                                         #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 hasZeroPoly := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), cs::TRDcs, R::TRDring, $)
     
@@ -383,13 +396,13 @@ hasZeroPoly := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), cs::
     p2_z := isZeroOverCS(p2, cs, R);
     
     if p1_z and p2_z then
-        return [[]], cs;
+        return [[]];
     end if;
     
     if p1_z then
-        return [[p2, cs]], RC:-TRDempty_constructible_set();
+        return [[p2, cs]];
     else
-        return [[p1, cs]], RC:-TRDempty_constructible_set();
+        return [[p1, cs]];
     end if;
     
 end proc;
@@ -402,13 +415,12 @@ end proc;
 # no indeterminants.                                                      #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as comprehensive_gcd_src                                         #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
     
     local cs_p1 :: TRDcs,
-          cs_nz :: TRDcs,
-          cs_z :: TRDcs;
+          cs_nz :: TRDcs;
     
     ASSERT(RC:-TRDis_expanded(p1));
     ASSERT(RC:-TRDis_expanded(p2));
@@ -424,9 +436,9 @@ gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R))
     # Case where both p1 and p2 are constant
     if RC:-TRDis_constant(p1, R) then
         if p1 = 0 and p2 = 0 then
-            return [[]], cs;
+            return [[]];
         else
-            return [[gcd(p1, p2), cs]], RC:-TRDempty_constructible_set();
+            return [[gcd(p1, p2), cs]];
         end if;
     end if;
     
@@ -434,19 +446,19 @@ gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R))
     if p2 = 0 then
         # Case where both p1 and p2 are 0
         if isZeroOverCS(p1, cs, R) then
-            return [[]], cs;
+            return [[]];
         end if;
         
         # Split for cases where p1=0 and p1<>0
         cs_p1 := RC_CST:-GeneralConstruct([coeffs(expand(p1), v)], [], R);
-        cs_nz, cs_z := RC:-TRDdifference_intersect_cs_cs(cs, cs_p1, R);
+        cs_nz := RC_CST:-Difference(cs, cs_p1, R);
         
-        return [[p1, cs_nz]], cs_z;
+        return [[p1, cs_nz]];
         
     end if;
     
     # If p2 <> 0, call gcd
-    return [[gcd(p1, p2), cs]], RC:-TRDempty_constructible_set();
+    return [[gcd(p1, p2), cs]];
     
 end proc;
 
@@ -458,7 +470,7 @@ end proc;
 # contain the variable the gcd is being computed w.r.t.                   #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as comprehensive_gcd_src                                         #
+#   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
 missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
 
@@ -467,12 +479,10 @@ missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v
           cs1_z::TRDcs,
           cs1_nz::TRDcs,
           cs2_nz::TRDcs,
-          cs_z_z::TRDcs,
           cs_z_nz::TRDcs,
           cs_nz_z::TRDcs,
           cs_nz_nz::TRDcs,
-          cs_nz::TRDcs, 
-          cs_z::TRDcs, 
+          cs_nz::TRDcs,  
           cs_p12::TRDcs;
     
     ASSERT(RC:-TRDis_expanded(p1));
@@ -487,8 +497,8 @@ missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v
     # If neither p1 nor p2 are polynomials in v, return splitting case
     if RC:-MainVariable(p1, R) <> v then
         cs_p12 := RC_CST:-GeneralConstruct([p1, p2], [], R);
-        cs_nz, cs_z := RC:-TRDdifference_intersect_cs_cs(cs, cs_p12, R);
-        return [[gcd(p1, p2), cs_nz]], cs_z;
+        cs_nz := RC_CST:-Difference(cs, cs_p12, R);
+        return [[gcd(p1, p2), cs_nz]];
     end if;
     
     # If mvar(p1) = v, split into cases where p1 and p2 <> 0
@@ -499,10 +509,10 @@ missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v
     
     cs2_nz := RC_CST:-Difference(cs, cs_p2, R);
     
-    cs_z_z, cs_z_nz := RC:-TRDdifference_intersect_cs_cs(cs1_z, cs2_nz, R);
+    cs_z_nz := RC_CST:-Intersection(cs1_z, cs2_nz, R);
     cs_nz_z, cs_nz_nz := RC:-TRDdifference_intersect_cs_cs(cs1_nz, cs2_nz, R);
     
-    return [[p2, cs_z_nz], [p1, cs_nz_z], [1, cs_nz_nz]], cs_z_z;
+    return [[p2, cs_z_nz], [p1, cs_nz_z], [1, cs_nz_nz]];
     
 end proc;
 
