@@ -260,7 +260,7 @@ end proc;
 # OUTPUT                                                                  #
 #    Same as ComprehensiveGcd                                             #
 # ----------------------------------------------------------------------- #
-init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(polynom), R::TRDring, opts::table, $) :: {list([polynom, TRDrs]), list([polynom, TRDcs]), list([polynom, ratpoly, ratpoly, TRDrs])};
+init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(polynom), R::TRDring, opts::table, $)
 
     local i::posint,
           cs::TRDcs;

@@ -15,7 +15,47 @@ test := module()
           test8,
           test9,
           test10,
-          test11;
+          test11,
+          test12,
+          test13,
+          test14,
+          test15,
+          test16,
+          test17,
+          test18,
+          test19,
+          test20,
+          test21,
+          test22,
+          test23,
+          test24,
+          test25,
+          test26,
+          test27,
+          test28,
+          test29,
+          test30,
+          test31,
+          test32,
+          test33,
+          test34,
+          test35,
+          test36,
+          test37,
+          test38,
+          test39,
+          test40,
+          test41,
+          test42,
+          test43,
+          test44,
+          test45,
+          test46,
+          test47,
+          test48,
+          test49,
+          test50,
+          test51;
 
     uses ParametricMatrixTools, RegularChains, RegularChains:-ConstructibleSetTools, RegularChains:-ChainTools;
 
@@ -23,7 +63,16 @@ test := module()
 
         local passCount, failCount, test, testList, t; 
 
-        testList := ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11'];
+        testList := ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 
+                     'test7', 'test8', 'test9', 'test10', 'test11', 'test12', 
+                     'test13', 'test14', 'test15', 'test16', 'test17', 
+                     'test18', 'test19', 'test20', 'test21', 'test22',
+                     'test23', 'test24', 'test25', 'test26', 'test27', 
+                     'test28', 'test29', 'test30', 'test31', 'test32',
+                     'test33', 'test34', 'test35', 'test36', 'test37', 
+                     'test38', 'test39', 'test40', 'test41', 'test42',
+                     'test43', 'test44', 'test45', 'test46', 'test47', 
+                     'test48', 'test49', 'test50', 'test51'];
 
         printf("Testing ParametricGcd\n");
 
@@ -204,7 +253,7 @@ test := module()
         p2 := (x+2)^2;
         
         R := PolynomialRing([x,a]);
-        cs := GeneralConstruct([],[],R);
+        cs := GeneralConstruct([], [], R);
         
         try
             g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
@@ -228,6 +277,100 @@ test := module()
     
     
     test3 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := (x+2)*(x+a);
+        p2 := (x+2)^2;
+        
+        R := PolynomialRing([x,a]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test4 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := (x+2)*(x+a);
+        p2 := (x+2)^2;
+        
+        R := PolynomialRing([x,a]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test5 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero;
+        
+        p1 := (x-1)*(x+a);
+        p2 := a*x^2 + 2;
+        
+        R := PolynomialRing([x,a]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test6 := proc($)
     
         local p1, p2, R, cs, g, correct, cs_zero;
         
@@ -258,7 +401,69 @@ test := module()
     end proc;
     
     
-    test4 := proc($)
+    test7 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+        
+        p1 := (x-1)*(x+a);
+        p2 := a*x^2 + 2;
+        
+        R := PolynomialRing([x,a]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test8 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+        
+        p1 := (x-1)*(x+a);
+        p2 := a*x^2 + 2;
+        
+        R := PolynomialRing([x,a]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test9 := proc($)
     
         local p1, p2, R, rs, g, correct, cs_zero, cs;
     
@@ -290,11 +495,136 @@ test := module()
     end proc;
     
     
-    test5 := proc($)
+    test10 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := (x+a)*(x-b+2)*(x+1):
+        p2 := (x+b)*(x+1)^2*(x-a*b);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test11 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := (x+a)*(x-b+2)*(x+1):
+        p2 := (x+b)*(x+1)^2*(x-a*b);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test12 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := (x+a)*(x-b+2)*(x+1):
+        p2 := (x+b)*(x+1)^2*(x-a*b);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test13 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero;
+    
+        p1 := (x+2)*(x+a);
+        p2 := (x+2)^2;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[a-3, a-2], R);
+        rs := RepresentingRegularSystems(cs, R)[1];
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test14 := proc($)
     
         local p1, p2, R, cs, g, correct, cs_zero;
     
-        p1 := (x+1)*(x+a);
+        p1 := (x+2)*(x+a);
         p2 := (x+2)^2;
         
         R := PolynomialRing([x,a,b]);
@@ -321,7 +651,38 @@ test := module()
     end proc;
     
     
-    test6 := proc($)
+    test15 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := (x+2)*(x+a);
+        p2 := (x+2)^2;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[a-3, a-2], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [a-3, a-2], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test16 := proc($)
     
         local p1, p2, R, rs, g, correct, cs_zero, cs;
     
@@ -353,7 +714,100 @@ test := module()
     end proc;
     
     
-    test7 := proc($)
+    test17 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := x+a;
+        p2 := a*x+b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test18 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := x+a;
+        p2 := a*x+b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test19 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := x+a;
+        p2 := a*x+b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test20 := proc($)
     
         local p1, p2, R, rs, g, correct, cs_zero, cs;
     
@@ -385,7 +839,100 @@ test := module()
     end proc;
     
     
-    test8 := proc($)
+    test21 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a*x+b;
+        p2 := c*x+d;
+        
+        R := PolynomialRing([x,a,b,c,d]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test22 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a*x+b;
+        p2 := c*x+d;
+        
+        R := PolynomialRing([x,a,b,c,d]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test23 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a*x+b;
+        p2 := c*x+d;
+        
+        R := PolynomialRing([x,a,b,c,d]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test24 := proc($)
     
         local p1, p2, R, rs, g, correct, cs_zero, cs;
     
@@ -417,7 +964,132 @@ test := module()
     end proc;
     
     
-    test9 := proc($)
+    test25 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a + b;
+        p2 := a*x^2 + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test26 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a + b;
+        p2 := a*x^2 + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test27 := proc($)
+    
+        local p1, p2, R, g, correct, cs_zero, cs;
+    
+        p1 := a + b;
+        p2 := a*x^2 + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test28 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero;
+    
+        p1 := 2;
+        p2 := x + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test29 := proc($)
     
         local p1, p2, R, cs, g, correct, cs_zero;
     
@@ -448,7 +1120,243 @@ test := module()
     end proc;
     
     
-    test10 := proc($)
+    test30 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := 2;
+        p2 := x + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test31 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := 2;
+        p2 := x + c;
+        
+        R := PolynomialRing([x,a,b,c]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test32 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero;
+    
+        p1 := b*x + a;
+        p2 := a*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test33 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := b*x + a;
+        p2 := a*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test34 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := b*x + a;
+        p2 := a*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test35 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero;
+    
+        p1 := b*x + a;
+        p2 := a*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test36 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero, csCorrect;
+    
+        p1 := 5;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        if not IsEmpty(cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        if g[1][1] <> 1 then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        csCorrect := GeneralConstruct([],[],R);
+        
+        if not equalCS(csCorrect, g[1][2], R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test37 := proc($)
     
         local p1, p2, R, cs, g, correct, cs_zero, csCorrect;
     
@@ -496,7 +1404,141 @@ test := module()
     end proc;
     
     
-    test11 := proc($)
+    test38 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect;
+    
+        p1 := 5;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        if not IsEmpty(cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        if g[1][1] <> 1 then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        csCorrect := GeneralConstruct([],[],R);
+        
+        if not equalCS(csCorrect, g[1][2], R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test39 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect;
+    
+        p1 := 5;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        if not IsEmpty(cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        if g[1][1] <> 1 then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        csCorrect := GeneralConstruct([],[],R);
+        
+        if not equalCS(csCorrect, g[1][2], R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test40 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 0;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1, b], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test41 := proc($)
     
         local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
     
@@ -514,6 +1556,376 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1, b], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test42 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 0;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1, b], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test43 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 0;
+        p2 := (a+1)*x + b;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1, b], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test44 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := (a+1)*x + (a+1);
+        p2 := (a+1);
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    test45 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := (a+1)*x + (a+1);
+        p2 := (a+1);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test46 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := (a+1)*x + (a+1);
+        p2 := (a+1);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test47 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := (a+1)*x + (a+1);
+        p2 := (a+1);
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test48 := proc($)
+    
+        local p1, p2, R, rs, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 2*a + 2;
+        p2 := a + 1;
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, rs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    test49 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 2*a + 2;
+        p2 := a + 1;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test50 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 2*a + 2;
+        p2 := a + 1;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
+        if not equalCS(cs_zero_correct, cs_zero, R) then
+            printf("\b\b\bFAIL: Incorrect result\n");
+            return false;
+        end if;
+        
+        correct := verify(p1, p2, g, cs, cs_zero, R);
+        
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test51 := proc($)
+    
+        local p1, p2, R, cs, g, correct, cs_zero, csCorrect, cs_zero_correct;
+    
+        p1 := 2*a + 2;
+        p2 := a + 1;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([], [], R);
+        
+        try
+            g, cs_zero := ComprehensiveGcd(p1, p2, x, [], [], R);
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+        
+        cs_zero_correct := GeneralConstruct([a+1], [], R);
         if not equalCS(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
