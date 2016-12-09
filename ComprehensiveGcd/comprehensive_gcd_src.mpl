@@ -76,7 +76,7 @@ comprehensive_gcd_src := module()
 # INPUT/OUTPUT                                                            #
 #    Same as comprehensive_gcd_src                                        #
 # ----------------------------------------------------------------------- #
-pre_compute := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+pre_compute := proc(p1, p2, v, cs, R, $)
     
     local cs_zero_polys :: TRDcs,
           cs_zero :: TRDcs,
@@ -119,7 +119,7 @@ end proc;
 #   cs_i. The set {cs_1, cs_2, ...} forms a partition of the input        #
 #   constructible set.                                                    #
 # ----------------------------------------------------------------------- #
-implementation := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+implementation := proc(p1, p2, v, cs, R, $)
     
     local cs_nz :: TRDcs,
           cs_z :: TRDcs,
@@ -234,7 +234,7 @@ end proc;
 #   deg(p2, v) > 0                                                        #
 #   res(p1, p2, v) = 0 in the zero set of rs                              #
 # ----------------------------------------------------------------------- #
-gcd_for_zero_resultant_rs := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), src::TRDsrc, v::name, rs::TRDrs, R::TRDring, $)
+gcd_for_zero_resultant_rs := proc(p1, p2, src, v, rs, R, $)
     
     local p1_init::polynom,
           p2_init::polynom,
@@ -286,7 +286,7 @@ end proc;
 # INPUT/OUTPUT                                                            #
 #   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
-gcd_by_subresultant_non_vanishing_initals := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), src::TRDsrc, v::name, cs_in::TRDcs, R::TRDring, $)
+gcd_by_subresultant_non_vanishing_initals := proc(p1, p2, src, v, cs_in, R, $)
     
     local cs::TRDcs,
           g::polynom,
@@ -384,7 +384,7 @@ end proc;
 # INPUT/OUTPUT                                                            #
 #   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
-hasZeroPoly := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), cs::TRDcs, R::TRDring, $)
+hasZeroPoly := proc(p1, p2, cs, R, $)
     
     local p1_z::truefalse, p2_z::truefalse;
     
@@ -417,7 +417,7 @@ end proc;
 # INPUT/OUTPUT                                                            #
 #   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
-gcd_for_constants := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+gcd_for_constants := proc(p1, p2, v, cs, R, $)
     
     local cs_p1 :: TRDcs,
           cs_nz :: TRDcs;
@@ -472,7 +472,7 @@ end proc;
 # INPUT/OUTPUT                                                            #
 #   Same as implementation                                                #
 # ----------------------------------------------------------------------- #
-missingMainVar := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+missingMainVar := proc(p1, p2, v, cs, R, $)
 
     local cs_p1_coeff::TRDcs,
           cs_p2::TRDcs,
