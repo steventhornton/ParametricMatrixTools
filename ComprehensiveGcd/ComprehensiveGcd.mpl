@@ -7,12 +7,12 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 8/2016                                                 #
+# UPDATED ... Dec. 9/2016                                                 #
 #                                                                         #
-# Computes the gcd of two parametric univariate polynomials in the sense  #
-# of Lazard. That is, two univariate polynomials where the coefficients   #
-# are multivariate polynomials in the parameters. Computation is done     #
-# modulo a regular system or constructible set.                           #
+# Compute the gcd of two parametric univariate polynomials in the sense   #
+# of Lazard. Constraints on parameter values can be provided via a        #
+# constructible set, regular system or lists of polynomial equality and   #
+# inequation constraints.                                                 #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
 #   ComprehensiveGcd(p1, p2, v, rs, R, options)                           #
@@ -35,21 +35,18 @@
 #                     - No cofactors are computed                         #
 #                  true:                                                  #
 #                     - Cofactors are computed (see output)               #
-#   lazy ......... true (default):                                        #
-#                      - Only compute one branch of the computation       #
-#                  false:                                                 #
-#                      - Compute all branches of the computation          #
-#   outputType ... "ConstructibleSet" or "CS" (default):                  #
+#   outputType ... 'ConstructibleSet' or 'CS' (default):                  #
 #                      - Output will contain constructible sets           #
-#                  "RegularSystem" or "RS":                               #
+#                  'RegularSystem' or 'RS':                               #
 #                      - Output will contain regular systems              #
 #                                                                         #
 # OPTION COMPATIBILITY                                                    #
-#   - 'cofactors' = true and 'outputType' = "ConstructibleSet" or "CS"    #
+#   - 'cofactors' = true and 'outputType' = 'ConstructibleSet' or 'CS'    #
 #     are incompatible.                                                   #
 #                                                                         #
 # OUTPUT                                                                  #
-#   A list with elements in one of the following forms:                   #
+#   A sequence gcdList, cs_zero where gcdList is a list with elements of  #
+#   the form:                                                             #
 #       [g_i, rs_i] ....................... 'outputType' either 'RS' or   #
 #                                           'RegularSystem' and           #
 #                                           'cofactors' = false.          #
@@ -58,19 +55,30 @@
 #                                           'cofactors' = false.          #
 #       [c_i, cof_p1_i, cof_p2_i, rs_i] ... 'outputType' either 'RS' or   #
 #                                           'RegularSystem' and           #
-#   Where g_i is the gcd of p1 and p2 for all parameter values that       #
-#   satisfy the equations and inequations of cs_i or rs_i. cof_p1_i and   #
-#   cof_p2_i are the cofactors of p1 and p2 respectively.                 #
-#       cof_p1_i = p1/g                                                   #
-#       cof_p2_i = p2/g                                                   #
-#   ** If g=0 then cof_p1 and cof_p2 will be zero.                        #
-#   Together, all the constructible sets cs_i or regular systems rs_i     #
-#   (for all values of i) form a partition of the input constructible set #
-#   or regular system.                                                    #
+#                                           'cofactors' = true.           #
+#   Where g_i is the gcd of p1 and p2 for all values in the zero set of   #
+#   cs_i or rs_i, and cof_p1_i and cof_p2_i are the cofactors of p1 and   #
+#   p2 respectively:                                                      #
+#       cof_p1_i = p1/g_i                                                 #
+#       cof_p2_i = p2/g_i                                                 #
+#   cs_zero is the constructible set where both p1 and p2 vanish for all  #
+#   values in its zero set. The set {cs_1, cs_2, ..., cs_zero} forms a    #
+#   partition of the input constructible set.                             #
 #                                                                         #
 # ASSUMPTIONS                                                             #
+#   v is the largest variable in R that appears in p1 and p2.             #
+#   cs must only contain polynomials in variables strictly less than v    #
 #                                                                         #
 # EXAMPLE                                                                 #
+#   > p1 := (x+1)*(x+a):                                                  #
+#   > p2 := (x+2)^2:                                                      #
+#   > R := PolynomialRing([x, a]):                                        #
+#   > cs := GeneralConstruct([], [], R):                                  #
+#   > g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R):                   #
+#   > IsEmpty(cs_zero, R);                                                #
+#         true                                                            #
+#   > Display(g, R)                                                       #
+#         [[-a*x-2*a+2*x+4, a-2 <> 0], [x^2+4*x+4, a-2 = 0]]              #
 #                                                                         #
 # REFERENCES                                                              #
 #                                                                         #
@@ -121,7 +129,6 @@ ComprehensiveGcd := module()
 # INPUT/OUTPUT                                                            #
 #   Same as ComprehensiveGcd                                              #
 # ----------------------------------------------------------------------- #
-# init := proc() :: {list([polynom, TRDrs]), list([polynom, TRDcs]), list([polynom, ratpoly, ratpoly, TRDrs])};
 init := proc()
     
     local p1, p2, v, F, H, R, rs, cs, opts;
@@ -129,8 +136,8 @@ init := proc()
     # Check the number of arguments
     if nargs < 5 then
         error "Insufficient number of arguments";
-    elif nargs > 9 then
-        error "To many arguments";
+    elif nargs > 8 then
+        error "Too many arguments";
     end if;
     
     if type(args[4], 'list') and type(args[5], 'list') then
@@ -214,7 +221,6 @@ end proc;
 # OUTPUT                                                                  #
 #    A table with indices                                                 #
 #        'cofactors'                                                      #
-#        'lazy'                                                           #
 #        'outputType'                                                     #
 #    See ComprehensiveGcd header for specifications.                      #
 # ----------------------------------------------------------------------- #
@@ -224,10 +230,9 @@ processOptions := proc(opts_in::set(equation), $) :: table;
           opt::equation;
 
     # Default values
-    opts['outputType'] := "CS";
-    opts['lazy']       := true;
+    opts['outputType'] := 'CS';
     opts['cofactors']  := false;
-
+    
     # Process each option
     for opt in opts_in do
         if lhs(opt) in {indices(opts, 'nolist')} then
@@ -236,6 +241,16 @@ processOptions := proc(opts_in::set(equation), $) :: table;
             error "'%1' is not a valid option", lhs(opt);
         end if;
     end do;
+
+    # Print message for unsupported options
+    if opts['outputType'] = 'RS' then
+        printf("outputType option is not supported yet. Defaulting to CS\n");
+        opts['outputType'] := 'CS';
+    end if;
+    if opts['cofactors'] then
+        printf("cofactors option is not supported yet. Defaulting to false\n");
+        opts['cofactors'] := false;
+    end if;
 
     return opts;
 
@@ -285,7 +300,7 @@ init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(po
     # Convert F and H to a constructible set
     cs := RC_CST:-GeneralConstruct(F, H, R);
     
-    return implementation(p1, p2, v, cs, R, opts);
+    return implementation(p1, p2, v, cs, R);
     
 end proc;
 
@@ -307,7 +322,6 @@ end proc;
 # OUTPUT                                                                  #
 #    Same as ComprehensiveGcd                                             #
 # ----------------------------------------------------------------------- #
-# init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::table, $) :: {list([polynom, TRDrs]), list([polynom, TRDcs]), list([polynom, ratpoly, ratpoly, TRDrs])};
 init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::table, $)
 
     local cs::TRDcs;
@@ -315,7 +329,8 @@ init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::
     # Check the input for errors
     checkInput(p1, p2, v, R, opts);
     
-    # rs should not contain any condition on v
+    # All polynomial equations and inequations in rs should be not contain
+    # any variables strictly greater than v as an indeterminant.
     if not isUnder(rs, v, R) then
         error "Input regular system should not contain conditions on %1", v;
     end if;
@@ -323,7 +338,7 @@ init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::
     # Convert rs to a constructible set
     cs := RC_CST:-ConstructibleSet([rs], R);
     
-    return implementation(p1, p2, v, cs, R, opts);
+    return implementation(p1, p2, v, cs, R);
 
 end proc;
 
@@ -345,7 +360,6 @@ end proc;
 # OUTPUT                                                                  #
 #    Same as ComprehensiveGcd                                             #
 # ----------------------------------------------------------------------- #
-# init_cs := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::table, $) :: {list([polynom, TRDrs]), list([polynom, TRDcs]), list([polynom, ratpoly, ratpoly, TRDrs])};
 init_cs := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::table, $)
     
     # Check the input for errors
@@ -356,7 +370,7 @@ init_cs := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::
         error "Input constructible set should not contain conditions on %1", v;
     end if;
     
-    return implementation(p1, p2, v, cs, R, opts);
+    return implementation(p1, p2, v, cs, R);
 
 end proc;
 
@@ -373,26 +387,23 @@ end proc;
 #   R ...... Polynomial Ring                                              #
 #   opts ... A table containing the options (see ComprehensiveGcd header) #
 # ----------------------------------------------------------------------- #
-checkInput := proc(p1::polynom, p2::polynom, v::name, R::TRDring, opts::table, $)
+checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, R::TRDring, opts::table, $)
     
-    # v must be the greatest variable of R
-    if not isGreatestVariable(v, R) then
-        error "v must be the greatest variable of R";
+    # p1 and p2 must not contain any variables strictly greater than v
+    if not RC:-TRDis_constant(p1, R) then
+        if RC:-TRDstrictly_less_var(v, RC:-MainVariable(p1, R), R) then
+        error "p1 must not contain any variables stricly greater than v";
+        end if;
+    end if;
+    if not RC:-TRDis_constant(p1, R) then
+        if RC:-TRDstrictly_less_var(v, RC:-MainVariable(p2, R), R) then
+            error "p2 must not contain any variables stricly greater than v";
+        end if;
     end if;
     
-    # p1 must be a polynomial in R
-    if not RC:-TRDis_poly(p1, R) then
-        error "invalid polynomial: %1", p1;
-    end if;
-    
-    # p2 must be a polynomial in R
-    if not RC:-TRDis_poly(p2, R) then
-        error "invalid polynomial: %1", p2;
-    end if;
-    
-    # outputType option must be either "RegularSystem", "RS", "ConstructibleSet" 
-    # or "CS"
-    if not opts['outputType'] in {"RegularSystem", "RS", "ConstructibleSet", "CS"} then
+    # outputType option must be either 'RegularSystem', 'RS', 
+    # 'ConstructibleSet', or 'CS'
+    if not opts['outputType'] in {'RegularSystem', 'RS', 'ConstructibleSet', 'CS'} then
         error "outputType option must be either RegularSystem, RS, ConstructibleSet or CS";
     end if;
     
@@ -401,14 +412,9 @@ checkInput := proc(p1::polynom, p2::polynom, v::name, R::TRDring, opts::table, $
         error "cofactors option must be a boolean values";
     end if;
     
-    # Check the lazy option
-    if not type(opts['lazy'], 'truefalse') then
-        error "lazy option must be a boolean values";
-    end if;
-    
-    # Output options 'cofactors' = true and 'outputType' = "ConstructibleSet"
+    # Output options 'cofactors' = true and 'outputType' = 'ConstructibleSet'
     # are not compatible
-    if (opts['outputType'] in {"ConstructibleSet", "CS"}) and opts['cofactors'] then
+    if (opts['outputType'] in {'ConstructibleSet', 'CS'}) and opts['cofactors'] then
         error "Output options ConstructibleSet or CS and cofactors=true are not compatible.";
     end if;
     
@@ -432,8 +438,7 @@ end proc;
 # OUTPUT                                                                  #
 #    Same as ComprehensiveGcd                                             #
 # ----------------------------------------------------------------------- #
-# implementation := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::table, $) :: {list([polynom, TRDrs]), list([polynom, TRDcs]), list([polynom, ratpoly, ratpoly, TRDrs])};
-implementation := proc(p1_in::polynom, p2_in::polynom, v::name, cs::TRDcs, R::TRDring, opts::table, $)
+implementation := proc(p1_in::polynom, p2_in::polynom, v::name, cs::TRDcs, R::TRDring, $)
     
     local p1, p2;
     
