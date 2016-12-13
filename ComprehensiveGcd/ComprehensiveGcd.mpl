@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 9/2016                                                 #
+# UPDATED ... Dec. 12/2016                                                #
 #                                                                         #
 # Compute the gcd of two parametric univariate polynomials in the sense   #
 # of Lazard. Constraints on parameter values can be provided via a        #
@@ -109,7 +109,8 @@ ComprehensiveGcd := module()
         processOptions,
         checkInput,
         implementation,
-        comprehensive_gcd_src;
+        comprehensive_gcd_src,
+        convertToRS;
     
     ModuleApply := proc()
         return init(args);
@@ -242,16 +243,6 @@ processOptions := proc(opts_in::set(equation), $) :: table;
         end if;
     end do;
 
-    # Print message for unsupported options
-    if opts['outputType'] = 'RS' then
-        printf("outputType option is not supported yet. Defaulting to CS\n");
-        opts['outputType'] := 'CS';
-    end if;
-    if opts['cofactors'] then
-        printf("cofactors option is not supported yet. Defaulting to false\n");
-        opts['cofactors'] := false;
-    end if;
-
     return opts;
 
 end proc;
@@ -300,7 +291,7 @@ init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(po
     # Convert F and H to a constructible set
     cs := RC_CST:-GeneralConstruct(F, H, R);
     
-    return implementation(p1, p2, v, cs, R);
+    return implementation(p1, p2, v, cs, R, opts);
     
 end proc;
 
@@ -338,7 +329,7 @@ init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::
     # Convert rs to a constructible set
     cs := RC_CST:-ConstructibleSet([rs], R);
     
-    return implementation(p1, p2, v, cs, R);
+    return implementation(p1, p2, v, cs, R, opts);
 
 end proc;
 
@@ -370,7 +361,7 @@ init_cs := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::
         error "Input constructible set should not contain conditions on %1", v;
     end if;
     
-    return implementation(p1, p2, v, cs, R);
+    return implementation(p1, p2, v, cs, R, opts);
 
 end proc;
 
@@ -406,15 +397,26 @@ checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::na
     if not opts['outputType'] in {'RegularSystem', 'RS', 'ConstructibleSet', 'CS'} then
         error "outputType option must be either RegularSystem, RS, ConstructibleSet or CS";
     end if;
+    if opts['outputType'] = 'RegularSystem' then
+        opts['outputType'] := 'RS';
+    end if;
+    if opts['outputType'] = 'ConstructibleSet' then
+        opts['outputType'] := 'CS';
+    end if;
     
     # Check the cofactors option
     if not type(opts['cofactors'], 'truefalse') then
         error "cofactors option must be a boolean values";
     end if;
     
+    # Cofactors option is not yet supported.
+    if opts['cofactors'] then
+        error("cofactors option is not currently supported");
+    end if;
+    
     # Output options 'cofactors' = true and 'outputType' = 'ConstructibleSet'
     # are not compatible
-    if (opts['outputType'] in {'ConstructibleSet', 'CS'}) and opts['cofactors'] then
+    if opts['outputType'] ='CS' and opts['cofactors'] then
         error "Output options ConstructibleSet or CS and cofactors=true are not compatible.";
     end if;
     
@@ -424,7 +426,7 @@ end proc;
 # ----------------------------------------------------------------------- #
 # implementation                                                          #
 #                                                                         #
-# Computes the Gcd using the specified method and returns the specified   #
+# Computes the gcd using the specified method and returns the specified   #
 # type. Assume no errors in input values.                                 #
 #                                                                         #
 # INPUT                                                                   #
@@ -438,16 +440,56 @@ end proc;
 # OUTPUT                                                                  #
 #    Same as ComprehensiveGcd                                             #
 # ----------------------------------------------------------------------- #
-implementation := proc(p1_in::polynom, p2_in::polynom, v::name, cs::TRDcs, R::TRDring, $)
+implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts, $)
     
-    local p1, p2;
+    local p1 :: polynom,
+          p2 :: polynom,
+          result,
+          cs_zero :: TRDcs;
     
     p1 := expand(p1_in);
     p2 := expand(p2_in);
     
     # Call the algorithm
-    return comprehensive_gcd_src(p1, p2, v, cs, R);
+    result, cs_zero := comprehensive_gcd_src(p1, p2, v, cs, R);
     
+    # Convert to regular systems
+    if opts['outputType'] = 'RS' then
+        result := convertToRS(result, R);
+    end if;
+    
+    return result, cs_zero;
+    
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# convertToRS                                                             #
+#                                                                         #
+# Given a list with elements of the form                                  #
+#   [g, cs]                                                               #
+# expand the list by extracting all regular systems from each             #
+# constructible set.                                                      #
+#                                                                         #
+# INPUT                                                                   #
+#   result ... A list with elements of the form                           #
+#                  [g, cs]                                                #
+#              where g is a polynomial and rs is a regular system.        #
+#   R ........ Polynomial ring                                            #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A list with elements of the form                                      #
+#       [g, rs]                                                           #
+# ----------------------------------------------------------------------- #
+convertToRS := proc(result, R::TRDring, $)
+    local output, pair, g, cs, lrs;
+    output := [];
+    for pair in result do
+        g, cs := op(pair);
+        lrs := RC_CST:-RepresentingRegularSystems(cs, R);
+        output := [op(output), op(zip((x, y) -> [x, y], g, lrs))];
+    end do;
+    return output;
 end proc;
 
 
