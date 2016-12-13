@@ -465,7 +465,6 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
     if opts['outputType'] = 'RS' then
         result := convertToRS(result, R);
         result := cleanRS(result, v, R);
-<<<<<<< edd27cadc49bae305285791e165347cb4bdb9ca8:src/ComprehensiveGcd/ComprehensiveGcd.mpl
     end if;
 
     # Compute the cofactors
@@ -473,15 +472,6 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
         result := compute_cofactors_rs_list(p1, p2, result, v, R);
     end if;
 
-=======
-    end if;
-
-    # Compute the cofactors
-    if opts['cofactors'] then
-        result := compute_cofactors_rs_list(p1, p2, result, v, R);
-    end if;
-
->>>>>>> Added cofactor computation:ComprehensiveGcd/ComprehensiveGcd.mpl
     return result, cs_zero;
 
 end proc;
@@ -561,18 +551,13 @@ cleanRS := proc(result, v::name, R::TRDring, $)
           m :: polynom,
           q :: polynom,
           r :: polynom,
-<<<<<<< edd27cadc49bae305285791e165347cb4bdb9ca8:src/ComprehensiveGcd/ComprehensiveGcd.mpl
           rc::TRDrc, inv,gFactors, zdiv, gMonic;
-=======
-          rc::TRDrc, inv;
->>>>>>> Added cofactor computation:ComprehensiveGcd/ComprehensiveGcd.mpl
 
     output := [];
 
     for pair in result do
         g, rs := op(pair);
 
-<<<<<<< edd27cadc49bae305285791e165347cb4bdb9ca8:src/ComprehensiveGcd/ComprehensiveGcd.mpl
         rc := RC_CST:-RepresentingChain(rs, R);
         
         g := RC:-SparsePseudoRemainder(g, rc, R); 
@@ -598,36 +583,6 @@ cleanRS := proc(result, v::name, R::TRDring, $)
         
         output := [op(output), [g, rs]];
         
-=======
-        # g := RC:-SparsePseudoRemainder(g, RC_CST:-RepresentingChain(rs, R), R);
-
-        r := sprem(g, lcoeff(g, v), v, 'm', 'q');
-
-        if isZeroOverRS(r, rs, R) then
-            # g := normal(g/m);
-            rc := RC_CST:-RepresentingChain(rs, R);
-            q := RC:-SparsePseudoRemainder(q, rc, R);
-            m := RC:-SparsePseudoRemainder(m, rc, R);
-            g := normal(q/m);
-
-            if denom(g) <> 1 then
-                # Try inverting?
-                print("This should not happen2 :(");
-                g := numer(g);
-                inv := RC:-Inverse(lcoeff(g,v), rc, R);
-                g := RC:-SparsePseudoRemainder(g*inv[1][1][1], rc, R);
-            end if;
-
-
-            # rc := RC_CST:-RepresentingChain(rs, R);
-            # g := collect(RC:-SparsePseudoRemainder(g, rc, R), v);
-        else
-            print("Should not happen :(");
-        end if;
-
-        output := [op(output), [g, rs]];
-
->>>>>>> Added cofactor computation:ComprehensiveGcd/ComprehensiveGcd.mpl
     end do;
 
     return output;
