@@ -259,6 +259,7 @@ gcd_for_zero_resultant_rs := proc(p1, p2, src, v, rs, R, $)
     #          of cs_z
     p1_init := RC:-TRDuniv_lcoeff(p1, v);
     p2_init := RC:-TRDuniv_lcoeff(p2, v);
+    
     cs_init := RC_CST:-GeneralConstruct([p1_init, p2_init], [], R);
     cs_nz, cs_z:= RC:-TRDdifference_intersect_cs_cs(cs, cs_init, R);
     
@@ -297,13 +298,14 @@ gcd_by_subresultant_non_vanishing_initals := proc(p1, p2, src, v, cs_in, R, $)
           result_tmp::list({[polynom, TRDcs], []});
     
     cs := RC:-TRDrename_constructible_set(copy(cs_in));
-    
+   
     result := [];
     
     # Proceeding bottom up with src, get the first subresultant whos 
     # initial does not vanish in the zero set of cs; it is the gcd. If no 
     # such subresultant exists, either p1 or p2 is the gcd.
-    for i to nops(src['subresultant_chain_vector']) -2 - 1 while not RC:-TRDis_empty_constructible_set(cs, R) do
+    for i to min(degree(p1, v), degree(p2, v)) - 1 while not RC:-TRDis_empty_constructible_set(cs, R) do
+    # for i to nops(src['subresultant_chain_vector']) -2 - 1 while not RC:-TRDis_empty_constructible_set(cs, R) do
         
         g := RC_CT:-SubresultantOfIndex(i, src, R);
         

@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 12/2016                                                #
+# UPDATED ... Dec. 13/2016                                                #
 #                                                                         #
 # Compute the gcd of two parametric univariate polynomials in the sense   #
 # of Lazard. Constraints on parameter values can be provided via a        #
@@ -449,15 +449,6 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
     p1 := expand(p1_in);
     p2 := expand(p2_in);
 
-    # Cofactors is currently only compatible with systems where init(p1, v) 
-    # and init(p2, v) do not vanish anywhere in cs.
-    if opts['cofactors'] then
-        if not isNonZeroOverCS(RC:-TRDuniv_lcoeff(p1, v), cs, R) or 
-           not isNonZeroOverCS(RC:-TRDuniv_lcoeff(p2, v), cs, R) then
-            error "cofactors option is only compatible with polynomials whose initials do not vanish."
-        end if;
-    end if;
-
     # Call the algorithm
     result, cs_zero := comprehensive_gcd_src(p1, p2, v, cs, R);
 
@@ -542,16 +533,18 @@ end proc;
 #   order as the input list. g has been divided by it's leading           #
 #   coefficient.                                                          #
 # ----------------------------------------------------------------------- #
-cleanRS := proc(result, v::name, R::TRDring, $)
+cleanRS := proc(result::list([polynom, TRDrs]), v::name, R::TRDring, $)
 
     local output,
-          pair,
+          pair :: [polynom, TRDrs],
           g :: ratpoly,
           rs :: TRDrs,
-          m :: polynom,
-          q :: polynom,
-          r :: polynom,
-          rc::TRDrc, inv,gFactors, zdiv, gMonic, rc_inv;
+          rc :: TRDrc, 
+          inv,
+          zdiv, 
+          gFactors,
+          gMonic, 
+          rc_inv::TRDrc;
 
     output := [];
 
@@ -569,23 +562,18 @@ cleanRS := proc(result, v::name, R::TRDring, $)
         
         if denom(gMonic) <> 1 then
             inv, zdiv := op(RC:-Inverse(lcoeff(g, v), rc, R));
-            if nops(zdiv) <> 0 then
-                print("This shoudln't happen");
-            end if;
-            if nops(inv) >  1 then
-                print("This also shouldn't happen");
-            end if;
             rc_inv := inv[1][3];
-            if not RC_CT:-EqualSaturatedIdeals(rc, rc_inv, R) then
-                print("This definitly shouldn't happen");
-            end if;
+            
+            ASSERT(nops(zdiv) = 0, "Must not be any zero divisors");
+            ASSERT(nops(inv) = 1, "Inverse must only contain one case.");
+            ASSERT(RC_CT:-EqualSaturatedIdeals(rc, rc_inv, R), "Inverse must not lose any cases.");
             
             g := RC:-SparsePseudoRemainder(g*inv[1][1], rc, R);
             if denom(normal(g/lcoeff(g, v))) = 1 then
                 g := normal(g/lcoeff(g, v));
             end if;
         end if;
-        
+        g := RC:-SparsePseudoRemainder(g, rc, R);
         output := [op(output), [g, rs]];
         
     end do;
@@ -614,14 +602,23 @@ end proc;
 #       [g, rs]                                                           #
 # ----------------------------------------------------------------------- #
 convertToRS := proc(result, R::TRDring, $)
-    local output, pair, g, cs, lrs;
+    
+    local output:: {[], list([polynom, TRDrs])},
+          pair :: [polynom, TRDcs],
+          g :: polynom,
+          cs :: TRDcs,
+          lrs :: TRDlrs;
+    
     output := [];
+    
     for pair in result do
         g, cs := op(pair);
         lrs := RC_CST:-RepresentingRegularSystems(cs, R);
         output := [op(output), op(zip((x, y) -> [x, y], g, lrs))];
     end do;
+    
     return output;
+    
 end proc;
 
 

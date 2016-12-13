@@ -46,20 +46,29 @@ pseudo_cofactor := proc(p_in::depends(polyInRing(R)), g_in::depends(polyInRing(R
           m :: polynom,
           q :: ratpoly,
           p :: polynom,
-          g :: polynom;
+          g :: polynom, pMonic, h, inv, zdiv, q_spr, m_spr, h_q, h_m;
     
-    p := RC:-SparsePseudoRemainder(p_in, rc, R);
-    g := RC:-SparsePseudoRemainder(g_in, rc, R);
+    p := p_in;
+    g := g_in;
     
     ASSERT(not isZeroOverRS(g, RC_CST:-RegularSystem(rc, [], R), R), "g must not be zero");
     
-    r := sprem(p, g, v, 'm','q');
+    # if denom(p_in/g) = 1 then
+    #     return normal(p/g);
+    # end if;
+    
+    r := sprem(p, g, v, 'm', 'q');
     
     ASSERT(isZeroOverRS(r, RC_CST:-RegularSystem(rc, R), R), "Remainder must be zero");
     
-    q := RC:-SparsePseudoRemainder(q, rc, R);
-    q := normal(q/m);
+    if abs(m) = 1 then
+      return m*q;
+    end if;
+    
+    q_spr := RC:-SparsePseudoRemainder(q, rc, R, 'h_q');
+    m_spr := RC:-SparsePseudoRemainder(m, rc, R, 'h_m');
+    q := normal(q_spr*h_q/(m_spr*h_m));
     
     return q;
 
-end proc:
+end proc;
