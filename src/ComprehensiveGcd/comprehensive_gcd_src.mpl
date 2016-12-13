@@ -303,7 +303,7 @@ gcd_by_subresultant_non_vanishing_initals := proc(p1, p2, src, v, cs_in, R, $)
     # Proceeding bottom up with src, get the first subresultant whos 
     # initial does not vanish in the zero set of cs; it is the gcd. If no 
     # such subresultant exists, either p1 or p2 is the gcd.
-    for i to nops(src['subresultant_chain_vector']) -2 - 1 while not RC:-TRDis_empty_constructible_set(cs, R) do
+    for i to min(degree(p1, v), degree(p2, v)) - 1 while not RC:-TRDis_empty_constructible_set(cs, R) do
         
         g := RC_CT:-SubresultantOfIndex(i, src, R);
         
