@@ -80,8 +80,6 @@
 #   > Display(g, R)                                                       #
 #         [[-a*x-2*a+2*x+4, a-2 <> 0], [x^2+4*x+4, a-2 = 0]]              #
 #                                                                         #
-# REFERENCES                                                              #
-#                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
 #   it under the terms of the GNU General Public License as published by  #
@@ -558,6 +556,7 @@ cleanRS := proc(result::list([polynom, TRDrs]), v::name, R::TRDring, $)
         gFactors := remove((x,v) -> not v in indets(x[1]), gFactors, v);
         g := mul(map(x -> x[1]^x[2], gFactors));
         
+        
         gMonic := normal(g/lcoeff(g, v));
         
         if denom(gMonic) <> 1 then
@@ -573,7 +572,12 @@ cleanRS := proc(result::list([polynom, TRDrs]), v::name, R::TRDring, $)
                 g := normal(g/lcoeff(g, v));
             end if;
         end if;
-        g := RC:-SparsePseudoRemainder(g, rc, R);
+        
+        g := RC:-SparsePseudoRemainder(g, rc, R); 
+        gFactors := factors(g)[2];
+        gFactors := remove((x,v) -> not v in indets(x[1]), gFactors, v);
+        g := mul(map(x -> x[1]^x[2], gFactors));
+        
         output := [op(output), [g, rs]];
         
     end do;

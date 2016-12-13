@@ -176,11 +176,11 @@ test := module()
         for item in result do
             g, c1, c2, rs := op(item);
             
-            if not ParametricMatrixTools:-isZeroOverRS(c1*g-p1, rs, R) then
+            if not ParametricMatrixTools:-isZeroOverRS(numer(c1*g-p1), rs, R) then
                 print(SparsePseudoRemainder(c1*g - p1, RepresentingChain(rs, R), R));
                 return false;
             end if;
-            if not ParametricMatrixTools:-isZeroOverRS(c2*g-p2, rs, R) then
+            if not ParametricMatrixTools:-isZeroOverRS(numer(c2*g-p2), rs, R) then
                 print(SparsePseudoRemainder(c2*g - p2, RepresentingChain(rs, R), R));
                 return false;
             end if;

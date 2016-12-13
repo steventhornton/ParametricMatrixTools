@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 12/2016                                                #
+# UPDATED ... Dec. 13/2016                                                #
 #                                                                         #
 # Computes the polynomial p/g where g is known to be a factor of p over   #
 # a regular chain.                                                        #
@@ -20,7 +20,7 @@
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   The polynomial p/g mod rc.                                            #
+#   The rational expression p/g mod rc.                                   #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   g is never 0                                                          #
@@ -40,34 +40,19 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-pseudo_cofactor := proc(p_in::depends(polyInRing(R)), g_in::depends(polyInRing(R)), v::name, rc::TRDrc, R::TRDring, $)
+pseudo_cofactor := proc(p::depends(polyInRing(R)), g::depends(polyInRing(R)), v::name, rc::TRDrc, R::TRDring, $)
     
     local r :: polynom,
           m :: polynom,
-          q :: ratpoly,
-          p :: polynom,
-          g :: polynom, pMonic, h, inv, zdiv, q_spr, m_spr, h_q, h_m;
-    
-    p := p_in;
-    g := g_in;
+          q :: ratpoly;
     
     ASSERT(not isZeroOverRS(g, RC_CST:-RegularSystem(rc, [], R), R), "g must not be zero");
-    
-    # if denom(p_in/g) = 1 then
-    #     return normal(p/g);
-    # end if;
     
     r := sprem(p, g, v, 'm', 'q');
     
     ASSERT(isZeroOverRS(r, RC_CST:-RegularSystem(rc, R), R), "Remainder must be zero");
     
-    if abs(m) = 1 then
-      return m*q;
-    end if;
-    
-    q_spr := RC:-SparsePseudoRemainder(q, rc, R, 'h_q');
-    m_spr := RC:-SparsePseudoRemainder(m, rc, R, 'h_m');
-    q := normal(q_spr*h_q/(m_spr*h_m));
+    q := normal(q/m);
     
     return q;
 
