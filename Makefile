@@ -1,4 +1,4 @@
-SRCS = ParametricMatrixTools.mpl
+SRCS = src/ParametricMatrixTools.mpl
 MLAFILE = ParametricMatrixTools.mla
 MACROS = -D RC=RegularChains\
 		 -D RC_CST=RegularChains:-ConstructibleSetTools\
@@ -22,7 +22,7 @@ test: mla
 
 mla: $(SRCS)
 	@rm -f $(MLAFILE)
-	@maple -q $(MACROS) make_mla.mpl
+	@maple -q $(MACROS) src/make_mla.mpl
 	@(echo "Done!";)
 
 clean:

@@ -496,6 +496,6 @@ end proc;
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # External Files
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$include <ComprehensiveGcd/comprehensive_gcd_src.mpl>
+$include <src/ComprehensiveGcd/comprehensive_gcd_src.mpl>
 
 end module;

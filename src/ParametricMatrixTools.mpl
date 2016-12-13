@@ -52,18 +52,18 @@ ParametricMatrixTools := module()
 
 
 # External Files
-$include "types.mpl"
+$include "src/types.mpl"
 
-$include "Extra/isGreatestVariable.mpl"
-$include "Extra/isUnder.mpl"
-$include "Extra/isNonZeroOverCS.mpl"
-$include "Extra/isNonZeroOverRS.mpl"
-$include "Extra/isZeroOverCS.mpl"
-$include "Extra/isZeroOverRS.mpl"
-$include "Extra/ListIntersection.mpl"
-$include "Extra/ListUnion.mpl"
-$include "Extra/TRDdifference_intersect_cs_p.mpl"
+$include "src/Extra/isGreatestVariable.mpl"
+$include "src/Extra/isUnder.mpl"
+$include "src/Extra/isNonZeroOverCS.mpl"
+$include "src/Extra/isNonZeroOverRS.mpl"
+$include "src/Extra/isZeroOverCS.mpl"
+$include "src/Extra/isZeroOverRS.mpl"
+$include "src/Extra/ListIntersection.mpl"
+$include "src/Extra/ListUnion.mpl"
+$include "src/Extra/TRDdifference_intersect_cs_p.mpl"
 
-$include "ComprehensiveGcd/ComprehensiveGcd.mpl"
+$include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 
 end module:

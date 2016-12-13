@@ -4,6 +4,6 @@ loc := cat(currentdir(),"/ParametricMatrixTools.mla"):
 
 Create(loc):
 
-read("ParametricMatrixTools.mpl"):
+read("src/ParametricMatrixTools.mpl"):
 
 Save(ParametricMatrixTools, loc):
