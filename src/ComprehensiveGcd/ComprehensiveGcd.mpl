@@ -551,41 +551,38 @@ cleanRS := proc(result, v::name, R::TRDring, $)
           m :: polynom,
           q :: polynom,
           r :: polynom,
-          rc::TRDrc, inv;
+          rc::TRDrc, inv,gFactors, zdiv, gMonic;
 
     output := [];
 
     for pair in result do
         g, rs := op(pair);
 
-        # g := RC:-SparsePseudoRemainder(g, RC_CST:-RepresentingChain(rs, R), R);
-
-        r := sprem(g, lcoeff(g, v), v, 'm', 'q');
-
-        if isZeroOverRS(r, rs, R) then
-            # g := normal(g/m);
-            rc := RC_CST:-RepresentingChain(rs, R);
-            q := RC:-SparsePseudoRemainder(q, rc, R);
-            m := RC:-SparsePseudoRemainder(m, rc, R);
-            g := normal(q/m);
-
-            if denom(g) <> 1 then
-                # Try inverting?
-                print("This should not happen2 :(");
-                g := numer(g);
-                inv := RC:-Inverse(lcoeff(g,v), rc, R);
-                g := RC:-SparsePseudoRemainder(g*inv[1][1][1], rc, R);
+        rc := RC_CST:-RepresentingChain(rs, R);
+        
+        g := RC:-SparsePseudoRemainder(g, rc, R); 
+        gFactors := factors(g)[2];
+        gFactors := remove((x,v) -> not v in indets(x[1]), gFactors, v);
+        g := mul(map(x -> x[1]^x[2], gFactors));
+        
+        gMonic := normal(g/lcoeff(g, v));
+        
+        if denom(gMonic) <> 1 then
+            inv, zdiv := op(RC:-Inverse(lcoeff(g, v), rc, R));
+            if nops(zdiv) <> 0 then
+                print("This shoudln't happen");
             end if;
-
-
-            # rc := RC_CST:-RepresentingChain(rs, R);
-            # g := collect(RC:-SparsePseudoRemainder(g, rc, R), v);
-        else
-            print("Should not happen :(");
+            if nops(inv) >  1 then
+                print("This also shouldn't happen");
+            end if;
+            g := RC:-SparsePseudoRemainder(g*inv[1][1], rc, R);
+            if denom(normal(g/lcoeff(g, v))) = 1 then
+                g := normal(g/lcoeff(g, v));
+            end if;
         end if;
-
+        
         output := [op(output), [g, rs]];
-
+        
     end do;
 
     return output;
