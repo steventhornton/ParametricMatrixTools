@@ -386,7 +386,7 @@ checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::na
         error "p1 must not contain any variables stricly greater than v";
         end if;
     end if;
-    if not RC:-TRDis_constant(p1, R) then
+    if not RC:-TRDis_constant(p2, R) then
         if RC:-TRDstrictly_less_var(v, RC:-MainVariable(p2, R), R) then
             error "p2 must not contain any variables stricly greater than v";
         end if;
