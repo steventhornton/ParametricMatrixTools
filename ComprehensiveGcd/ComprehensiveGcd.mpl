@@ -551,7 +551,7 @@ cleanRS := proc(result, v::name, R::TRDring, $)
           m :: polynom,
           q :: polynom,
           r :: polynom,
-          rc::TRDrc, inv,gFactors, zdiv, gMonic;
+          rc::TRDrc, inv,gFactors, zdiv, gMonic, rc_inv;
 
     output := [];
 
@@ -575,6 +575,11 @@ cleanRS := proc(result, v::name, R::TRDring, $)
             if nops(inv) >  1 then
                 print("This also shouldn't happen");
             end if;
+            rc_inv := inv[1][3];
+            if not RC_CT:-EqualSaturatedIdeals(rc, rc_inv, R) then
+                print("This definitly shouldn't happen");
+            end if;
+            
             g := RC:-SparsePseudoRemainder(g*inv[1][1], rc, R);
             if denom(normal(g/lcoeff(g, v))) = 1 then
                 g := normal(g/lcoeff(g, v));
