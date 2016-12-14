@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 13/2016                                                #
+# UPDATED ... Dec. 14/2016                                                #
 #                                                                         #
 # Compute the gcd of two parametric univariate polynomials in the sense   #
 # of Lazard. Constraints on parameter values can be provided via a        #
@@ -112,7 +112,8 @@ ComprehensiveGcd := module()
         cleanRS,
         compute_cofactors_rs_list,
         compute_cofactors_rs,
-        pseudo_cofactor;
+        pseudo_cofactor,
+        listGcd;
 
     ModuleApply := proc()
         return init(args);
@@ -552,10 +553,8 @@ cleanRS := proc(result::list([polynom, TRDrs]), v::name, R::TRDring, $)
         rc := RC_CST:-RepresentingChain(rs, R);
         
         g := RC:-SparsePseudoRemainder(g, rc, R); 
-        gFactors := factors(g)[2];
-        gFactors := remove((x,v) -> not v in indets(x[1]), gFactors, v);
-        g := mul(map(x -> x[1]^x[2], gFactors));
         
+        g := normal(g/listGcd([coeffs(g, v)]));
         
         gMonic := normal(g/lcoeff(g, v));
         
@@ -634,5 +633,6 @@ $include <src/ComprehensiveGcd/comprehensive_gcd_src.mpl>
 $include <src/ComprehensiveGcd/comprehensive_gcd_src.mpl>
 $include <src/ComprehensiveGcd/compute_cofactors_rs.mpl>
 $include <src/ComprehensiveGcd/pseudo_cofactor.mpl>
+$include <src/ComprehensiveGcd/listGcd.mpl>
 
 end module;
