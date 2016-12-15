@@ -234,7 +234,7 @@ test := module()
     
     verifyResult_cs := proc(p1, p2, g, cs, cs_zero, R)
     
-        local pair, G, lrs, cs_p, rs, rc, p1_s, p2_s, r1, r2, correct, csList;
+        local pair, G, lrs, cs_p, rs, rc, r1, r2, correct, csList;
         
         # Verify that p1 and p2 both vanish for all values in the zero set 
         # of cs_zero.
@@ -264,13 +264,10 @@ test := module()
             for rs in lrs do
                 rc := RepresentingChain(rs, R);
                 
-                p1_s := SparsePseudoRemainder(p1, rc, R);
-                p2_s := SparsePseudoRemainder(p2, rc, R);
-                
                 # Verify that mG = pq + r for p = p1 and p2 and r is always
                 # zero
-                r1 := sprem(p1_s, G, x);
-                r2 := sprem(p2_s, G, x);
+                r1 := sprem(p1, G, x);
+                r2 := sprem(p2, G, x);
                 
                 if not ParametricMatrixTools:-isZeroOverRS(r1, rs, R) then
                     return false;
