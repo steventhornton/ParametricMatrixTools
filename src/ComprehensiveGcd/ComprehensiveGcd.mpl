@@ -283,12 +283,18 @@ init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(po
         if not RC:-TRDis_poly(F[i], R) then
             error "Invalid polynomial in F";
         end if;
+        if v in indets(H[i]) then
+            error "Input polynomial equation list F should not contain conditions on %1", v;
+        end if;
     end do;
 
     # All elements of H must be polynomials in R
     for i to nops(H) do
         if not RC:-TRDis_poly(H[i], R) then
             error "Invalid polynomial in H";
+        end if;
+        if v in indets(H[i]) then
+            error "Input polynomial inequation list H should not contain conditions on %1", v;
         end if;
     end do;
 
