@@ -48,8 +48,18 @@ ParametricMatrixTools := module()
     ModuleLoad := proc()
         kernelopts('opaquemodules' = false);
         loadTypes();
-    end proc:
+    end proc;
 
+# Macros
+$define RC RegularChains 
+$define RC_CST RegularChains:-ConstructibleSetTools
+$define RC_PST RegularChains:-ParametricSystemTools
+$define RC_CT RegularChains:-ChainTools
+$define RC_SAST RegularChains:-SemiAlgebraicSetTools
+$define RC_MT RegularChains:-MatrixTools
+$define LA LinearAlgebra
+$define PT PolynomialTools
+$define LT ListTools
 
 # External Files
 $include "src/types.mpl"
