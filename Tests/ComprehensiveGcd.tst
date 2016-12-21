@@ -92,7 +92,7 @@ test := module()
                      'test56', 'test57', 'test58', 'test59', 'test60', 
                      'test61', 'test62', 'test63', 'test64', 'test65'];
 
-        printf("Testing ParametricGcd\n");
+        printf("Testing ComprehensiveGcd\n");
 
         passCount, failCount := 0, 0;
 
