@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 8/2016                                                 #
+# UPDATED ... Dec. 21/2016                                                #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -30,7 +30,9 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export ComprehensiveGcd;
+    export ComprehensiveGcd,
+           ComprehensiveSquareFreeFactorization,
+           JordanFormWithProviso;
     
     local ModuleLoad,
           loadTypes,
@@ -75,5 +77,8 @@ $include "src/Extra/ListUnion.mpl"
 $include "src/Extra/TRDdifference_intersect_cs_p.mpl"
 
 $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
+$include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
+
+$include "src/JordanForm/JordanFormWithProviso.mpl"
 
 end module:
