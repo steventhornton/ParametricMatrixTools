@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 22/2016                                                #
+# UPDATED ... Dec. 23/2016                                                #
 #                                                                         #
 # Compute the square-free decomposition of a parametric univariate        #
 # polynomial over a constructible set by a modified version of Yun's      #
@@ -91,6 +91,7 @@ ComprehensiveSquareFreeFactorization := module()
           processOptions,
           checkInput,
           implementation,
+          convertToCS,
           comprehensive_square_free_factorization_yun;
     
     ModuleApply := proc()
@@ -340,7 +341,7 @@ init_cs := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts:
         error "Input constructible set should not contain conditions on %1", v;
     end if;
 
-    return implementation(p, v, cs, R);
+    return implementation(p, v, cs, R, opts);
 
 end proc;
 
@@ -392,11 +393,13 @@ end proc;
 #   v ....... Variable                                                    #
 #   cs ...... Constructible set                                           #
 #   R ....... Polynomial Ring                                             #
+#   opts .... Table of options, see the                                   #
+#             ComprehensiveSquareFreeFactorization header for details.    #
 #                                                                         #
 # OUTPUT                                                                  #
 #    Same as ComprehensiveSquareFreeFactorization                         #
 # ----------------------------------------------------------------------- #
-implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
+implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts, $)
 
     local p :: polynom,
           result;
@@ -406,8 +409,39 @@ implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDr
     # Call the algorithm
     result := comprehensive_square_free_factorization_yun(p, v, cs, R);
     
-    return result;
+    if opts['outputType'] = 'CS' then
+        return convertToCS(result, R);
+    else
+        return result;
+    end if;
 
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# implementation                                                          #
+#                                                                         #
+# Convert the output structure from regular systems to constructible sets.#
+#                                                                         #
+# INPUT                                                                   #
+#   result ...
+#   R ........
+#                                                                         #
+# OUTPUT                                                                  #
+#    Same as ComprehensiveSquareFreeFactorization                         #
+# ----------------------------------------------------------------------- #
+convertToCS := proc(result, R, $)
+    
+    local out, item, cs::TRDcs;
+    
+    out := [];
+    for item in result do
+        cs := RC_CST:-ConstructibleSet([item[2]], R);
+        out := [op(out), [item[1], cs]];
+    end do;
+    
+    return out;
+    
 end proc;
 
 
