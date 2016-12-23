@@ -67,5 +67,31 @@ Display(result[2], R);
     [[[x+1, 3]], a-1 = 0]
 ```
 
+## ComprehensiveSquareFreeFactorization
+The `ComprehensiveSquareFreeFactorization` function will return a complete case discussion for the square-free factorization of a parametric univariate polynomial.
+
+### Example
+```
+with(RegularChains):
+with(ConstructibleSetTools):
+with(ParametricMatrixTools):
+
+# Set up the polynomials with variable order x > a
+R := PolynomialRing([x, a]):
+p := (x+1)^2 * (x+1):
+
+# Constraints on the parameters (a <> 10)
+cs := GeneralConstruct([], [a-10], R):
+
+# Compute the gcd
+result := ComprehensiveSquareFreeFactorization(p, x, cs, R)
+nops(result);
+    2
+Display(result[1], R);
+    [[x+a, 1], [x+1, 2]], a-1 <> 0, a-10 <> 0]
+Display(result[2], R);
+    [[[x+1, 3]], a-1 = 0]
+```
+
 
 __This package is being actively developed and likely contains bugs :bug:__
