@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 16/2016                                                #
+# UPDATED ... Dec. 22/2016                                                #
 #                                                                         #
 # Computes the square free factorization of a parametric univariate       #
 # polynomial in the sense of Lazard. Computation is done over a           #
@@ -86,6 +86,8 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring
     dp := diff(p, v); 
 
     gcdResult, cs_zero := ComprehensiveGcd(p, dp, v, cs, R, 'outputType' = 'RS', 'cofactors' = true);
+    
+    ASSERT(RC:-TRDis_empty_constructible_set(cs_zero, R));
     
     result := [];
     

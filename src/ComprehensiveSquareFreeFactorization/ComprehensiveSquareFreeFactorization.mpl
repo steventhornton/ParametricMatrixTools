@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 16/2016                                                #
+# UPDATED ... Dec. 22/2016                                                #
 #                                                                         #
 # Compute the square-free decomposition of a parametric univariate        #
 # polynomial over a constructible set by a modified version of Yun's      #
@@ -340,7 +340,7 @@ init_cs := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts:
         error "Input constructible set should not contain conditions on %1", v;
     end if;
 
-    return implementation(p, v, cs, R, opts);
+    return implementation(p, v, cs, R);
 
 end proc;
 
@@ -392,17 +392,14 @@ end proc;
 #   v ....... Variable                                                    #
 #   cs ...... Constructible set                                           #
 #   R ....... Polynomial Ring                                             #
-#   opts .... A table containing the options (see                         #
-#             ComprehensiveSquareFreeFactorization header)                #
 #                                                                         #
 # OUTPUT                                                                  #
 #    Same as ComprehensiveSquareFreeFactorization                         #
 # ----------------------------------------------------------------------- #
-implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts, $)
+implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
 
     local p :: polynom,
-          result,
-          cs_zero :: TRDcs;
+          result;
 
     p := expand(p_in);
 

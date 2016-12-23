@@ -105,7 +105,6 @@ end proc;
 implementation := proc(A::Matrix(square), $)
 
     local p :: polynom,
-          x :: name,
           F :: Matrix,
           J :: Matrix,
           i :: posint,
@@ -120,30 +119,30 @@ implementation := proc(A::Matrix(square), $)
 
     # Compute the characteristic polynomial of A and compute square-free 
     # factorization.
-    p := LA:-CharacteristicPolynomial(A, x);
-    p := mul(map(y -> y[1], sqrfree(p, x)[2]));
+    p := LA:-CharacteristicPolynomial(A, 'x');
+    p := mul(map(y -> y[1], sqrfree(p, 'x')[2]));
 
-    d := discrim(p, x);
+    d := discrim(p, 'x');
     d := mul(map(y -> y[1], sqrfree(d)[2]));
 
     F := LA:-FrobeniusForm(A);
 
-    charPolyList := getCharPolys(F, x);
+    charPolyList := getCharPolys(F, 'x');
 
     blocks := [];
 
     for charPoly in charPolyList do
-        sqrFreeCharPoly := sqrfree(factor(charPoly), x)[2];
+        sqrFreeCharPoly := sqrfree(factor(charPoly), 'x')[2];
         for term in sqrFreeCharPoly do
             
             q, m := op(term);
             
-            if degree(q, x) > 1 then
-                for i to degree(q, x) do
-                    blocks := [op(blocks), [RootOf(q, x, 'index'=i), m]];
+            if degree(q, 'x') > 1 then
+                for i to degree(q, 'x') do
+                    blocks := [op(blocks), [RootOf(q, 'x', 'index'=i), m]];
                 end do;
             else
-                blocks := [op(blocks), [RootOf(q, x), m]];
+                blocks := [op(blocks), [RootOf(q, 'x'), m]];
             end if;
         end do;
     end do;
