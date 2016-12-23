@@ -31,6 +31,7 @@ ParametricMatrixTools := module()
     option package;
     
     export ComprehensiveGcd,
+           ListComprehensiveGcd,
            ComprehensiveSquareFreeFactorization,
            JordanFormWithProviso,
            companion_matrix_to_JCF;
@@ -84,6 +85,7 @@ $include "src/Extra/TRDis_disjoint_lcs.mpl"
 $include "src/Extra/TRDis_partition_cs.mpl"
 
 $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
+$include "src/ComprehensiveGcd/ListComprehensiveGcd.mpl"
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 
 $include "src/JordanForm/JordanFormWithProviso.mpl"
