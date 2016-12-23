@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 21/2016                                                #
+# UPDATED ... Dec. 22/2016                                                #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -32,7 +32,8 @@ ParametricMatrixTools := module()
     
     export ComprehensiveGcd,
            ComprehensiveSquareFreeFactorization,
-           JordanFormWithProviso;
+           JordanFormWithProviso,
+           companion_matrix_to_JCF;
     
     local ModuleLoad,
           loadTypes,
@@ -80,5 +81,6 @@ $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 
 $include "src/JordanForm/JordanFormWithProviso.mpl"
+$include "src/JordanForm/companion_matrix_to_JCF.mpl"
 
 end module:
