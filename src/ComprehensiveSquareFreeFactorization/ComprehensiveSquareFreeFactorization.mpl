@@ -122,7 +122,7 @@ init := proc()
         error "Too many arguments";
     end if;
 
-    if type(args[3], 'list') and type(args[2], 'list') then
+    if type(args[3], 'list') and type(args[4], 'list') then
         # ComprehensiveSquareFreeFactorization(p, v, F, H, R, options)
         userinfo(2, 'ParametricMatrixTools', "ComprehensiveSquareFreeFactorization called as ComprehensiveSquareFreeFactorization(p, v, F, H, R, options)");
 
