@@ -45,7 +45,10 @@ ParametricMatrixTools := module()
           isZeroOverRS,
           ListIntersection,
           ListUnion,
-          TRDdifference_intersect_cs_p;
+          TRDdifference_intersect_cs_p,
+          TRDequal_cs,
+          TRDis_disjoint_lcs,
+          TRDis_partition_cs;
     
     # This function is run when the package is loaded.
     ModuleLoad := proc()
@@ -76,6 +79,9 @@ $include "src/Extra/isZeroOverRS.mpl"
 $include "src/Extra/ListIntersection.mpl"
 $include "src/Extra/ListUnion.mpl"
 $include "src/Extra/TRDdifference_intersect_cs_p.mpl"
+$include "src/Extra/TRDequal_cs.mpl"
+$include "src/Extra/TRDis_disjoint_lcs.mpl"
+$include "src/Extra/TRDis_partition_cs.mpl"
 
 $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"

@@ -4,9 +4,7 @@ test := module()
 
     local verifyResult_rs,
           verifyResult_cs,
-          verifyPartition_cs,
           verifyCofactors,
-          equalCS,
           test1,
           test2,
           test3,
@@ -118,56 +116,6 @@ test := module()
 
     end proc;
     
-    equalCS := proc(cs1, cs2, R)
-        
-        local csD;
-        
-        csD := Difference(cs1, cs2, R);
-        if not IsEmpty(csD, R) then
-            return false;
-        end if;
-        
-        csD := Difference(cs2, cs1, R);
-        if not IsEmpty(csD, R) then
-            return false;
-        end if;
-        
-        return true;
-        
-    end proc;
-    
-    
-    # Verify that a list of constructible sets forms a partition of
-    # another constructible set.
-    verifyPartition_cs := proc(cs, csList, R)
-    
-        local csU, csListNonEmpty, i, j, csI;
-        
-        csListNonEmpty := remove(c -> IsEmpty(c, R), csList);
-        
-        csU := ParametricMatrixTools:-ListUnion(csListNonEmpty, R);
-        
-        if not equalCS(cs, csU, R) then
-            return false;
-        end if;
-        
-        # Verify that each pairwise element of csListNonEmpty is disjoint
-        if nops(csListNonEmpty) = 1 then
-            return true;
-        end if;
-        for i to nops(csListNonEmpty)-1 do
-            for j from i+1 to nops(csListNonEmpty) do
-                csI := Intersection(csListNonEmpty[i], csListNonEmpty[j], R);
-                if not IsEmpty(csI, R) then
-                    return false;
-                end if;
-            end do;
-        end do;
-        
-        return true;
-        
-    end proc;
-    
     
     verifyCofactors := proc(p1, p2, result, R)
         
@@ -214,7 +162,7 @@ test := module()
         csList := ListTools:-Flatten([map(x -> x[-1], g)]);
         csList := map(x -> ConstructibleSet([x], R), csList);
         csList := [op(csList), cs_zero];
-        if not verifyPartition_cs(cs, csList, R) then
+        if not ParametricMatrixTools:-TRDis_partition_cs(csList, cs, R) then
             printf("Not a partition!");
             return false;
         end if;
@@ -252,7 +200,7 @@ test := module()
         # Verify that the constructible sets in g, plus cs_zero form a 
         # partition of cs
         csList := ListTools:-Flatten([map(x -> x[-1], g), cs_zero]);
-        if not verifyPartition_cs(cs, csList, R) then
+        if not ParametricMatrixTools:-TRDis_partition_cs(csList, cs, R) then
             printf("Not a partition!");
             return false;
         end if;
@@ -1758,7 +1706,7 @@ test := module()
         
         csCorrect := GeneralConstruct([],[],R);
         
-        if not equalCS(csCorrect, g[1][2], R) then
+        if not ParametricMatrixTools:-TRDequal_cs(csCorrect, g[1][2], R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -1806,7 +1754,7 @@ test := module()
         
         csCorrect := GeneralConstruct([],[],R);
         
-        if not equalCS(csCorrect, g[1][2], R) then
+        if not ParametricMatrixTools:-TRDequal_cs(csCorrect, g[1][2], R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -1854,7 +1802,7 @@ test := module()
         
         csCorrect := GeneralConstruct([],[],R);
         
-        if not equalCS(csCorrect, g[1][2], R) then
+        if not ParametricMatrixTools:-TRDequal_cs(csCorrect, g[1][2], R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -1902,7 +1850,7 @@ test := module()
         
         csCorrect := GeneralConstruct([],[],R);
         
-        if not equalCS(csCorrect, g[1][2], R) then
+        if not ParametricMatrixTools:-TRDequal_cs(csCorrect, g[1][2], R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -1978,7 +1926,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1, b], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2015,7 +1963,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1, b], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2052,7 +2000,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1, b], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2089,7 +2037,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1, b], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2165,7 +2113,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2201,7 +2149,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2238,7 +2186,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2275,7 +2223,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2351,7 +2299,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2387,7 +2335,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2424,7 +2372,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
@@ -2461,7 +2409,7 @@ test := module()
         end try;
         
         cs_zero_correct := GeneralConstruct([a+1], [], R);
-        if not equalCS(cs_zero_correct, cs_zero, R) then
+        if not ParametricMatrixTools:-TRDequal_cs(cs_zero_correct, cs_zero, R) then
             printf("\b\b\bFAIL: Incorrect result\n");
             return false;
         end if;
