@@ -417,6 +417,11 @@ implementation := proc(lp_in::depends(list(polyInRing(R))), v::name, cs::TRDcs, 
         result := cleanRS(result, v, R);
     else
         result := cleanCS(result, R);
+        
+        # Clean result in only one gcd is found
+        if nops(result) = 1 and RC:-TRDis_empty_constructible_set(cs_zero, R) then
+            result := [[result[1][1], cs]];
+        end if;
     end if;
 
     return result, cs_zero;
