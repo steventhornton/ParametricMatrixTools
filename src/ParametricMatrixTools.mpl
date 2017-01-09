@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 22/2016                                                #
+# UPDATED ... Jan. 9/2016                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -30,14 +30,16 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export ComprehensiveGcd,
-           ListComprehensiveGcd,
+    export companion_matrix_to_JCF,
+           ComprehensiveGcd,
+           ComprehensiveSmithForm_Minors,
            ComprehensiveSquareFreeFactorization,
-           JordanFormWithProviso,
-           companion_matrix_to_JCF;
+           JordanForm,
+           ListComprehensiveGcd;
     
     local ModuleLoad,
           loadTypes,
+          allComb,
           isGreatestVariable,
           isNonZeroOverCS,
           isNonZeroOverRS,
@@ -71,6 +73,7 @@ $define LT ListTools
 # External Files
 $include "src/types.mpl"
 
+$include "src/Extra/allComb.mpl"
 $include "src/Extra/isGreatestVariable.mpl"
 $include "src/Extra/isUnder.mpl"
 $include "src/Extra/isNonZeroOverCS.mpl"
@@ -86,9 +89,12 @@ $include "src/Extra/TRDis_partition_cs.mpl"
 
 $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 $include "src/ComprehensiveGcd/ListComprehensiveGcd.mpl"
+
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 
-$include "src/JordanForm/JordanFormWithProviso.mpl"
+$include "src/JordanForm/JordanForm.mpl"
 $include "src/JordanForm/companion_matrix_to_JCF.mpl"
+
+$include "src/ComprehensiveSmithForm/ComprehensiveSmithForm_Minors.mpl"
 
 end module:

@@ -1,27 +1,22 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# JordanFormWithProviso.mpl                                               #
+# JordanForm.mpl                                                          #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 21/2016                                                #
+# UPDATED ... Jan. 9/2016                                                 #
 #                                                                         #
-# Given a matrix A where the entries are multivariate polynomials in      #
-# paramters, this method computes the Jordan canonical form of A and      #
-# provides conditions on the parameters such that the correct Jordan      #
-# form is returned.                                                       #
+# Compute the Jordan canonical form of a square matrix. If the matrix     #
+# contains parameters, the generic result is returned.                    #
 #                                                                         #
 # INPUT                                                                   #
 #   A ... Square matrix with parameters                                   #
 #                                                                         #
 # OUTPUT                                                                  #
-#   Two values:                                                           #
-#       J, h                                                              #
-#   Where J is the Jordan canonical form of A under the constraints       #
-#   imposed on the parameters by the inequation h.                        #
+#   The Jordan form of the input matrix.                                  #
 #                                                                         #
 # EXAMPLE                                                                 #
 #   > p1 := (x + 1)^2 * (x^2 + x + 1) * (x + a):                          #
@@ -29,7 +24,7 @@
 #   > C1 := CompanionMatrix(p1, x):                                       #
 #   > C2 := CompanionMatrix(p2, x):                                       #
 #   > A := DiagonalMatrix([C1, C2]):                                      #
-#   > J, h := JordanFormWithProviso(A):                                   #
+#   > J := JordanForm(A):                                                 #
 #   > convert(J, radical);                                                #
 #         [-1/2+((1/2)*I)*sqrt(3), 0, 0, 0, 0, 0, 0, 0]                   #
 #         [0, -1/2-((1/2)*I)*sqrt(3), 0, 0, 0, 0, 0, 0]                   #
@@ -39,8 +34,6 @@
 #         [0, 0, 0, 0, 0, -1/2+((1/2)*I)*sqrt(3), 0, 0]                   #
 #         [0, 0, 0, 0, 0, 0, -1/2-((1/2)*I)*sqrt(3), 0]                   #
 #         [0, 0, 0, 0, 0, 0, 0, -a]                                       #
-#   > h;                                                                  #
-#         a^3-2*a^2+2*a-1 <> 0                                            #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -57,7 +50,7 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-JordanFormWithProviso := module()
+JordanForm := module()
 
     export ModuleApply;
 
@@ -80,15 +73,12 @@ JordanFormWithProviso := module()
 # values pass checks.                                                     #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as JordanFormWithProviso                                         #
+#   Same as JordanForm                                                    #
 # ----------------------------------------------------------------------- #
 init := proc(A::Matrix(square), $)
 
-    # Check if A has parameters
-    #if nops(indets(A)) = 0 then
-    #    error "Matrix has no parameters, use LinearAlgebra:-JordanForm";
-    #end if;
-
+    # Check the types for the entries of A
+    
     return implementation(A);
 
 end proc;
@@ -100,12 +90,11 @@ end proc;
 # Compute the JCF of A.                                                   #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as JordanFormWithProviso                                         #
+#   Same as JordanFormWith                                                #
 # ----------------------------------------------------------------------- #
 implementation := proc(A::Matrix(square), $)
 
-    local p :: polynom,
-          F :: Matrix,
+    local F :: Matrix,
           J :: Matrix,
           i :: posint,
           blocks,
@@ -113,17 +102,8 @@ implementation := proc(A::Matrix(square), $)
           charPolyList :: list(polynom),
           q :: polynom,
           m :: posint,
-          d :: polynom,
           sqrFreeCharPoly, 
           term :: [polynom, posint];
-
-    # Compute the characteristic polynomial of A and compute square-free 
-    # factorization.
-    p := LA:-CharacteristicPolynomial(A, 'x');
-    p := mul(map(y -> y[1], sqrfree(p, 'x')[2]));
-
-    d := discrim(p, 'x');
-    d := mul(map(y -> y[1], sqrfree(d)[2]));
 
     F := LA:-FrobeniusForm(A);
 
@@ -149,7 +129,7 @@ implementation := proc(A::Matrix(square), $)
 
     J := LA:-JordanBlockMatrix(blocks);
 
-    return J, d <> 0;
+    return J;
 
 
 end proc;
