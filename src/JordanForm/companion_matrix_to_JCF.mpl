@@ -112,7 +112,8 @@ implementation := proc(A, cs, R, $)
           q,
           es,
           result,
-          R2 :: TRDring;
+          R2 :: TRDring,
+          x;
     
     # Compute the square-free factorization of the characteristic 
     # polynomial of A
