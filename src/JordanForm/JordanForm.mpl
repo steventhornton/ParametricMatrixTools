@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 9/2016                                                 #
+# UPDATED ... Jan. 9/2017                                                 #
 #                                                                         #
 # Compute the Jordan canonical form of a square matrix. If the matrix     #
 # contains parameters, the generic result is returned.                    #
