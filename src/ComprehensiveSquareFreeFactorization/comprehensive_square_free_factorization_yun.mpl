@@ -209,7 +209,8 @@ oneYunIteration := proc(a_in::depends(list([polyInRing(R), posint])), b_in::depe
     
     out, task := [], [];
     
-    if isZeroOverRS(b_in-1, rs_in, R) or isZeroOverRS(1+b_in, rs_in, R) then
+    if isConstant(b_in, R) then
+    # if isZeroOverRS(b_in-1, rs_in, R) or isZeroOverRS(1+b_in, rs_in, R) then
         return [], [[a_in, rs_in]];
     end if;
     
@@ -225,7 +226,8 @@ oneYunIteration := proc(a_in::depends(list([polyInRing(R), posint])), b_in::depe
     for g in gcdResult do
         a, b, c, rs := op(g);
         
-        if isZeroOverRS(b-1, rs, R) or isZeroOverRS(1+b, rs, R) then
+        if isConstant(b_in, R) then
+        # if isZeroOverRS(b-1, rs, R) or isZeroOverRS(1+b, rs, R) then
             out := [op(out), [[op(a_in), [a, i]], rs]];
         else
             d := expand(c - (diff(b, v)));
