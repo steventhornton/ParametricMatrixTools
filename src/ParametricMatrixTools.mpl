@@ -30,9 +30,9 @@ ParametricMatrixTools := module()
 
     option package;
     
-    export companion_matrix_to_JCF,
-           ComprehensiveFrobeniusForm,
+    export ComprehensiveFrobeniusForm,
            ComprehensiveGcd,
+           ComprehensiveJordanForm,
            ComprehensiveSmithForm,
            ComprehensiveSquareFreeFactorization,
            JordanForm,
@@ -105,7 +105,7 @@ $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 
-$include "src/ComprehensiveJordanForm/companion_matrix_to_JCF.mpl"
 $include "src/ComprehensiveJordanForm/JordanForm.mpl"
+$include "src/ComprehensiveJordanForm/ComprehensiveJordanForm.mpl"
 
 end module:

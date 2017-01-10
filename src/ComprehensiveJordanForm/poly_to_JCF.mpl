@@ -1,35 +1,36 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# companion_matrix_to_JCF.mpl                                             #
+# poly_to_JCF.mpl                                                         #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 22/2016                                                #
+# UPDATED ... Jan. 10/2017                                                #
 #                                                                         #
 # Compute a full discussion for the Jordan canonical form (JCF) of a      #
 # Frobenius companion matrix of a parametric univariate polynomial.       #
 #                                                                         #
 # INPUT                                                                   #
-#   C ... Frobenius companion matrix                                      #
+#   p .... parametric univariate polynomial                               #
+#   v .... Variable                                                       #
 #   cs ... Constructible set                                              #
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list with elements of the form                                      #
 #       [J_i, cs_i]                                                       #
-#   such that J_i is the JCF of the input matrix C for all values of the  #
-#   parameters in the zero set of cs_i. The set of constructible sets     #
-#   {cs_i, for all i} forms a partition of the input constructible set.   #
+#   such that J_i is the JCF of the Frobenius companion matrix of the     #
+#   input polynomial for all parameter values in the zer set of cs_i. The #
+#   set of constructible sets {cs_i, for all i} forms a partition of the  #
+#   input constructible set.                                              #
 #                                                                         #
 # EXAMPLE                                                                 #
 #   > p := (x + 1) * (x^2 + x + 1) * (x + a):                             #
-#   > C := CompanionMatrix(p, x):                                         #
-#   > R := PolynomialRing([a]):                                           #
+#   > R := PolynomialRing([x, a]):                                        #
 #   > cs := GeneralConstruct([], [], R):                                  #
-#   > result := companion_matrix_to_JCF(C, cs, R):                        #
+#   > result := poly_to_JCF(p, x, cs, R):                                 #
 #   > convert(result[1][1], radical), Display(result[1][2], R);           #
 #         [-1, 0, 0, 0]                                                   #
 #         [0, -1/2+((1/2)*I)*sqrt(3), 0, 0]     { a-1 <> 0                #
@@ -61,72 +62,48 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-companion_matrix_to_JCF := module()
+poly_to_JCF := module()
 
     export ModuleApply;
 
-    local init,
-          implementation,
+    local implementation,
           constructJCF;
 
     ModuleApply := proc()
-        return init(args);
+        return implementation(args);
     end proc;
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # METHODS
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-# ----------------------------------------------------------------------- #
-# init                                                                    #
-#                                                                         #
-# Check the input for errors.                                             #
-#                                                                         #
-# INPUT/OUTPUT                                                            #
-#   Same as comprehensive_FNF_to_JCF                                      #
-# ----------------------------------------------------------------------- #
-init := proc(A::Matrix(square), cs::TRDcs, R::TRDring, $)
-    
-    # TO DO
-    # Check that A is a matrix of polynomials in R
-    
-    return implementation(A, cs, R);
-    
-end proc;
-
 
 # ----------------------------------------------------------------------- #
 # implementation                                                          #
 #                                                                         #
-# Compute the full case discusion for the Jordan canonical form of a      #
-# companion matrix.                                                       #
+# Compute the full case discusion for the Jordan canonical form of the    #
+# companion matrix associated with a polynomial.                          #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as comprehensive_FNF_to_JCF                                      #
+#   Same as poly_to_JCF                                                   #
 # ----------------------------------------------------------------------- #
-implementation := proc(A, cs, R, $)
+implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
     
-    local p :: polynom,
-          p_sqr_free_list,
+    local p_sqr_free_list,
           p_sqr_free,
           q,
           es,
-          result,
-          R2 :: TRDring,
-          x;
+          result;
     
-    # Compute the square-free factorization of the characteristic 
-    # polynomial of A
-    p := LA:-CharacteristicPolynomial(A, 'x');
-    R2 := RC:-PolynomialRing(['x', op(R['variables'])]);
-    p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, 'x', cs, R2, 'outputType'='CS');
+    # Compute the square-free factorization of p
+    p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, v, cs, R, 'outputType'='CS');
     
-    # Build the JCF of A for each case returned by 
-    # ComprehensiveSquareFreeFactorization
+    # Build the JCF of the companion matrix associated with p for each case 
+    # returned by ComprehensiveSquareFreeFactorization
     result := [];
     for p_sqr_free in p_sqr_free_list do
         q, es := op(p_sqr_free);
-        result := [op(result), [constructJCF(q, 'x'), es]];
+        result := [op(result), [constructJCF(q, v), es]];
     end do;
     
     return result;
