@@ -429,7 +429,7 @@ implementation := proc(lp_in::depends(list(polyInRing(R))), v::name, cs::TRDcs, 
     result, cs_zero := list_comprehensive_gcd_src(lp, v, cs, R);
 
     # Convert to regular systems
-    if opts['ouput_RS'] then
+    if opts['output_RS'] then
         result := convertToRS(result, R);
         result := cleanRS(result, v, R);
     else
