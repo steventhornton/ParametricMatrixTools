@@ -64,11 +64,8 @@ FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, $)
     # where i is the index of the characteristic polynomial that needs to
     # be computed next
     # JList is a list of matrices
-    print("HERE4");
-    print(charPolyList);
-    print(RC:-Display(cs, R2));
     tasks := poly_to_JCF(charPolyList[1], 'v', cs, R2);
-    print("HERE5");
+    
     if N > 1 then
         tasks := map(x -> [[x[1]], x[2], 2], tasks);
     else
@@ -76,7 +73,7 @@ FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, $)
     end if;
     
     while nops(tasks) > 0 do
-        print(tasks);
+        
         JList, cs_i, i := op(tasks[1]);
         tasks := tasks[2..-1];
         
