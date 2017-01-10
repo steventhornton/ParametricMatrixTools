@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 14/2016                                                #
+# UPDATED ... Jan. 10/2017                                                #
 #                                                                         #
 # Compute the gcd of two parametric univariate polynomials in the sense   #
 # of Lazard. Constraints on parameter values can be provided via a        #
@@ -225,28 +225,70 @@ end proc;
 #                                                                         #
 # OUTPUT                                                                  #
 #    A table with indices                                                 #
-#        'cofactors'                                                      #
-#        'outputType'                                                     #
+#       cofactors                                                         #
+#       output_CS                                                         #
+#       output_RS                                                         #
 #    See ComprehensiveGcd header for specifications.                      #
 # ----------------------------------------------------------------------- #
 processOptions := proc(opts_in::set(equation), $) :: table;
 
     local opts::table(),
-          opt::equation;
+          opt::equation,
+          tab_opts,
+          opt_name,
+          opt_value;
 
     # Default values
-    opts['outputType'] := 'CS';
+    opts['output_CS'] := true;
+    opts['output_RS'] := false;
     opts['cofactors']  := false;
-
+    
+    tab_opts := table();
+    
     # Process each option
     for opt in opts_in do
-        if lhs(opt) in {indices(opts, 'nolist')} then
-            opts[lhs(opt)] := rhs(opt);
+        if type(opt, 'equation') then
+            
+            opt_name := lhs(opt);
+            
+            if assigned(tab_opts[opt_name]) then
+                error "duplicate option";
+            end if;
+            
+            if opt_name = ('outputType') then
+                opt_value := rhs(opt);
+                if not member(opt_value, ['CS', 'RS', 'ConstructibleSet', 'RegularSystem']) then
+                    error "incorrect option value: %1", opt;
+                end if;
+                if member(opt_value, ['CS', 'ConstructibleSet']) then
+                    opts['output_CS'] := true;
+                    opts['output_RS'] := false;
+                elif member(opt_value, ['RS', 'RegularSystem']) then
+                    opts['output_CS'] := false;
+                    opts['output_RS'] := true;
+                else
+                    error "incorrect option value: %1", opt;
+                end if;
+            elif opt_name = ('cofactors') then
+                opt_value := rhs(opt);
+                if not type(opts['cofactors'], 'truefalse') then
+                    error "incorrect option value: %1", opt;
+                end if;
+                opts['cofactors'] := opt_value;
+            else
+                error "unknown option";
+            end if;
+            tab_opts[opt_name] := true;
         else
-            error "'%1' is not a valid option", lhs(opt);
+            error "incorrect option format";
         end if;
     end do;
-
+    
+    # Check option compatibility
+    if opts['output_CS'] and opts['cofactors'] then
+        error "Output options ConstructibleSet or CS and cofactors=true are not compatible.";
+    end if;
+    
     return opts;
 
 end proc;
@@ -276,7 +318,7 @@ init_F_H := proc(p1::polynom, p2::polynom, v::name, F::list(polynom), H::list(po
           cs::TRDcs;
 
     # Check the input for errors
-    checkInput(p1, p2, v, R, opts);
+    checkInput(p1, p2, v, R);
 
     # All elements of F must be polynomials in R
     for i to nops(F) do
@@ -328,7 +370,7 @@ init_rs := proc(p1::polynom, p2::polynom, v::name, rs::TRDrs, R::TRDring, opts::
     local cs::TRDcs;
 
     # Check the input for errors
-    checkInput(p1, p2, v, R, opts);
+    checkInput(p1, p2, v, R);
 
     # All polynomial equations and inequations in rs should be not contain
     # any variables strictly greater than v as an indeterminant.
@@ -364,7 +406,7 @@ end proc;
 init_cs := proc(p1::polynom, p2::polynom, v::name, cs::TRDcs, R::TRDring, opts::table, $)
 
     # Check the input for errors
-    checkInput(p1, p2, v, R, opts);
+    checkInput(p1, p2, v, R);
 
     # cs should not contain any condition on v
     if not isUnder(cs, v, R) then
@@ -386,9 +428,8 @@ end proc;
 #   p2 ..... Polynomial                                                   #
 #   v ...... Variable                                                     #
 #   R ...... Polynomial Ring                                              #
-#   opts ... A table containing the options (see ComprehensiveGcd header) #
 # ----------------------------------------------------------------------- #
-checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, R::TRDring, opts::table, $)
+checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::name, R::TRDring, $)
 
     # p1 and p2 must not contain any variables strictly greater than v
     if not RC:-TRDis_constant(p1, R) then
@@ -401,30 +442,7 @@ checkInput := proc(p1::depends(polyInRing(R)), p2::depends(polyInRing(R)), v::na
             error "p2 must not contain any variables stricly greater than v";
         end if;
     end if;
-
-    # outputType option must be either 'RegularSystem', 'RS', 
-    # 'ConstructibleSet', or 'CS'
-    if not opts['outputType'] in {'RegularSystem', 'RS', 'ConstructibleSet', 'CS'} then
-        error "outputType option must be either RegularSystem, RS, ConstructibleSet or CS";
-    end if;
-    if opts['outputType'] = 'RegularSystem' then
-        opts['outputType'] := 'RS';
-    end if;
-    if opts['outputType'] = 'ConstructibleSet' then
-        opts['outputType'] := 'CS';
-    end if;
-
-    # Check the cofactors option
-    if not type(opts['cofactors'], 'truefalse') then
-        error "cofactors option must be a boolean values";
-    end if;
-
-    # Output options 'cofactors' = true and 'outputType' = 'ConstructibleSet'
-    # are not compatible
-    if opts['outputType'] ='CS' and opts['cofactors'] then
-        error "Output options ConstructibleSet or CS and cofactors=true are not compatible.";
-    end if;
-
+    
 end proc;
 
 
@@ -459,7 +477,7 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
     result, cs_zero := comprehensive_gcd_src(p1, p2, v, cs, R);
 
     # Convert to regular systems
-    if opts['outputType'] = 'RS' then
+    if opts['output_RS'] then
         result := convertToRS(result, R);
         result := cleanRS(result, v, R);
     else

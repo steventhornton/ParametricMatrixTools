@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 23/2016                                                #
+# UPDATED ... Jan. 10/2017                                                #
 #                                                                         #
 # Compute the square-free decomposition of a parametric univariate        #
 # polynomial over a constructible set by a modified version of Yun's      #
@@ -197,23 +197,54 @@ end proc;
 #                                                                         #
 # OUTPUT                                                                  #
 #    A table with indices                                                 #
-#        'outputType'                                                     #
+#       output_CS                                                         #
+#       output_RS                                                         #
 #    See ComprehensiveSquareFreeFactorization header for specifications.  #
 # ----------------------------------------------------------------------- #
 processOptions := proc(opts_in::set(equation), $) :: table;
 
     local opts :: table(),
-          opt :: equation;
+          opt :: equation,
+          tab_opts,
+          opt_name,
+          opt_value;
 
     # Default values
-    opts['outputType'] := 'CS';
-
+    opts['output_CS'] := true;
+    opts['output_RS'] := false;
+    
+    tab_opts := table();
+    
     # Process each option
     for opt in opts_in do
-        if lhs(opt) in {indices(opts, 'nolist')} then
-            opts[lhs(opt)] := rhs(opt);
+        if type(opt, 'equation') then
+            
+            opt_name := lhs(opt);
+            
+            if assigned(tab_opts[opt_name]) then
+                error "duplicate option";
+            end if;
+            
+            if opt_name = ('outputType') then
+                opt_value := rhs(opt);
+                if not member(opt_value, ['CS', 'RS', 'ConstructibleSet', 'RegularSystem']) then
+                    error "incorrect option value: %1", opt;
+                end if;
+                if member(opt_value, ['CS', 'ConstructibleSet']) then
+                    opts['output_CS'] := true;
+                    opts['output_RS'] := false;
+                elif member(opt_value, ['RS', 'RegularSystem']) then
+                    opts['output_CS'] := false;
+                    opts['output_RS'] := true;
+                else
+                    error "incorrect option value: %1", opt;
+                end if;
+            else
+                error "unknown option";
+            end if;
+            tab_opts[opt_name] := true;
         else
-            error "'%1' is not a valid option", lhs(opt);
+            error "incorrect option format";
         end if;
     end do;
 
@@ -246,7 +277,7 @@ init_F_H := proc(p::depends(polyInRing(R)), v::name, F::list(polynom), H::list(p
           cs :: TRDcs;
 
     # Check the input for errors
-    checkInput(p, v, R, opts);
+    checkInput(p, v, R);
 
     # All elements of F must be polynomials in R
     for i to nops(F) do
@@ -298,7 +329,7 @@ init_rs := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, opts:
     local cs :: TRDcs;
 
     # Check the input for errors
-    checkInput(p, v, R, opts);
+    checkInput(p, v, R);
 
     # All polynomial equations and inequations in rs should be not contain
     # any variables strictly greater than v as an indeterminant.
@@ -334,7 +365,7 @@ end proc;
 init_cs := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, opts::table, $)
 
     # Check the input for errors
-    checkInput(p, v, R, opts);
+    checkInput(p, v, R);
 
     # cs should not contain any condition on v
     if not isUnder(cs, v, R) then
@@ -355,28 +386,14 @@ end proc;
 #   p ...... Polynomial                                                   #
 #   v ...... Variable                                                     #
 #   R ...... Polynomial Ring                                              #
-#   opts ... A table containing the options (see                          #
-#            ComprehensiveSquareFreeFactorization header)                 #
 # ----------------------------------------------------------------------- #
-checkInput := proc(p::depends(polyInRing(R)), v::name, R::TRDring, opts::table, $)
+checkInput := proc(p::depends(polyInRing(R)), v::name, R::TRDring, $)
 
     # p1 and p2 must not contain any variables strictly greater than v
     if not RC:-TRDis_constant(p, R) then
         if RC:-TRDstrictly_less_var(v, RC:-MainVariable(p, R), R) then
             error "p must not contain any variables stricly greater than v";
         end if;
-    end if;
-
-    # outputType option must be either 'RegularSystem', 'RS', 
-    # 'ConstructibleSet', or 'CS'
-    if not opts['outputType'] in {'RegularSystem', 'RS', 'ConstructibleSet', 'CS'} then
-        error "outputType option must be either RegularSystem, RS, ConstructibleSet or CS";
-    end if;
-    if opts['outputType'] = 'RegularSystem' then
-        opts['outputType'] := 'RS';
-    end if;
-    if opts['outputType'] = 'ConstructibleSet' then
-        opts['outputType'] := 'CS';
     end if;
 
 end proc;
@@ -409,7 +426,7 @@ implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDr
     # Call the algorithm
     result := comprehensive_square_free_factorization_yun(p, v, cs, R);
     
-    if opts['outputType'] = 'CS' then
+    if opts['output_CS'] then
         return convertToCS(result, R);
     else
         return result;
