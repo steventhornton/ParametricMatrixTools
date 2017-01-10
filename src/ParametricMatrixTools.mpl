@@ -105,7 +105,7 @@ $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 
-$include "src/JordanForm/companion_matrix_to_JCF.mpl"
-$include "src/JordanForm/JordanForm.mpl"
+$include "src/ComprehensiveJordanForm/companion_matrix_to_JCF.mpl"
+$include "src/ComprehensiveJordanForm/JordanForm.mpl"
 
 end module:
