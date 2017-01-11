@@ -12,7 +12,7 @@ ComprehensiveSmithForm(A, v, F, H, R, options)
 
 ## Input
 | Variable | Description |
-|-|-|
+| --- | --- |
 |`A` | Square matrix of monic, parametric univariate polynomials in `v` |
 |`v` | The variable that the entries of `A` are monic polynomials in |
 |`rs`| Regular system |
@@ -23,7 +23,7 @@ ComprehensiveSmithForm(A, v, F, H, R, options)
 
 ## Options
 | Option name | Default value | Description |
-| - | - | - |
+| --- | --- | --- |
 | `'outputType'` | `'CS'` | When set to `'CS'` or `'ConstructibleSet'` the output will contain constructible sets, when set to `'RS'` or `'RegularSystem'`, the output will contain regular systems. |
 | `'outputMatrices'` | `'S'` | Which matrices to return, value can be either `'S'`, `'U'`, or `'V'` or a list containing any combination of `'S'`, `'U'`, and `'V'` |
 | `'lazy'` | `false` | When `true`, this method will only return one branch of the computation. This option is not currently implemented. |
@@ -36,7 +36,7 @@ ComprehensiveSmithForm(A, v, F, H, R, options)
 A list with elements in one of the following forms:
 
 | Output structure | Options |
-| - | - |
+| --- | --- |
 | `[S, rs]` | `'outputType'` is `'RegularSystem'` or ``'RS'`` and `'outputMatrices' = 'S'` |
 | `[S, cs]` | `'outputType'` is `'ConstructibleSet'` or ``'CS'`` and `'outputMatrices' = 'S'` |
 | `[U, rs]` | `'outputType'` is `'RegularSystem'` or ``'RS'`` and `'outputMatrices' = 'U'` |

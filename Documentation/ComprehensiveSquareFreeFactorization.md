@@ -13,7 +13,7 @@ ComprehensiveSquareFreeFactorization(p, v, F, H, R, options)
 ## Input
 
 | Variable | Description |
-| - | - |
+| --- | --- |
 | `p` | A parametric, univariate polynomial in `v` |
 | `v`  | The variable that `p1` and `p2` are polynomials in |
 | `rs` | Regular system |
@@ -25,14 +25,14 @@ ComprehensiveSquareFreeFactorization(p, v, F, H, R, options)
 ## Options
 
 | Option name | Default value | Description |
-| - | - | - |
+| --- | --- | --- |
 | `'outputType'` | `'CS'` | When set to `'CS'` or `'ConstructibleSet'` the output will contain constructible sets, when set to `'RS'` or `'RegularSystem'`, the output will contain regular systems. |
 
 ## Output
 
 A list with elements of the form:
 | Output structure | Options |
-| - | - |
+| --- | --- |
 | `[lp, rs_i]` | `'outputType'` is `'RegularSystem'` or `'RS'` |
 | `[lp, cs_i]` | `'outputType'` is `'ConstructibleSet'` or `'CS'` |
 

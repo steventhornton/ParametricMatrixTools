@@ -13,7 +13,7 @@ ComprehensiveJordanForm(A, F, H, R, options)
 ## Input
 
 | Variable | Description |
-| - | - |
+| --- | --- |
 | `A`  | Square matrix of multivariate polynomials over `R` |
 | `rs` | Regular system |
 | `cs` | Constructible set |
@@ -24,7 +24,7 @@ ComprehensiveJordanForm(A, F, H, R, options)
 ## Options
 
 | Option name | Default value | Description |
-| - | - | - |
+| --- | --- | --- |
 | `'outputType'` | `'CS'` | When set to `'CS'` or `'ConstructibleSet'` the output will contain constructible sets, when set to `'RS'` or `'RegularSystem'`, the output will contain regular systems. |
 | `'outputMatrices'` | `'J'` | Which matrices to return, value can be either `'J'` or `'Q'` or a list containing any combination of `'J'`, and `'Q'` |
 | `'lazy'` | `false` | When `true`, this method will only return one branch of the computation. This option is not currently implemented. |
@@ -36,7 +36,7 @@ ComprehensiveJordanForm(A, F, H, R, options)
 ## Output
 
 | Output structure | Options |
-| - | - |
+| --- | --- |
 | `[J, rs]` | `'outputType'` is `'RegularSystem'` or `'RS'` and `'outputMatrices' = 'J'` |
 | `[J, cs]` | `'outputType'` is `'ConstructibleSet'` or `'CS'` and `'outputMatrices' = 'J'` |
 | `[Q, rs]` | `'outputType'` is `'RegularSystem'` or `'RS'` and `'outputMatrices' = 'Q'` |

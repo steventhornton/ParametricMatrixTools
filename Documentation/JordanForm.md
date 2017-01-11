@@ -9,7 +9,7 @@ JordanForm(A)
 ## Input
 
 | Variable | Description |
-| - | - |
+| --- | --- |
 | `A`  | Square matrix |
 
 ## Output

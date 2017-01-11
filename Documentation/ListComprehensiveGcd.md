@@ -13,7 +13,7 @@ ListComprehensiveGcd(lp, v, F, H, R, options)
 ## Input
 
 | Variable | Description |
-| - | - |
+| --- | --- |
 | `lp` | A list of parametric, univariate polynomial in `v` |
 | `v`  | The variable that `p1` and `p2` are polynomials in |
 | `rs` | Regular system |
@@ -25,7 +25,7 @@ ListComprehensiveGcd(lp, v, F, H, R, options)
 ## Options
 
 | Option name | Default value | Description |
-| - | - | - |
+| --- | --- | --- |
 | `'outputType'` | `'CS'` | When set to `'CS'` or `'ConstructibleSet'` the output will contain constructible sets, when set to `'RS'` or `'RegularSystem'`, the output will contain regular systems. |
 
 ## Output
@@ -33,7 +33,7 @@ ListComprehensiveGcd(lp, v, F, H, R, options)
 A sequence `gcdList, cs_zero` where `gcdList` is a list with elements of the form:
 
 | Output structure | Options |
-| - | - |
+| --- | --- |
 | `[g, rs]` | `'outputType'` is `'RegularSystem'` or `'RS'` |
 | `[g, cs]` | `'outputType'` is `'ConstructibleSet'` or `'CS'` |
 | `[g, cof_p1, cof_p2, rs]` | `'outputType'` is `'RegularSystem'` or `'RS'` and `'cofactors' = true` |
