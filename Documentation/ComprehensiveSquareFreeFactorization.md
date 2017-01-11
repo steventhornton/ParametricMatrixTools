@@ -31,6 +31,7 @@ ComprehensiveSquareFreeFactorization(p, v, F, H, R, options)
 ## Output
 
 A list with elements of the form:
+
 | Output structure | Options |
 | --- | --- |
 | `[lp, rs_i]` | `'outputType'` is `'RegularSystem'` or `'RS'` |
