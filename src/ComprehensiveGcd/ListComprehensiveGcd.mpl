@@ -15,14 +15,14 @@
 # inequation constraints.                                                 #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#   ListComprehensiveGcd(lp, v, R, options)                               #
 #   ListComprehensiveGcd(lp, v, rs, R, options)                           #
 #   ListComprehensiveGcd(lp, v, cs, R, options)                           #
 #   ListComprehensiveGcd(lp, v, F, R, options)                            #
 #   ListComprehensiveGcd(lp, v, F, H, R, options)                         #
-#
+#                                                                         #
 # INPUT                                                                   #
-#   p1 ... Polynomial                                                     #
-#   p2 ... Polynomial                                                     #
+#   lp ... List of polynomials                                            #
 #   v .... Variable                                                       #
 #   rs ... Regular system                                                 #
 #   cs ... Constructible set                                              #

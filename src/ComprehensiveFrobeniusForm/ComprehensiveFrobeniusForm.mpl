@@ -14,6 +14,7 @@
 # regular system or constructible set.                                    #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#   ComprehensiveFrobeniusForm(A, R, options)                             #
 #   ComprehensiveFrobeniusForm(A, rs, R, options)                         #
 #   ComprehensiveFrobeniusForm(A, cs, R, options)                         #
 #   ComprehensiveFrobeniusForm(A, F, R, options)                          #
@@ -49,8 +50,8 @@
 #                                                                         #
 # OPTION COMPATIBILITY                                                    #
 #   - Only the Frobenius form can be returned when the snf_minors         #
-#     alogrithm is used, the transformation matrices are not computed     #
-#     with this algorithm.                                                #
+#     alogrithm is used, the transformation matrix is not computed with   #
+#     this algorithm.                                                     #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list with elements in one of the following forms:                   #
@@ -63,9 +64,9 @@
 #       [Q, cs] ......... 'outputType' is 'ConstructibleSet' or 'CS' and  #
 #                                  'outputMatrices' = 'Q'                 #
 #       [F, Q, rs] ...... 'outputType' is 'RegularSystem' or 'RS' and     #
-#                                  'outputMatrices' = {'F', 'Q'}          #
+#                                  'outputMatrices' = ['F', 'Q']          #
 #       [F, Q, cs] ...... 'outputType' is 'ConstructibleSet' or 'CS' and  #
-#                                  'outputMatrices' = {'F', 'Q'}          #
+#                                  'outputMatrices' = ['F', 'Q']          #
 #   Where F is the Frobenius normal form of A for all parameter values    #
 #   that satisfy the equations and inequations of cs or rs. Q is the      #
 #   similarity transformation matrix such that                            #

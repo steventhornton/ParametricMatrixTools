@@ -15,6 +15,7 @@
 # inequation constraints.                                                 #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#   ComprehensiveGcd(p1, p2, v, R, options)                               #
 #   ComprehensiveGcd(p1, p2, v, rs, R, options)                           #
 #   ComprehensiveGcd(p1, p2, v, cs, R, options)                           #
 #   ComprehensiveGcd(p1, p2, v, F, R, options)                            #
@@ -53,7 +54,7 @@
 #       [g_i, cs_i] ....................... 'outputType' either 'CS' or   #
 #                                           'ConstructibleSet' and        #
 #                                           'cofactors' = false.          #
-#       [c_i, cof_p1_i, cof_p2_i, rs_i] ... 'outputType' either 'RS' or   #
+#       [g_i, cof_p1_i, cof_p2_i, rs_i] ... 'outputType' either 'RS' or   #
 #                                           'RegularSystem' and           #
 #                                           'cofactors' = true.           #
 #   Where g_i is the gcd of p1 and p2 for all values in the zero set of   #

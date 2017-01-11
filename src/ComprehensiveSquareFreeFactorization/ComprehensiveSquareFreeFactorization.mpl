@@ -14,6 +14,7 @@
 # algorithm for parametric univariate polynomials.                        #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#   ComprehensiveSquareFreeFactorization(p, v, R, options)                #
 #   ComprehensiveSquareFreeFactorization(p, v, rs, R, options)            #
 #   ComprehensiveSquareFreeFactorization(p, v, cs, R, options)            #
 #   ComprehensiveSquareFreeFactorization(p, v, F, R, options)             #

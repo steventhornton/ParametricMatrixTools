@@ -9,62 +9,15 @@ The parametric matrices this package is designed to work with are matrices where
 From the `ParametricMatrixTools` directory, run `make mla`. This will create a Maple library file called `ParametricMatrixTools.mla` containing the package. See the `Examples.mw` worksheet for examples of using the functions in the package.
 
 ## Methods
-The following methods are currently implemented:
 
-- [ComprehensiveGcd](#comprehensivegcd)
-- [ComprehensiveSquareFreeFactorization](#comprehensivesquarefreefactorization)
+- [ComprehensiveSmithForm](Documentation/ComprehensiveSmithForm.md)
+- [ComprehensiveFrobeniusForm](Documentation/ComprehensiveFrobeniusForm.md)
+- [JordanForm](Documentation/JordanForm.md)
+- [ComprehensiveJordanForm](Documentation/ComprehensiveJordanForm.md)
+- [ComprehensiveGcd](Documentation/ComprehensiveGcd.md)
+- [ListComprehensiveGcd](Documentation/ListComprehensiveGcd.md)
+- [ComprehensiveSquareFreeFactorization](Documentation/ComprehensiveSquareFreeFactorization.md)
 
-Brief descriptions of each of these methods can be found in the headers of each file. An example Maple worksheet has been provided to show how these methods are used.
-
-## ComprehensiveGcd
-The `ComprehensiveGcd` function will compute a complete case discussion of the gcd of two parametric univariate polynomials.
-
-### Example
-```
-with(RegularChains):
-with(ConstructibleSetTools):
-with(ParametricMatrixTools):
-
-# Set up the polynomials with variable order x > a
-R := PolynomialRing([x, a]):
-p1 := (x+1)*(x+a):
-p2 := (x+2)^2:
-
-# Constraints on the parameters (a <> 10)
-cs := GeneralConstruct([], [a-10], R):
-
-# Compute the gcd
-g, cs_zero := ComprehensiveGcd(p1, p2, x, cs, R):
-IsEmpty(cs_zero, R);
-    true
-Display(g, R);
-    [[-a*x-2*a+2*x+4, a-2 <> 0, a-10 <> 0], [x^2+4*x+4, a-2 = 0]]
-```
-
-## ComprehensiveSquareFreeFactorization
-The `ComprehensiveSquareFreeFactorization` function will return a complete case discussion for the square-free factorization of a parametric univariate polynomial.
-
-### Example
-```
-with(RegularChains):
-with(ConstructibleSetTools):
-with(ParametricMatrixTools):
-
-# Set up the polynomials with variable order x > a
-R := PolynomialRing([x, a]):
-p := (x+1)^2 * (x+1):
-
-# Constraints on the parameters (a <> 10)
-cs := GeneralConstruct([], [a-10], R):
-
-# Compute the gcd
-result := ComprehensiveSquareFreeFactorization(p, x, cs, R)
-nops(result);
-    2
-Display(result[1], R);
-    [[x+a, 1], [x+1, 2]], a-1 <> 0, a-10 <> 0]
-Display(result[2], R);
-    [[[x+1, 3]], a-1 = 0]
-```
+Detailed descriptions of each of these methods can be found in the [Documentation](Documentation) directory. An Maple worksheet [Examples.mw](Examples.mw) contains numerous examples of each of the above methods in use.
 
 __This package is being actively developed and likely contains bugs :bug:__

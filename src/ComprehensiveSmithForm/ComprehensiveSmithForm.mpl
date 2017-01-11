@@ -7,13 +7,14 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 9/2017                                                 #
+# UPDATED ... Jan. 10/2017                                                #
 #                                                                         #
 # Computes the Smith normal form of a matrix where the entries are        #
 # parametric univariate polynomials. Computation is done modulo a         #
 # regular system or constructible set.                                    #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#    ComprehensiveSmithForm(A, v, R, options)                             #
 #    ComprehensiveSmithForm(A, v, rs, R, options)                         #
 #    ComprehensiveSmithForm(A, v, cs, R, options)                         #
 #    ComprehensiveSmithForm(A, v, F, R, options)                          #
@@ -39,7 +40,7 @@
 #                      S, U, V, [S, U, V], [U, V], [S, U], [S, V]         #
 #                         - Which matrices to return (see below)          #
 #                                                                         #
-#   lazy ............. Default = true                                     #
+#   lazy ............. Default = false                                    #
 #                      If true, only one branch of the computation is     #
 #                      returned (significatly faster). Otherwise, all     #
 #                      branches are returned.                             #
@@ -98,6 +99,46 @@
 #     variable in any equations or inequations.                           #
 #                                                                         #
 # EXAMPLE                                                                 #
+#   > with(RegularChains):                                                #
+#   > with(ParametricMatrixTools):                                        #
+#   >                                                                     #
+#   > R := PolynomialRing([x,a]):                                         #
+#   > A := Matrix([[ 0,  a,  1,  1,  1],                                  #
+#                  [ 2, -2,  0, -2, -4],                                  #
+#                  [ 0,  0,  1,  1,  3],                                  #
+#                  [-6,  0, -3, -1, -3],                                  #
+#                  [ 2,  2,  2,  2,  4]]):                                #
+#   > Ax := x*IdentityMatrix(5) - A:                                      #
+#   >                                                                     #
+#   > result := ComprehensiveSmithForm(Ax, x, [], R):                     #
+#   >                                                                     #
+#   > map(factor, result[1][1]), Display(result[1][2], R);                #
+#         [1,0,0,0,0]                                                     #
+#         [0,1,0,0,0]                              {a-4 <> 0              #
+#         [0,0,1,0,0]                              {a-1 <> 0              #
+#         [0,0,0,1,0]                              {23a^2-61a+68 <> 0     #
+#         [0,0,0,0,-(x-2)(x^2+2)(-x^2+2a-4)]                              #
+#   >                                                                     #
+#   > map(factor, result[2][1]), Display(result[2][2], R);                #
+#         [1,0,0,0,0]                                                     #
+#         [0,1,0,0,0]                                                     #
+#         [0,0,1,0,0]                              {23a^2-61a+68 = 0      #
+#         [0,0,0,1,0]                                                     #
+#         [0,0,0,0,-(x-2)(x^2+2)(-x^2+2a-4)]                              #
+#   >                                                                     #
+#   > map(factor, result[3][1]), Display(result[3][2], R);                #
+#         [1,0,0,0,  0]                                                   #
+#         [0,1,0,0,  0]                                                   #
+#         [0,0,1,0,  0]                     {a-4 = 0                      #
+#         [0,0,0,x-2,0]                                                   #
+#         [0,0,0,0,  (x-2)*(x+2)*(x^2+2)]                                 #
+#   >                                                                     #
+#   > map(factor, result[4][1]), Display(result[4][2], R);                #
+#         [1,0,0,0,    0]                                                 #
+#         [0,1,0,0,    0]                                                 #
+#         [0,0,1,0,    0]                     {a-1 = 0                    #
+#         [0,0,0,x^2+2,0]                                                 #
+#         [0,0,0,0,    (x-2)*(x^2+2)]                                     #
 #                                                                         #
 # REFERENCES                                                              #
 #                                                                         #

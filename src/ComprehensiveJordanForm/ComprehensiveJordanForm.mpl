@@ -14,6 +14,7 @@
 # or constructible set.                                                   #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
+#   ComprehensiveJordanForm(A, R, options)                                #
 #   ComprehensiveJordanForm(A, rs, R, options)                            #
 #   ComprehensiveJordanForm(A, cs, R, options)                            #
 #   ComprehensiveJordanForm(A, F, R, options)                             #
@@ -63,9 +64,9 @@
 #       [Q, cs] ......... 'outputType' is 'ConstructibleSet' or 'CS' and  #
 #                                  'outputMatrices' = 'Q'                 #
 #       [J, Q, rs] ...... 'outputType' is 'RegularSystem' or 'RS' and     #
-#                                  'outputMatrices' = {'J', 'Q'}          #
+#                                  'outputMatrices' = ['J', 'Q']          #
 #       [J, Q, cs] ...... 'outputType' is 'ConstructibleSet' or 'CS' and  #
-#                                  'outputMatrices' = {'J', 'Q'}          #
+#                                  'outputMatrices' = ['J', 'Q']          #
 #   Where J is the Jordan canonical form of A for all parameter values    #
 #   that satisfy the equations and inequations of cs or rs. Q is the      #
 #   similarity transformation matrix such that                            #
