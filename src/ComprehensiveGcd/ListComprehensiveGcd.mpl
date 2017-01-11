@@ -175,9 +175,21 @@ init := proc()
         opts := processOptions({args[5..-1]});
 
         return init_cs(lp, v, cs, R, opts);
-
+    
+    elif RC:-TRDis_polynomial_ring(args[3]) then
+        # ListComprehensiveGcd(lp, v, R, options)
+        userinfo(2, 'ParametricMatrixTools', "ListComprehensiveGcd called as ListComprehensiveGcd(lp, v, R, options)");
+        
+        lp := args[1];
+        v  := args[2];
+        R  := args[3];
+        
+        opts := processOptions({args[4..-1]});
+        
+        return init_F_H(lp, v, [], [], R, opts);
+        
     else
-        error "Expected fourth argument to be a list of polynomials, regular system or a constructible set";
+        error "Invalid arguments";
     end if;
 
 end proc;

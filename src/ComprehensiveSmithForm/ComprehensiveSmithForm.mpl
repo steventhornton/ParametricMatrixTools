@@ -203,7 +203,7 @@ init := proc()
     local A, v, F, H, R, opts, cs, rs;
 
     # Check the number of arguments
-    if nargs < 4 then
+    if nargs < 3 then
         error "Insufficient number of arguments";
     elif nargs > 9 then
         error "To many arguments";
@@ -265,9 +265,21 @@ init := proc()
         opts := processOptions({args[5..-1]});
         
         return init_cs(A, v, cs, R, opts);
+    
+    elif RC:-TRDis_polynomial_ring(args[3]) then
+        # ComprehensiveSmithForm(A, v, R, opts)
+        userinfo(2, 'ParametricMatrixTools', "ComprehensiveSmithForm called as ComprehensiveSmithForm(A, v, R, options)");
+        
+        A  := args[1];
+        v  := args[2];
+        R  := args[3];
+        
+        opts := processOptions({args[4..-1]});
+        
+        return init_F_H(A, v, [], [], R, opts);
         
     else
-        error "Expected third argument to be a list of polynomials, regular system or a constructible set";
+        error "Invalid arguments";
     end if;
 
 

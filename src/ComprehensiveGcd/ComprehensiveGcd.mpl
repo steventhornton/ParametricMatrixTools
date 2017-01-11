@@ -140,7 +140,7 @@ init := proc()
     local p1, p2, v, F, H, R, rs, cs, opts;
 
     # Check the number of arguments
-    if nargs < 5 then
+    if nargs < 4 then
         error "Insufficient number of arguments";
     elif nargs > 8 then
         error "Too many arguments";
@@ -207,9 +207,22 @@ init := proc()
         opts := processOptions({args[6..-1]});
 
         return init_cs(p1, p2, v, cs, R, opts);
-
+    
+    elif RC:-TRDis_polynomial_ring(args[4]) then
+        # ComprehensiveGcd(p1, p2, v, R, options)
+        userinfo(2, 'ParametricMatrixTools', "ComprehensiveGcd called as ComprehensiveGcd(p1, p2, v, R, options)");
+        
+        p1 := args[1];
+        p2 := args[2];
+        v  := args[3];
+        R  := args[4];
+        
+        opts := processOptions({args[5..-1]});
+        
+        return init_F_H(p1, p2, v, [], [], R, opts);
+        
     else
-        error "Expected fourth argument to be a list of polynomials, regular system or a constructible set";
+        error "Invalid arguments";
     end if;
 
 end proc;

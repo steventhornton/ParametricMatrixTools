@@ -117,7 +117,7 @@ init := proc()
     local p, v, F, H, R, rs, cs, opts;
 
     # Check the number of arguments
-    if nargs < 4 then
+    if nargs < 3 then
         error "Insufficient number of arguments";
     elif nargs > 6 then
         error "Too many arguments";
@@ -179,9 +179,21 @@ init := proc()
         opts := processOptions({args[5..-1]});
 
         return init_cs(p, v, cs, R, opts);
-
+    
+    elif RC:-TRDis_polynomial_ring(args[3]) then
+        # ComprehensiveSquareFreeFactorization(p, v, R, options)
+        userinfo(2, 'ParametricMatrixTools', "ComprehensiveSquareFreeFactorization called as ComprehensiveSquareFreeFactorization(p, v, R, options)");
+        
+        p  := args[1];
+        v  := args[2];
+        R  := args[3];
+        
+        opts := processOptions({args[4..-1]});
+        
+        return init_F_H(p, v, [], [], R, opts);
+        
     else
-        error "Expected third argument to be a list of polynomials, regular system or a constructible set";
+        error "Invalid arguments";
     end if;
 
 end proc;

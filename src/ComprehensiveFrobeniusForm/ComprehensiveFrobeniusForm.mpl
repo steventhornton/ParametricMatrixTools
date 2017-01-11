@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 9/2017                                                 #
+# UPDATED ... Jan. 10/2017                                                #
 #                                                                         #
 # Computes the Frobenius (rational) normal form of a matrix where the     #
 # entries are multivariate polynomials. Computation is done modulo a      #
@@ -141,7 +141,7 @@ init := proc()
           cs :: TRDcs,
           opts :: table;
 
-    if nargs < 3 then
+    if nargs < 2 then
         error "Insufficient number of arguments";
     elif nargs > 8 then
         error "To many arguments";
@@ -199,9 +199,20 @@ init := proc()
         opts := processOptions({args[4..-1]});
 
         return init_cs(A, cs, R, opts);
-
+    
+    elif RC:-TRDis_polynomial_ring(args[2]) then
+        # ComprehensiveFrobeniusForm(A, R, opts)
+        userinfo(2, 'ParametricMatrixTools', "ComprehensiveFrobeniusForm called as ComprehensiveFrobeniusForm(A, R, options)");
+        
+        A  := args[1];
+        R  := args[2];
+        
+        opts := processOptions({args[3..-1]});
+        
+        return init_F_H(A, [], [], R, opts);
+        
     else
-        error "Expected second argument to be a list of polynomials, regular system or a constructible set";
+        error "Invalid arguments";
     end if;
 
 end proc;
