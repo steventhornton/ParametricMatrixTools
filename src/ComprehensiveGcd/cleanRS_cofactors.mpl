@@ -1,7 +1,7 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# cleanRS.mpl                                                             #
+# cleanRS_cofactors.mpl                                                   #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
@@ -10,22 +10,26 @@
 # UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Given a list with elements of the form                                  #
-#   [g, rs]                                                               #
+#   [g, c1, c2, rs]                                                       #
 # clean the polynomial g by:                                              #
 #    - removing its content                                               #
 #    - reducing modulo the regular chain of rs                            #
 #    - Ensure the sign(lcoeff(g)) is positive                             #
+# And ensure that c1*g = p1, and c2*g = p2.                               #
 #                                                                         #
 # INPUT                                                                   #
 #   result ... A list with elements of the form                           #
-#                  [g, rs]                                                #
-#              where g is a polynomial and rs is a regular system.        #
+#                  [g, c1, c2, rs]                                        #
+#              where g is a polynomial, c1 and c2 are polynomials in v    #
+#              where the coefficients are rational functions in the       #
+#              remaining variables (parameters) and rs is a regular       #
+#              system.                                                    #
 #   v ........ Variable                                                   #
 #   R ........ Polynomial ring                                            #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list with elements of the form                                      #
-#       [g, rs]                                                           #
+#       [g, c1, c2, rs]                                                   #
 #   with the same number of elements as the input list.                   #
 #                                                                         #
 # LICENSE                                                                 #
@@ -43,26 +47,50 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-cleanRS := proc(result::list([polynom, TRDrs]), v::name, R::TRDring, $)
+cleanRS_cofactors := proc(result::list([polynom, ratpoly, ratpoly, TRDrs]), v::name, R::TRDring, $)
 
-    local out :: list([polynom, TRDrs]),
-          item :: [polynom, TRDrs],
+    local item :: [polynom, ratpoly, ratpoly, TRDrs],
           g :: polynom,
+          c1 :: ratpoly,
+          c2 :: ratpoly,
           rs :: TRDrs,
-          rc :: TRDrc;
-    
+          rc :: TRDrc,
+          co :: ratpoly,
+          out :: list([polynom, ratpoly, ratpoly, TRDrs]),
+          s :: integer,
+          h :: polynom,
+          h1 :: polynom,
+          h2 :: polynom;
+
     out := [];
-    
+
     for item in result do
-        g, rs := op(item);
+        g, c1, c2, rs := op(item);
         rc := RC_CST:-RepresentingChain(rs, R);
-        
-        g := primpart(RC:-SparsePseudoRemainder(g, rc, R), v);
-        g := sign(lcoeff(g,v))*g;
-        
-        out := [op(out), [g, rs]];
+
+        g := primpart(RC:-SparsePseudoRemainder(g, rc, R, 'h'), v, 'co');
+        s := sign(lcoeff(g,v));
+        g := s*g;
+
+        c1 := normal(c1*co/h);
+        c2 := normal(c2*co/h);
+
+        c1 := normal(RC:-SparsePseudoRemainder(numer(c1), rc, R, 'h1')/RC:-SparsePseudoRemainder(denom(c1), rc, R, 'h2'));
+        c1 := normal(c1*h2/h1);
+        c2 := normal(RC:-SparsePseudoRemainder(numer(c2), rc, R, 'h1')/RC:-SparsePseudoRemainder(denom(c2), rc, R, 'h2'));
+        c2 := normal(c2*h2/h1);
+
+        c1 := s*c1;
+        c2 := s*c2;
+
+        # TO DO:
+        #   Add heuristic to clean the result by inverting denom(c1) and denom(c2)
+        #   over rc.
+
+        out := [op(out), [g, c1, c2, rs]];
+
     end do;
     
     return out;
-    
+
 end proc;

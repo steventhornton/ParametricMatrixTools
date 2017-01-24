@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 13/2016                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Computes the polynomial p/g where g is known to be a factor of p over   #
 # a regular chain.                                                        #
@@ -53,6 +53,8 @@ pseudo_cofactor := proc(p::depends(polyInRing(R)), g::depends(polyInRing(R)), v:
     ASSERT(isZeroOverRS(r, RC_CST:-RegularSystem(rc, R), R), "Remainder must be zero");
     
     q := normal(q/m);
+    
+    ASSERT(not v in indets(denom(q)), "Denominator must not contain v");
     
     return q;
 

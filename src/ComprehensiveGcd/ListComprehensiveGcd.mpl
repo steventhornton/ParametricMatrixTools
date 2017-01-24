@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Compute the gcd of a list of parametric univariate polynomials in the   #
 # sense of Lazard. Constraints on parameter values can be provided via a  #
@@ -86,8 +86,7 @@ ListComprehensiveGcd := module()
         list_comprehensive_gcd_src,
         convertToRS,
         cleanRS,
-        cleanCS,
-        listGcd;
+        cleanCS;
 
     ModuleApply := proc()
         return init(args);
@@ -462,7 +461,6 @@ end proc;
 # External Files
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveGcd/list_comprehensive_gcd_src.mpl>
-$include <src/ComprehensiveGcd/listGcd.mpl>
 $include <src/ComprehensiveGcd/cleanRS.mpl>
 $include <src/ComprehensiveGcd/cleanCS.mpl>
 $include <src/ComprehensiveGcd/convertToRS.mpl>

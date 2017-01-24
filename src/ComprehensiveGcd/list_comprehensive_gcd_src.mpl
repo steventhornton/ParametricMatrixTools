@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Dec. 23/2016                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Computes the gcd of a list of parametric univariate polynomials in the  #
 # sense of Lazard. Computation is done over a constructible set.          #
@@ -179,7 +179,6 @@ end proc;
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # External Files
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 $include <src/ComprehensiveGcd/listGcd.mpl>
 
 end module;

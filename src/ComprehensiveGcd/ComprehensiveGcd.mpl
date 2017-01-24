@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Compute the gcd of two parametric univariate polynomials in the sense   #
 # of Lazard. Constraints on parameter values can be provided via a        #
@@ -111,11 +111,11 @@ ComprehensiveGcd := module()
         comprehensive_gcd_src,
         convertToRS,
         cleanRS,
+        cleanRS_cofactors,
         cleanCS,
         compute_cofactors_rs_list,
         compute_cofactors_rs,
-        pseudo_cofactor,
-        listGcd;
+        pseudo_cofactor;
 
     ModuleApply := proc()
         return init(args);
@@ -490,19 +490,20 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
     # Call the algorithm
     result, cs_zero := comprehensive_gcd_src(p1, p2, v, cs, R);
 
-    # Convert to regular systems
+    # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R);
-        result := cleanRS(result, v, R);
+        if opts['cofactors'] then
+            result := convertToRS(result, R);
+            result := compute_cofactors_rs_list(p1, p2, result, v, R);
+            result := cleanRS_cofactors(result, v, R);
+        else
+            result := convertToRS(result, R);
+            result := cleanRS(result, v, R);
+        end if;
     else
         result := cleanCS(result, R);
     end if;
-
-    # Compute the cofactors
-    if opts['cofactors'] then
-        result := compute_cofactors_rs_list(p1, p2, result, v, R);
-    end if;
-
+    
     return result, cs_zero;
 
 end proc;
@@ -558,8 +559,8 @@ end proc;
 $include <src/ComprehensiveGcd/comprehensive_gcd_src.mpl>
 $include <src/ComprehensiveGcd/compute_cofactors_rs.mpl>
 $include <src/ComprehensiveGcd/pseudo_cofactor.mpl>
-$include <src/ComprehensiveGcd/listGcd.mpl>
 $include <src/ComprehensiveGcd/cleanRS.mpl>
+$include <src/ComprehensiveGcd/cleanRS_cofactors.mpl>
 $include <src/ComprehensiveGcd/cleanCS.mpl>
 $include <src/ComprehensiveGcd/convertToRS.mpl>
 
