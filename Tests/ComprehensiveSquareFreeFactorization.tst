@@ -14,7 +14,11 @@ test := module()
           test9,
           test10,
           test11,
-          test12;
+          test12,
+          test13,
+          test14,
+          test15,
+          test16;
 
     uses ParametricMatrixTools, RegularChains, RegularChains:-ConstructibleSetTools, RegularChains:-ChainTools;
 
@@ -24,7 +28,8 @@ test := module()
 
         testList := ['test1',  'test2',  'test3',  'test4',  'test5', 
                      'test6',  'test7',  'test8',  'test9',  'test10',
-                     'test11', 'test12'];
+                     'test11', 'test12', 'test13', 'test14', 'test15',
+                     'test16'];
 
         printf("Testing ComprehensiveSquareFreeFactorization\n");
 
@@ -68,9 +73,10 @@ test := module()
         
         # Check that the total degree of the result matches the input 
         # polynomial
+        
         d1 := degree(p, v);
         for item in result do
-            d2 := add(map(x -> degree(x[1], v)*x[2], item[1]));
+            d2 := add(map(x -> degree(x[1], v)*x[2], item[1][2]));
             if d1 <> d2 then
                 printf("Degrees don't match\n");
                 return false;
@@ -81,6 +87,7 @@ test := module()
         # constructible set
         for item in result do
             sqr, es := op(item);
+            sqr := sqr[2];
             sqr := ListTools:-Flatten(map(x -> x[1], sqr));
             if nops(sqr) = 1 then
                 next;
@@ -108,8 +115,8 @@ test := module()
         # the input polynomial over the given constructible set
         for item in result do
             sqr, es := op(item);
-            q := mul(map(x -> x[1]^x[2], sqr));
-            if not ParametricMatrixTools:-isZeroOverCS(p - q, es, R) then
+            q := sqr[1]*mul(map(x -> x[1]^x[2], sqr[2]));
+            if not ParametricMatrixTools:-isZeroOverCS(numer(normal(p - q)), es, R) then
                 printf("Square-free factorization not equal to input polynomial\n");
                 return false;
             end if;
@@ -478,6 +485,133 @@ test := module()
         p := (x+1)^2*(x^2+x+1)*(x+a);
         
         R := PolynomialRing([x,a]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            result := ComprehensiveSquareFreeFactorization(p, 'x', [], [], R, 'outputType'='CS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_cs(p, 'x', cs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    # ------------------------------------------------------------------- #
+    # TEST 13-16                                                          #
+    #                                                                     #
+    # p = x^3 + a*x^2 - x - a*b - a                                       #
+    # cs = {}                                                             #
+    # ------------------------------------------------------------------- #
+    test13 := proc($)
+    
+        local p, R, cs, result, correct;
+        
+        p := x^3 + a*x^2 - x - a*b - a;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            result := ComprehensiveSquareFreeFactorization(p, 'x', cs, R, 'outputType'='CS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_cs(p, 'x', cs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test14 := proc($)
+    
+        local p, R, rs, cs, result, correct;
+        
+        p := x^3 + a*x^2 - x - a*b - a;
+        
+        R := PolynomialRing([x,a,b]);
+        rs := RegularSystem(Empty(R), R);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            result := ComprehensiveSquareFreeFactorization(p, 'x', rs, R, 'outputType'='CS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_cs(p, 'x', cs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test15 := proc($)
+    
+        local p, R, cs, result, correct;
+        
+        p := x^3 + a*x^2 - x - a*b - a;
+        
+        R := PolynomialRing([x,a,b]);
+        cs := GeneralConstruct([],[],R);
+        
+        try
+            result := ComprehensiveSquareFreeFactorization(p, 'x', [], R, 'outputType'='CS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_cs(p, 'x', cs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    test16 := proc($)
+    
+        local p, R, cs, result, correct;
+        
+        p := x^3 + a*x^2 - x - a*b - a;
+        
+        R := PolynomialRing([x,a,b]);
         cs := GeneralConstruct([],[],R);
         
         try
