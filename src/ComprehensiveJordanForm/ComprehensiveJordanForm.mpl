@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials. Computation is done modulo a regular system   #
@@ -524,14 +524,12 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
         if isConstantMatrix(A, R) then
 
             if opts['output_J'] then
-                Q := ParametricMatrixTools:-JordanForm(A, 'output'='J');
+                J := ParametricMatrixTools:-JordanForm(A);
                 result := [op(result), [J, rs]];
             elif opts['output_Q'] then
-                Q := ParametricMatrixTools:-JordanForm(A, 'output'='J');
-                result := [op(result), [Q, rs]];
+                error("Q output is not implemented.");
             elif opts['output_J'] and opts['output_Q'] then
-                J, Q := ParametricMatrixTools:-JordanForm(A, 'output'=['J','Q']);
-                result := [op(result), [J, Q, rs]];
+                error("Q output is not implemented.");
             end if;
 
         # Check if A is a zero matrix over rs
@@ -540,9 +538,9 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
             if opts['output_J'] then
                 result := [op(result), [Matrix(LA:-Dimension(A)), rs]];
             elif opts['output_Q'] then
-                result := [op(result), [LA:-IdentityMatrix(LA:-Dimension(A)), rs]];
+                error("Q output is not implemented.");
             elif opts['output_J'] and opts['output_Q'] then
-                result := [op(result), [A, LA:-IdentityMatrix(LA:-Dimension(A)), rs]];
+                error("Q output is not implemented.");
             end if;
         else
             lrsCompute := [op(lrsCompute), rs];

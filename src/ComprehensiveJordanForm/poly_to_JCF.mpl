@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Compute a full discussion for the Jordan canonical form (JCF) of a      #
 # Frobenius companion matrix of a parametric univariate polynomial.       #
@@ -103,6 +103,7 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
     result := [];
     for p_sqr_free in p_sqr_free_list do
         q, es := op(p_sqr_free);
+        q := q[2];
         result := [op(result), [constructJCF(q, v), es]];
     end do;
     
