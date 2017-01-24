@@ -27,7 +27,7 @@
 loadTypes := proc()
     
     userinfo(2, 'ParametricMatrixTools', "Adding types.");
-    printf("Loading Types\n");
+    
     # ------------------------------------------------------------------- #
     # polyInRing                                                          #
     #                                                                     #
