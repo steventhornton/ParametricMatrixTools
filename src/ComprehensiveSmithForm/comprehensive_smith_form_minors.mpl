@@ -100,7 +100,7 @@ implementation_cs := proc(A::Matrix(square), v::name, cs::TRDcs, R::TRDring, $)
     
     # Construct SNF for each entry of invariantFactors
     return convert(map(input -> [LA:-DiagonalMatrix(map(collect, input[1], v)), 
-                                 RC:-TRDrename_constructible_set(input[2])], 
+                                 RC:-TRDrename_regular_system(input[2])], 
                                  invariantFactors), list);
     
 end proc;
