@@ -59,13 +59,13 @@ cleanRS_cofactors := proc(result::list([polynom, ratpoly, ratpoly, TRDrs]), v::n
           out :: list([polynom, ratpoly, ratpoly, TRDrs]),
           s :: integer,
           h :: polynom,
-          h1 :: polynom,
-          h2 :: polynom;
+          h1, h2;
 
     out := [];
 
     for item in result do
         g, c1, c2, rs := op(item);
+        
         rc := RC_CST:-RepresentingChain(rs, R);
         
         g := RC:-SparsePseudoRemainder(primpart(g, v, 'co'), rc, R, 'h');
@@ -74,6 +74,11 @@ cleanRS_cofactors := proc(result::list([polynom, ratpoly, ratpoly, TRDrs]), v::n
 
         c1 := normal(c1*co/h);
         c2 := normal(c2*co/h);
+        
+        c1 := RC:-SparsePseudoRemainder(numer(c1), rc, R, 'h1')/RC:-SparsePseudoRemainder(denom(c1), rc, R, 'h2');
+        c1 := normal(c1*h2/h1);
+        c2 := RC:-SparsePseudoRemainder(numer(c2), rc, R, 'h1')/RC:-SparsePseudoRemainder(denom(c2), rc, R, 'h2');
+        c2 := normal(c2*h2/h1);
         
         c1 := s*c1;
         c2 := s*c2;

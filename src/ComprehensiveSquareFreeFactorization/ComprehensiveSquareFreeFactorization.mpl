@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 24/2017                                                #
 #                                                                         #
 # Compute the square-free decomposition of a parametric univariate        #
 # polynomial over a constructible set by a modified version of Yun's      #
@@ -39,27 +39,27 @@
 #   degree(p, mvar(R)) > 0                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   A list of lists of the form                                           #
-#       [lp_i, cs_i]                                                      #
+#   A list of with elements of the form                                   #
+#       [m_i, lp_i, cs_i]                                                 #
 #   or                                                                    #
-#       [lp_i, rs_i]                                                      #
-#   Where                                                                 #
+#       [m_i, lp_i, rs_i]                                                 #
+#   where                                                                 #
 #       - cs_i is a constructible set (outputType = 'CS')                 #
 #       - rs_i is a regular system    (outputType = 'RS')                 #
+#       - m_i is a rational function of the paramters                     #
 #       - lp_i is a list with elements of the form:                       #
-#             [p_j, m]                                                    #
-#         such that p = product(p_j^m) and p_j are the square-free        #
-#         factors in the zero set of cs_i or rs_i                         #
+#             [p_j, n_j]                                                  #
+#    such that p = m_i*product(p_j^n_j) and p_j are the square-free       #
+#    factors in the zero set of cs_i or rs_i.                             #
 #                                                                         #
 # EXAMPLE                                                                 #
 #   > p := (x+1)^2*(x+a):                                                 #
 #   > R := PolynomialRing([x, a]):                                        #
-#   > cs := GeneralConstruct([], [], R):                                  #
-#   > sqrFreeFac := ComprehensiveSquareFreeFactorization(p, x, cs, R):    #
+#   > sqrFreeFac := ComprehensiveSquareFreeFactorization(p, x, R):        #
 #   > Display(sqrFreeFac[1], R)                                           #
-#         [[[x + a, 1], [x + 1, 2]], a-1 <> 0]                            #
+#         [1, [[x+a, 1], [x+1, 2]], a-1 <> 0]                             #
 #   > Display(sqrFreeFac[2], R)                                           #
-#         [[[x + 1, 3]], a-1 = 0]                                         #
+#         [1, [[x+1, 3]], a-1 = 0]                                        #
 #                                                                         #
 # REFERENCES                                                              #
 #   - Yun, D. Y. (1976, August). On square-free decomposition algorithms. #
@@ -466,8 +466,8 @@ convertToCS := proc(result, R, $)
     
     out := [];
     for item in result do
-        cs := RC_CST:-ConstructibleSet([item[2]], R);
-        out := [op(out), [item[1], cs]];
+        cs := RC_CST:-ConstructibleSet([item[3]], R);
+        out := [op(out), [item[1], item[2], cs]];
     end do;
     
     return out;

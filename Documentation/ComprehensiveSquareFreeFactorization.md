@@ -34,10 +34,10 @@ A list with elements of the form:
 
 | Output structure | Options |
 | --- | --- |
-| `[lp, rs_i]` | `'outputType'` is `'RegularSystem'` or `'RS'` |
-| `[lp, cs_i]` | `'outputType'` is `'ConstructibleSet'` or `'CS'` |
+| `[m_i, lp_i, rs_i]` | `'outputType'` is `'RegularSystem'` or `'RS'` |
+| `[m_i, lp_i, cs_i]` | `'outputType'` is `'ConstructibleSet'` or `'CS'` |
 
-Where `lp` is a list with elements of the form `[q_j, m]` such that `p = product(q_j^m)` and `q_j` are the square-free factoris in the zero set of `cs_i` or `rs_i`.
+Where `m_i` is a rational functions in the parameters (i.e. does not contain v as an indeterminate), `lp_i` is a list with elements of the form `[q_j, n_j]` such that `p = m_i*product(q_j^n_j)` and `q_j` are the square-free factors of the input polynomial for parameter values in the zero set of `cs_i` or `rs_i`.
 
 ## Assumptions
 1. `degree(p, mvar(R)) > 0`
@@ -45,22 +45,18 @@ Where `lp` is a list with elements of the form `[q_j, m]` such that `p = product
 ## Example
 ```
 with(RegularChains):
-with(ConstructibleSetTools):
 with(ParametricMatrixTools):
 
 # Set up the polynomials with variable order x > a
 R := PolynomialRing([x, a]):
-p := (x+1)^2 * (x+1):
-
-# Constraints on the parameters (a <> 10)
-cs := GeneralConstruct([], [a-10], R):
+p := (x+1)^2 * (x+a):
 
 # Compute the square-free factorization
-result := ComprehensiveSquareFreeFactorization(p, x, cs, R)
+result := ComprehensiveSquareFreeFactorization(p, x, R):
 nops(result);
     2
 Display(result[1], R);
-    [[x+a, 1], [x+1, 2]], a-1 <> 0, a-10 <> 0]
+    [1, [[x+a, 1], [x+1, 2]], a-1 <> 0]
 Display(result[2], R);
-    [[[x+1, 3]], a-1 = 0]
+    [1, [[x+1, 3]], a-1 = 0]
 ```

@@ -22,10 +22,10 @@ printResult_CSFF := proc(result, p, cs, R, k)
     
     for i to nops(result) do
         printf("Case %d:\n", i);
-        printf("\tm = %a\n", result[i][1][1]);
-        printf("\tSquare-free Decomposition: %a\n", result[i][1][2]);
+        printf("\tm = %a\n", result[i][1]);
+        printf("\tSquare-free Decomposition: %a\n", result[i][2]);
         printf("\tParameter constraints:\n");
-        print_rs(result[i][2],R,2);
+        print_rs(result[i][3],R,2);
     end do;
     
 end proc:

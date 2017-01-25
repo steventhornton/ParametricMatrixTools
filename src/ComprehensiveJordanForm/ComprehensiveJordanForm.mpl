@@ -507,7 +507,6 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
           rc :: TRDrc,
           A :: 'Matrix'(square),
           J :: 'Matrix'(square),
-          Q :: 'Matrix'(square),
           result := [],
           lrsCompute :: TRDlrs := [],
           csCompute :: TRDcs;

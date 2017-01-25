@@ -20,17 +20,15 @@
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   A list of lists of the form                                           #
-#       [lp_i, cs_i]                                                      #
-#   Where                                                                 #
-#       - cs_i is a constructible set                                     #
-#       - lp_i is a list of the form:                                     #
-#             [m_i, llp_i]                                                #
-#         where llp_i is a list of the form                               #
+#   A list of with elements of the form                                   #
+#       [m_i, lp_i, rs_i]                                                 #
+#   where                                                                 #
+#       - rs_i is a regular system                                        #
+#       - m_i is a rational function of the paramters                     #
+#       - lp_i is a list with elements of the form:                       #
 #             [p_j, n_j]                                                  #
-#         such that p = m_i*product(p_j^n_j) and p_j are the square-free  #
-#         factors in the zero set of cs_i. Each m_i is a rational         #
-#         function in the parameters.                                     #
+#   such that p = m_i*product(p_j^n_j) and p_j are the square-free        #
+#   factors in the zero set of rs_i.                                      #
 #                                                                         #
 # REFERENCES                                                              #
 #   - Yun, D. Y. (1976, August). On square-free decomposition algorithms. #
@@ -59,9 +57,10 @@ comprehensive_square_free_factorization_yun := module()
     local implementation,
           computeFactors,
           oneYunIteration,
-          cleanCofactors,
           computeMultipliers,
-          cleanResult;
+          csff_gcd,
+          cleanResult1,
+          cleanResult2;
 
     ModuleApply := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring, $)
         return implementation(p, v, cs, R);
@@ -85,27 +84,92 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDring
 
     local dp :: polynom,
           gcdResult,
-          cs_zero :: TRDcs,
           result, a, b, c, rs, task;
 
     dp := diff(p, v);
-
-    gcdResult, cs_zero := ComprehensiveGcd(p, dp, v, cs, R, 'outputType' = 'RS', 'cofactors'=true);
-
-    ASSERT(RC:-TRDis_empty_constructible_set(cs_zero, R));
+    
+    gcdResult := csff_gcd(p, dp, v, cs, R);
 
     result := [];
 
     for task in gcdResult do
         a, b, c, rs := op(task);
-        b, c := cleanCofactors(b, c);
         result := [op(result), op(computeFactors(a, b, c, v, rs, R))];
     end do;
     
-    result := cleanResult(result, v, R);
+    result := cleanResult1(result, R);
     result := computeMultipliers(p, result, v);
+    result := cleanResult2(result, v, R);
     return result;
 
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# csff_gcd                                                                #
+#                                                                         #
+# Compute the gcd of g of p1 and p2 and compute the polynomials c1 and c2 #
+# such that c1*g = p1, and c2*g = p2.                                     #
+#                                                                         #
+# INPUT                                                                   #
+#   p1 ... Polynomial                                                     #
+#   p2 ... Polynomial                                                     #
+#   v .... Variable                                                       #
+#   cs ... Constructible set                                              #
+#   R .... Polynomial ring                                                #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A list with elements of the form                                      #
+#       [g, c1, c2, rs]                                                   #
+#   where g = gcd(p1, p2) in the zero set of rs, and c1*g = p1, and       #
+#   c2*g = p2.                                                            #
+# ----------------------------------------------------------------------- #
+csff_gcd := proc(p1, p2, v, cs, R)
+    
+    local result,
+          cs_zero :: TRDcs,
+          item :: [polynom, TRDrs],
+          g :: polynom,
+          rs :: TRDrs,
+          rc :: TRDrc,
+          out :: list([polynom, ratpoly, ratpoly, TRDrs]),
+          c1 :: ratpoly,
+          c2 :: ratpoly,
+          l :: polynom,
+          s :: integer;
+    
+    result, cs_zero := ComprehensiveGcd:-comprehensive_gcd_src(p1, p2, v, cs, R);
+    
+    ASSERT(RC:-TRDis_empty_constructible_set(cs_zero, R));
+    
+    result := ComprehensiveGcd:-convertToRS(result, R);
+    
+    # Compute the cofactors
+    out := [];
+    for item in result do
+        
+        g, rs := op(item);
+        
+        rc := RC_CST:-RepresentingChain(rs, R);
+        
+        c1 := ComprehensiveGcd:-pseudo_cofactor(p1, g, v, rc, R);
+        c2 := ComprehensiveGcd:-pseudo_cofactor(p2, g, v, rc, R);
+        
+        # Clean the cofactors
+        s := sign(lcoeff(g,v));
+        g := s*g;
+        
+        c1 := s*c1;
+        c2 := s*c2;
+        
+        l := lcm(denom(c1), denom(c2));
+        c1 := normal(c1*l);
+        c2 := normal(c2*l);
+        
+        out := [op(out), [g, c1, c2, rs]];
+        
+    end do;
+    
 end proc;
 
 
@@ -118,31 +182,32 @@ end proc;
 # INPUT                                                                   #
 #   p ........ Polynomial                                                 #
 #   result ... List with elements of the form                             #
-#                  [lp, cs]                                               #
+#                  [lp, rs]                                               #
 #              where lp is a list with elements of the form               #
 #                  [p_i, n_i]                                             #
 #   v ........ Variable                                                   #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list with elements of the form                                      #
-#       [lp, cs]                                                          #
+#       [m_i, lp_i, rs_i]                                                 #
 #   where lp is a list with elements of the form                          #
-#       [m, llp]                                                          #
-#   where llp is a list with elements of the form                         #
-#       [p_i, n_i]    (same as the input lp)                              #
-#   such that p = m*product(p_i^n_i) where m is a rational function.      #
+#       [p_j, n_j]    (same as the input lp)                              #
+#   such that p = m_i*product(p_j^n_j) where m_i is a rational function   #
+#   in the paramters (i.e. doesn't contain v).                            #
 # ----------------------------------------------------------------------- #
 computeMultipliers := proc(p::polynom, result, v::name, $)
     
-    local out, task, a, cs, q, m;
+    local out, task, a, rs, q, m;
     
     out := [];
     
     for task in result do
-        a, cs := op(task);
+        a, rs := op(task);
+        
         q := mul(map(x -> x[1]^x[2], a));
         m := normal(lcoeff(p, v)/lcoeff(q, v));
-        out := [op(out), [[m, a], cs]];
+        
+        out := [op(out), [m, a, rs]];
     end do;
     
     return out;
@@ -151,60 +216,93 @@ end proc;
 
 
 # ----------------------------------------------------------------------- #
-# cleanCofactors                                                          #
-#                                                                         #
-# Convert the input rational functions to polynomials by multiplying both #
-# by the lcm of their denominators.                                       #
-#                                                                         #
-# INPUT                                                                   #
-#   b ... Rational function                                               #
-#   c ... Rational function                                               #
-#                                                                         #
-# OUTPUT                                                                  #
-#   Two polynomials:                                                      #
-#       b_out = b*lcm(denom(b),denom(c))                                  #
-#       c_out = c*lcm(denom(b),denom(c))                                  #
-# ----------------------------------------------------------------------- #
-cleanCofactors := proc(b::ratpoly, c::ratpoly, $)
-    
-    local d_b :: polynom,
-          d_c :: polynom,
-          l :: polynom;
-    
-    # Compute the cofactors (b = p1/g)
-    d_b := denom(b);
-    
-    # Compute the cofactors (c = p2/g)
-    d_c := denom(c);
-    
-    l := lcm(d_c, d_b);
-    
-    return normal(b*l), normal(c*l);
-    
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# cleanResult                                                             #
+# cleanResult1                                                            #
 #                                                                         #
 # Remove the first element of each square-free factors list from the      #
 # result and remove any factors that are equal to 1.                      #
 # ----------------------------------------------------------------------- #
-cleanResult := proc(result, v, R, $)
+cleanResult1 := proc(result, R, $)
 
     local out, i, polyList, rs;
 
     out := [];
 
+    # Clean up factors that = 1
+    # Remove first factor
     for i to nops(result) do
 
         polyList, rs := op(result[i]);
+        
         polyList := polyList[2..-1];
         polyList := remove(x -> isZeroOverRS(x[1]-1, rs, R), polyList);
-
+        
         out := [op(out), [polyList, rs]]
     end do;
+    
+    return out;
+    
+end proc;
 
+
+# ----------------------------------------------------------------------- #
+# cleanResult2                                                            #
+#                                                                         #
+# - Remove the content from each factor (move into the multiplier)        #
+# - Call SparsePseudoRemainder on each factor                             #
+# - Remove the content again (move into multiplier)                       #
+# - Call SparsePseudoRemainder on multiplier                              #
+# ----------------------------------------------------------------------- #
+cleanResult2 := proc(result, v, R, $)
+    
+    local out, item, lp, rs, rc, lp_tmp, task, p, n, m, m_n, m_d, co, h, h_d, h_n;
+    
+    out := [];
+    
+    for item in result do
+        
+        m, lp, rs := op(item);
+        
+        rc := RC_CST:-RepresentingChain(rs, R);
+        
+        # Remove content from each factor
+        lp_tmp := [];
+        for task in lp do
+            p, n := op(task);
+            p := primpart(p, v, 'co');
+            m := m*co^n;
+            lp_tmp := [op(lp_tmp), [p, n]];
+        end do;
+        lp := lp_tmp;
+        
+        # Call SparsePseudoRemainder on each factor
+        lp_tmp := [];
+        for task in lp do
+            p, n := op(task);
+            p := RC:-SparsePseudoRemainder(p, rc, R, 'h');
+            m := m/(h^n);
+            lp_tmp := [op(lp_tmp), [p, n]];
+        end do;
+        lp := lp_tmp;
+        
+        # Remove content from each factor (again)
+        lp_tmp := [];
+        for task in lp do
+            p, n := op(task);
+            p := primpart(p, v, 'co');
+            m := m*co^n;
+            lp_tmp := [op(lp_tmp), [p, n]];
+        end do;
+        lp := lp_tmp;
+        
+        # Call SparsePseudoRemainder on multiplier
+        m_n := RC:-SparsePseudoRemainder(numer(m), rc, R, 'h_n');
+        m_d := RC:-SparsePseudoRemainder(denom(m), rc, R, 'h_d');
+        m := normal((m_n*h_d)/(m_d*h_n));
+        
+        out := [op(out), [m, lp, rs]];
+        
+    end do;
+    
     return out;
 
 end proc;
@@ -285,7 +383,6 @@ oneYunIteration := proc(a_in::depends(list([polyInRing(R), posint])), b_in::depe
           task :: list([list([polynom, posint]), polynom, polynom, TRDrs, posint]),
           g :: [polynom, ratpoly, ratpoly, rs],
           gcdResult :: list([polynom, ratpoly, ratpoly, TRDrs]),
-          cs_zero :: TRDcs,
           rs :: TRDrs;
 
     out, task := [], [];
@@ -294,16 +391,12 @@ oneYunIteration := proc(a_in::depends(list([polyInRing(R), posint])), b_in::depe
         return [], [[a_in, rs_in]];
     end if;
 
-    # pGcd is a list with elements of the form
+    # gcdResult is a list with elements of the form
     #   [g, c1, c2, rs]
-    # where g = gcd(b_in, d_in), c1*g = b_in, c2*g = d_in
-    gcdResult, cs_zero := ComprehensiveGcd(b_in, d_in, v, rs_in, R, 'outputType' = 'RS', 'cofactors'=true);
-
-    ASSERT(RC:-TRDis_empty_constructible_set(cs_zero, R));
+    gcdResult := csff_gcd(b_in, d_in, v, RC_CST:-ConstructibleSet([rs_in], R), R);
 
     for g in gcdResult do
         a, b, c, rs := op(g);
-        b, c := cleanCofactors(b, c);
         
         if not v in indets(b) then
             out := [op(out), [[op(a_in), [a, i]], rs]];

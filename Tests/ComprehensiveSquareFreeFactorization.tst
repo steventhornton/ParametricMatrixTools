@@ -61,7 +61,7 @@ test := module()
     verifyResult_cs := proc(p::depends(polyInRing(R)), v::name, cs::TRDcs, result, R::TRDring, $)
         
         local csList :: TRDlcs,
-              d1, d2, item, sqr, es, ds, i, j, g, G, g_item, cs_zero, q;
+              d1, d2, item, sqr, es, ds, i, j, g, G, g_item, cs_zero, q, m;
         
         # Check that the constructible sets in the result list form a 
         # partition of cs
@@ -73,10 +73,9 @@ test := module()
         
         # Check that the total degree of the result matches the input 
         # polynomial
-        
         d1 := degree(p, v);
         for item in result do
-            d2 := add(map(x -> degree(x[1], v)*x[2], item[1][2]));
+            d2 := add(map(x -> degree(x[1], v)*x[2], item[2]));
             if d1 <> d2 then
                 printf("Degrees don't match\n");
                 return false;
@@ -86,8 +85,7 @@ test := module()
         # Check that each pairwise factor has gcd=1 over the given
         # constructible set
         for item in result do
-            sqr, es := op(item);
-            sqr := sqr[2];
+            m, sqr, es := op(item);
             sqr := ListTools:-Flatten(map(x -> x[1], sqr));
             if nops(sqr) = 1 then
                 next;
@@ -114,8 +112,8 @@ test := module()
         # Check that the product of the square-free decomposition equals
         # the input polynomial over the given constructible set
         for item in result do
-            sqr, es := op(item);
-            q := sqr[1]*mul(map(x -> x[1]^x[2], sqr[2]));
+            m, sqr, es := op(item);
+            q := m*mul(map(x -> x[1]^x[2], sqr));
             if not ParametricMatrixTools:-isZeroOverCS(numer(normal(p - q)), es, R) then
                 printf("Square-free factorization not equal to input polynomial\n");
                 return false;

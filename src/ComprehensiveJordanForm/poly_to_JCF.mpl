@@ -93,7 +93,8 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
           p_sqr_free,
           q,
           es,
-          result;
+          result,
+          m;
     
     # Compute the square-free factorization of p
     p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, v, cs, R, 'outputType'='CS');
@@ -102,8 +103,7 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
     # returned by ComprehensiveSquareFreeFactorization
     result := [];
     for p_sqr_free in p_sqr_free_list do
-        q, es := op(p_sqr_free);
-        q := q[2];
+        m, q, es := op(p_sqr_free);
         result := [op(result), [constructJCF(q, v), es]];
     end do;
     
