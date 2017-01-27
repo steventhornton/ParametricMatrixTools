@@ -53,7 +53,7 @@ FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, $)
           
     
     # charPolyList[1] = minPoly(F)
-    charPolyList := getCharPolys(F, 'v');
+    charPolyList := getCharPolys(map(numer,F), 'v');
     N := nops(charPolyList);
     
     R2 := RC:-PolynomialRing(['v', op(R['variables'])]);

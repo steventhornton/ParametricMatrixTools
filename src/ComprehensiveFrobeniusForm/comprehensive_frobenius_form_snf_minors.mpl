@@ -119,8 +119,7 @@ SNF_to_FNF := proc(S::Matrix, v::name, $) :: Matrix;
 
     for i from n to 1 by -1 do
         if S[i,i] <> 1 and S[i,i] <> 0 then
-            C := LA:-CompanionMatrix(S[i,i], v);
-            
+            C := [LA:-CompanionMatrix(S[i,i], v)][1];
             CList := [op(CList), C];
         end if;
     end do;
