@@ -113,7 +113,7 @@ test := module()
         # the input polynomial over the given constructible set
         for item in result do
             m, sqr, es := op(item);
-            q := m*mul(map(x -> x[1]^x[2], sqr));
+            q := m*mul(i, i in map(x -> x[1]^x[2], sqr));
             if not ParametricMatrixTools:-isZeroOverCS(numer(normal(p - q)), es, R) then
                 printf("Square-free factorization not equal to input polynomial\n");
                 return false;

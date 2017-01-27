@@ -197,14 +197,14 @@ end proc;
 # ----------------------------------------------------------------------- #
 computeMultipliers := proc(p::polynom, result, v::name, $)
     
-    local out, task, a, rs, q, m;
+    local out, task, a, rs, q, m, i;
     
     out := [];
     
     for task in result do
         a, rs := op(task);
         
-        q := mul(map(x -> x[1]^x[2], a));
+        q := mul(i, i in map(x -> x[1]^x[2], a));
         m := normal(lcoeff(p, v)/lcoeff(q, v));
         
         out := [op(out), [m, a, rs]];
