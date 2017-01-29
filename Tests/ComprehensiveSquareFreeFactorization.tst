@@ -75,7 +75,7 @@ test := module()
         # polynomial
         d1 := degree(p, v);
         for item in result do
-            d2 := add(map(x -> degree(x[1], v)*x[2], item[2]));
+            d2 := add(x, x in map(x -> degree(x[1], v)*x[2], item[2]));
             if d1 <> d2 then
                 printf("Degrees don't match\n");
                 return false;
