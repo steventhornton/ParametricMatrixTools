@@ -87,7 +87,7 @@ poly_to_JCF := module()
 # INPUT/OUTPUT                                                            #
 #   Same as poly_to_JCF                                                   #
 # ----------------------------------------------------------------------- #
-implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
+implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, opt_lazard::truefalse, $)
     
     local p_sqr_free_list,
           p_sqr_free,
@@ -96,7 +96,11 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
           result;
     
     # Compute the square-free factorization of p
-    p_sqr_free_list := SquareFreeFactorization_monic(p, v, cs, R, 'outputType'='CS', 'output'='lazard');
+    if opt_lazard then
+        p_sqr_free_list := SquareFreeFactorization_monic(p, v, cs, R, 'outputType'='CS', 'output'='lazard');
+    else
+        p_sqr_free_list := SquareFreeFactorization_monic(p, v, cs, R, 'outputType'='CS', 'output'='kalkbrener');
+    end if;
     # p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, v, cs, R, 'outputType'='CS');
     
     # Build the JCF of the companion matrix associated with p for each case 

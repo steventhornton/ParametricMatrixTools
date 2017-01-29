@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 29/2017                                                #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials by computing the Smith form of xI - A.         #
@@ -56,8 +56,8 @@ comprehensive_jordan_form_snf_minors := module()
         poly_to_JCF,
         getCharPolys;
 
-    ModuleApply := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
-        return implementation(A, cs, R);
+    ModuleApply := proc(A::~Matrix, cs::TRDcs, R::TRDring, opt_lazard::truefalse, $)
+        return implementation(A, cs, R, opt_lazard);
     end proc;
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -72,7 +72,7 @@ comprehensive_jordan_form_snf_minors := module()
 # INPUT/OUTPUT                                                            #
 #   Same as comprehensive_jordan_form_snf_minors                          #
 # ----------------------------------------------------------------------- #
-implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
+implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, opt_lazard::truefalse, $)
 
     local FList;
     
@@ -80,7 +80,7 @@ implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
     FList := ComprehensiveFrobeniusForm(A, cs, R, 'outputMatrices'='F', 'outputType'='CS', 'algorithm'='snf_minors');
     
     # For element of FList, compute the Jordan form
-    return map(x -> op(FNF_to_JCF(x[1], x[2], R)), FList);
+    return map(x -> op(FNF_to_JCF(x[1], x[2], R, opt_lazard)), FList);
 
 end proc;
 

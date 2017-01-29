@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 24/2017                                                #
+# UPDATED ... Jan. 29/2017                                                #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials. Computation is done modulo a regular system   #
@@ -47,6 +47,13 @@
 #   algorithm ........ Default = snf_minors                               #
 #                      Specify which algorithm to use (Only the           #
 #                      snf_minors algorithm is currently implemented).    #
+#                                                                         #
+#   output ........... Default = kalkbrener                               #
+#                      kalkbrener:                                        #
+#                          - Output will be in the sense of kalkbrener    #
+#                      lazard:                                            #
+#                          - Output will be in the sense of lazard, a     #
+#                            full case discussion will be returned.       #
 #                                                                         #
 # OPTION COMPATIBILITY                                                    #
 #   - Only the Jordan form can be returned when the snf_minors alogrithm  #
@@ -141,7 +148,7 @@ init := proc()
 
     if nargs < 2 then
         error "Insufficient number of arguments";
-    elif nargs > 8 then
+    elif nargs > 9 then
         error "To many arguments";
     end if;
 
@@ -236,6 +243,7 @@ end proc;
 #       lazy                                                              #
 #       algorithm_snf_minors                                              #
 #       algorithm_snf_elementary                                          #
+#       opt_lazard                                                        #
 #   See ComprehensiveJordanForm header for specifications.                #
 # ----------------------------------------------------------------------- #
 processOptions := proc(opts_in::set(equation), $) :: table;
@@ -257,6 +265,7 @@ processOptions := proc(opts_in::set(equation), $) :: table;
     opts['lazy']      := false;
     opts['algorithm_snf_minors'] := true;
     opts['algorithm_snf_elementary'] := false;
+    opts['opt_lazard'] := false;
 
     tab_opts := table();
 
@@ -312,6 +321,15 @@ processOptions := proc(opts_in::set(equation), $) :: table;
                 elif opt_value = 'snf_elementary' then
                     opts['algorithm_snf_minors'] := false;
                     opts['algorithm_snf_elementary'] := true;
+                else
+                    error "incorrect option value: %1", opt;
+                end if;
+            elif opt_name = ('output') then
+                opt_value := rhs(opt);
+                if opt_value = 'lazard' then
+                    opts['opt_lazard'] := true;
+                elif opt_value = 'kalkbrener' then
+                    opts['opt_lazard'] := false;
                 else
                     error "incorrect option value: %1", opt;
                 end if;
@@ -558,7 +576,7 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     if opts['algorithm_snf_elementary'] then
         error "The ComprehensiveJordanForm snf_elementry algorithm has not been implemented yet.";
     elif opts['algorithm_snf_minors'] then
-        result := [op(result), op(comprehensive_jordan_form_snf_minors(AA, csCompute, R))];
+        result := [op(result), op(comprehensive_jordan_form_snf_minors(AA, csCompute, R, opts['opt_lazard']))];
     end if;
 
     return result;
