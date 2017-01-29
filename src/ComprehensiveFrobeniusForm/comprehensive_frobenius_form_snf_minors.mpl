@@ -83,7 +83,7 @@ implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
     # Matrix to compute the Smith Form of
     Ax := A - v*LA:-IdentityMatrix(n);
     
-    Rx := RC:-PolynomialRing([v, op(R['variables'])]);
+    Rx := RC:-PolynomialRing([v, op(R['variables'])], R['parameters']);
     
     # Compute the Smith form of Ax
     SList := ComprehensiveSmithForm(Ax, v, cs, Rx, 'outputMatrices'='S', 'outputType'='CS', 'algorithm'='minors');
