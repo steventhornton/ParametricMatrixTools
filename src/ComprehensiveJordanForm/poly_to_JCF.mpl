@@ -93,17 +93,17 @@ implementation := proc(p::depends(polyInRing(R)), v::name, cs, R::TRDring, $)
           p_sqr_free,
           q,
           es,
-          result,
-          m;
+          result;
     
     # Compute the square-free factorization of p
-    p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, v, cs, R, 'outputType'='CS');
+    p_sqr_free_list := SquareFreeFactorization_monic(p, v, cs, R, 'outputType'='CS', 'output'='lazard');
+    # p_sqr_free_list := ComprehensiveSquareFreeFactorization(p, v, cs, R, 'outputType'='CS');
     
     # Build the JCF of the companion matrix associated with p for each case 
     # returned by ComprehensiveSquareFreeFactorization
     result := [];
     for p_sqr_free in p_sqr_free_list do
-        m, q, es := op(p_sqr_free);
+        q, es := op(p_sqr_free);
         result := [op(result), [constructJCF(q, v), es]];
     end do;
     

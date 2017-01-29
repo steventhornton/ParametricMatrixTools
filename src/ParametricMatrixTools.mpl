@@ -35,7 +35,7 @@ ParametricMatrixTools := module()
            ComprehensiveJordanForm,
            ComprehensiveSmithForm,
            ComprehensiveSquareFreeFactorization,
-           SquarefreeFactorization_monic,
+           SquareFreeFactorization_monic,
            JordanForm,
            ListComprehensiveGcd;
     
@@ -105,7 +105,7 @@ $include "src/ComprehensiveGcd/ListComprehensiveGcd.mpl"
 $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
-$include "src/ComprehensiveSquareFreeFactorization/SquarefreeFactorization_monic.mpl"
+$include "src/ComprehensiveSquareFreeFactorization/SquareFreeFactorization_monic.mpl"
 
 $include "src/ComprehensiveJordanForm/JordanForm.mpl"
 $include "src/ComprehensiveJordanForm/ComprehensiveJordanForm.mpl"

@@ -1,13 +1,13 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# SquarefreeFactorization_monic.mpl                                       #
+# square_free_factorization_monic.mpl                                     #
 #                                                                         #
 # AUTHOR .... Steven E. Thornton                                          #
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 28/2017                                                #
+# UPDATED ... Jan. 29/2017                                                #
 #                                                                         #
 # Compute the square-free factorization of a parametric, univariate       #
 # polynomial that is monic in its main variable. The computation is can   #
@@ -48,7 +48,7 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-SquarefreeFactorization_monic := module()
+square_free_factorization_monic := module()
 
     export ModuleApply;
 
@@ -74,12 +74,11 @@ SquarefreeFactorization_monic := module()
 # specifications of the SquarefreeFactorization_monic method.             #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as SquarefreeFactorization_monic                                 #
+#   Same as square_free_factorization_monic                               #
 # ----------------------------------------------------------------------- #
 implementation := proc(p_in::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, opt_lazard, $)
     
-    local p :: polynom,
-          result;
+    local p :: polynom;
     
     p := expand(p_in);
     
@@ -117,7 +116,7 @@ end proc;
 # in the sense of lazard.                                                 #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as SquarefreeFactorization_monic                                 #
+#   Same as square_free_factorization_monic                               #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   - p is expanded                                                       #
@@ -133,9 +132,7 @@ monic_sqf_mod_rs_lazard := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R
           item :: [list([polynom, posint]), TRDrs],
           sqf_list :: list([polynom, posint]),
           rs_i :: TRDrs,
-          p_i :: polynom,
-          rc_i :: TRDrc,
-          var :: name;
+          p_i :: polynom;
     
     numParam := nops(R['variables']) - 1;
     
@@ -163,7 +160,7 @@ end proc;
 # in the sense of kalkbrener.                                             #
 #                                                                         #
 # INPUT/OUTPUT                                                            #
-#   Same as SquarefreeFactorization_monic                                 #
+#   Same as square_free_factorization_monic                               #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   - p is expanded                                                       #
@@ -222,7 +219,7 @@ end proc;
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
-#   Same as SquarefreeFactorization_monic                                 #
+#   Same as square_free_factorization_monic                               #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   - p is expanded                                                       #

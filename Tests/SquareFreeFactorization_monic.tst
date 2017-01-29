@@ -17,7 +17,7 @@ test := module()
 
         testList := ['test1', 'test2', 'test3', 'test4', 'test5'];
 
-        printf("Testing SquarefreeFactorization_monic\n");
+        printf("Testing SquareFreeFactorization_monic\n");
 
         passCount, failCount := 0, 0;
 
@@ -118,7 +118,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquarefreeFactorization_monic(p, 'x', rs, R, true);
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -155,7 +155,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquarefreeFactorization_monic(p, 'x', rs, R, true);
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -192,7 +192,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquarefreeFactorization_monic(p, 'x', rs, R, true);
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -229,7 +229,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquarefreeFactorization_monic(p, 'x', rs, R, true);
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -266,7 +266,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquarefreeFactorization_monic(p, 'x', rs, R, true);
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;

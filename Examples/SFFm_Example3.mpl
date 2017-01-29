@@ -11,10 +11,10 @@ rs := RegularSystem(R):
 p := (x+a)*(a*b+x)^2:
 
 # Compute the square-free factorization of p in the sense of Kalkbrener
-result := SquarefreeFactorization_monic(p, x, rs, R, false):
+result := SquareFreeFactorization_monic(p, x, rs, R, 'outputType'='RS', 'output'='kalkbrener'):
 printResult_SFFm(result, p, rs, R, false, 3);
 
 # Compute the square-free factorization of p in the sense of Kalkbrener
 printf("\n");
-result := SquarefreeFactorization_monic(p, x, rs, R, true):
+result := SquareFreeFactorization_monic(p, x, rs, R, 'outputType'='RS', 'output'='lazard'):
 printResult_SFFm(result, p, rs, R, true, 3);
