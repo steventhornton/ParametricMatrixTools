@@ -214,7 +214,14 @@ end proc;
 # Computes the square-free factorization over a regular chain in with an  #
 # inequation constraint.                                                  #
 #                                                                         #
-# INPUT/OUTPUT                                                            #
+# INPUT                                                                   #
+#   p .... Polynomial                                                     #
+#   v .... Variable                                                       #
+#   rc ... Regular chain                                                  #
+#   h .... Inequation                                                     #
+#   R .... Polynomial ring                                                #
+#                                                                         #
+# OUTPUT                                                                  #
 #   Same as SquarefreeFactorization_monic                                 #
 #                                                                         #
 # ASSUMPTIONS                                                             #
