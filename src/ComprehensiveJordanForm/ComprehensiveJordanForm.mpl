@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 24/2017                                                #
+# UPDATED ... Jan. 29/2017                                                #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials. Computation is done modulo a regular system   #
@@ -141,7 +141,7 @@ init := proc()
 
     if nargs < 2 then
         error "Insufficient number of arguments";
-    elif nargs > 8 then
+    elif nargs > 9 then
         error "To many arguments";
     end if;
 
@@ -516,9 +516,10 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     for rs in RC_CST:-RepresentingRegularSystems(cs, R) do
         
         # Map SparsePseudoRemainder to A
-        rc := RC_CST:-RepresentingChain(rs, R);
-        A := map(RC:-SparsePseudoRemainder, AA, rc, R);
-
+        #rc := RC_CST:-RepresentingChain(rs, R);
+        #A := map(RC:-SparsePseudoRemainder, AA, rc, R);
+        A := copy(AA);
+        
         # Check if A is either a constant matrix
         if isConstantMatrix(A, R) then
 

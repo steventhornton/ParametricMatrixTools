@@ -163,7 +163,7 @@ computeDeterminantDivisors := proc(A::Matrix(square), v::name, cs::TRDcs, R::TRD
     end do;
     
     # Make detDivisors disjoint (Splitting)
-        return makeDeterminantDivisorsDisjoint(detDivisors, R);
+    return makeDeterminantDivisorsDisjoint(detDivisors, R);
     
 end proc;
 

@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Jan. 29/2017                                                #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials by computing the Smith form of xI - A.         #

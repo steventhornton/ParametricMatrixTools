@@ -72,6 +72,40 @@ printResult_CGCD := proc(result, cs_zero, p1, p2, cs, R, k)
 end proc:
 
 
+printResult_SFFm := proc(result, p, rs, R, opt_lazard, k)
+
+    uses RegularChains, RegularChains:-ConstructibleSetTools;
+
+    local i, rc, eqn;
+
+    printf("============================================================\n");
+    printf("SquarefreeFactorization_monic - Example %d\n", k);
+    printf("============================================================\n\n");
+    
+    printf("Computing the Square-free factorization in the sense of ");
+    if opt_lazard then
+        printf("Lazard");
+    else
+        printf("Kalkbrener");
+    end if;
+    printf(" of \n");
+    printf("\tp = %a\n\n", p);
+    
+    if not IsEmpty(Complement(ConstructibleSet([rs],R),R),R) then
+        printf("\tParameter constraints:\n");
+        print_rs(rs, R,1);
+    end if;
+
+    for i to nops(result) do
+        printf("Case %d:\n", i);
+        printf("\tSquare-free Decomposition: %a\n", map(factor, result[i][1]));
+        printf("\tParameter constraints:\n");
+        print_rs(result[i][2],R,2);
+    end do;
+
+end proc:
+
+
 print_rs := proc(rs, R, n)
     
     local rc, eqn;
