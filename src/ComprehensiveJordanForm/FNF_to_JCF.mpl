@@ -36,7 +36,7 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
-FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, opt_lazard::truefalse, $)
+FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, $)
 
     local charPolyList,
           N,
@@ -64,7 +64,7 @@ FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, opt_lazard::truefalse, $)
     # where i is the index of the characteristic polynomial that needs to
     # be computed next
     # JList is a list of matrices
-    tasks := poly_to_JCF(numer(charPolyList[1]), 'v', cs, R2, opt_lazard);
+    tasks := poly_to_JCF(numer(charPolyList[1]), 'v', cs, R2);
     
     if N > 1 then
         tasks := map(x -> [[x[1]], x[2], 2], tasks);
@@ -78,7 +78,7 @@ FNF_to_JCF := proc(F::Matrix, cs, R::TRDring, opt_lazard::truefalse, $)
         tasks := tasks[2..-1];
         
         # Compute JCF
-        JCFList := poly_to_JCF(numer(charPolyList[i]), 'v', cs_i, R2, opt_lazard);
+        JCFList := poly_to_JCF(numer(charPolyList[i]), 'v', cs_i, R2);
         
         # Add to either output list or tasks
         if i = N then

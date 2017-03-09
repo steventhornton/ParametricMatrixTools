@@ -7,22 +7,19 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 29/2017                                                #
+# UPDATED ... Mar. 9/2017                                                 #
 #                                                                         #
 # Compute the square-free factorization of a parametric, univariate       #
-# polynomial that is monic in its main variable. The computation is can   #
-# return a complete case disussion such that each branch forms a          #
-# partition of the input regular system. Alternatively, the computation   #
-# can be done in the sense of kalkbrener.                                 #
+# polynomial that is monic in its main variable. A complete case          #
+# discussion forming a partition of the input reular system is returned.  #
+# The partition of the input regular system is such that over each branch #
+# the square-free factorization of the input polynomial is continuous.    #
 #                                                                         #
 # INPUT                                                                   #
-#   p ............ Polynomial                                             #
-#   v ............ Variable                                               #
-#   rs ........... Regular system                                         #
-#   R ............ Polynomial ring                                        #
-#   opt_lazard ... Output option, if true the square-free factorization   #
-#                  is computed in the sense of lazard, otherwise it is in #
-#                  the sense of kalkbrener.                               #
+#   p .... Polynomial                                                     #
+#   v .... Variable                                                       #
+#   rs ... Regular system                                                 #
+#   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list of with elements of the form                                   #
@@ -30,8 +27,10 @@
 #   where lp_i is a list with elements of the form                        #
 #       [p_j, n_j]                                                        #
 #   and rs_i is a regular system.                                         #
-#   p = m_i*product(p_j^n_j) and p_j are the square-free factors in the   #
-#   zero set of rs_i and m_i is some rational function of the parameters. #
+#   There exists a rational function m_i such that                        #
+#       p = m_i*product(p_j^n_j)                                          #
+#   where p_j are the square-free factors of p such that the              #
+#   factorization is continuous over rs_i.                                #
 #                                                                         #
 # LICENSE                                                                 #
 #   This program is free software: you can redistribute it and/or modify  #
@@ -53,12 +52,13 @@ square_free_factorization_monic := module()
     export ModuleApply;
 
     local implementation,
-          monic_sqf_mod_rs_lazard,
-          monic_sqf_mod_rs_kalkbrener,
-          monic_sqf_mod_rc_h;
+          sqf_mod_rs,
+          getNewTasks,
+          getDiscrims,
+          getResultants;
 
-    ModuleApply := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, opt_lazard::truefalse, $)
-        return implementation(p, v, rs, R, opt_lazard);
+    ModuleApply := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, $)
+        return implementation(p, v, rs, R);
     end proc;
 
 
@@ -76,9 +76,11 @@ square_free_factorization_monic := module()
 # INPUT/OUTPUT                                                            #
 #   Same as square_free_factorization_monic                               #
 # ----------------------------------------------------------------------- #
-implementation := proc(p_in::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, opt_lazard, $)
+implementation := proc(p_in::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, $)
     
-    local p :: polynom;
+    local p :: polynom,
+          rc :: TRDrc,
+          h :: list(polynom);
     
     p := expand(p_in);
     
@@ -100,166 +102,153 @@ implementation := proc(p_in::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDr
         return [[sqrfree(p, v)[2], rs]];
     end if;
     
-    if opt_lazard then
-        monic_sqf_mod_rs_lazard(p, v, rs, R);
-    else
-        return monic_sqf_mod_rs_kalkbrener(p, v, rs, R);
-    end if;
+    rc := RC_CST:-RepresentingChain(rs, R);
+    h := RC_CST:-RepresentingInequations(rs, R);
+    
+    return sqf_mod_rs(p, v, rc, h, R);
     
 end proc;
 
 
 # ----------------------------------------------------------------------- #
-# monic_sqf_mod_rs_lazard                                                 #
+# sqf_mod_rs                                                              #
 #                                                                         #
-# Computes the square-free factorization of a polynomial. The result is   #
-# in the sense of lazard.                                                 #
-#                                                                         #
-# INPUT/OUTPUT                                                            #
-#   Same as square_free_factorization_monic                               #
-#                                                                         #
-# ASSUMPTIONS                                                             #
-#   - p is expanded                                                       #
-#   - v is the greatest variable of R                                     #
-#   - deg(p, v) > 0                                                       #
-#   - p is a monic polynomial in v                                        #
-# ----------------------------------------------------------------------- #
-monic_sqf_mod_rs_lazard := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, $)
-    
-    local numParam :: posint,
-          result :: list([list([polynom, posint]), TRDrs]),
-          newResult :: list([list([polynom, posint]), TRDrs]),
-          item :: [list([polynom, posint]), TRDrs],
-          sqf_list :: list([polynom, posint]),
-          rs_i :: TRDrs,
-          p_i :: polynom;
-    
-    numParam := nops(R['variables']) - 1;
-    
-    result := monic_sqf_mod_rs_kalkbrener(p, v, rs, R);
-    
-    to numParam-1 do
-        newResult := [];
-        for item in result do
-            sqf_list, rs_i := op(item);
-            p_i := expand(mul(map(x -> x[1]^x[2], sqf_list)));
-            newResult := [op(newResult), op(monic_sqf_mod_rs_kalkbrener(p_i, v, rs_i, R))];
-        end do;
-        result := newResult;
-    end do;
-    
-    return result;
-    
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# monic_sqf_mod_rs_kalkbrener                                             #
-#                                                                         #
-# Computes the square-free factorization of a polynomial. The result is   #
-# in the sense of kalkbrener.                                             #
-#                                                                         #
-# INPUT/OUTPUT                                                            #
-#   Same as square_free_factorization_monic                               #
-#                                                                         #
-# ASSUMPTIONS                                                             #
-#   - p is expanded                                                       #
-#   - v is the greatest variable of R                                     #
-#   - deg(p, v) > 0                                                       #
-#   - p is a monic polynomial in v                                        #
-# ----------------------------------------------------------------------- #
-monic_sqf_mod_rs_kalkbrener := proc(p::depends(polyInRing(R)), v::name, rs::TRDrs, R::TRDring, $)
-    
-    local result :: list([list([polynom, posint]), TRDrs]),
-          rc :: TRDrc,
-          h :: polynom,
-          p_sqf :: polynom,
-          p_sqf_disc :: polynom,
-          h_disc :: polynom,
-          lrc :: TRDlrc,
-          rc_i :: TRDrc;
-    
-    rc := RC:-TRDregular_chain_rs(rs, R);
-    h := RC:-TRDlist_mul_polys(RC:-TRDinequations_rs(rs, R), R);
-    
-    # Get the square-free part of p when viewed as a univariate polynomial 
-    # in v
-    p_sqf := RC:-TRDuniv_square_free_part(p, v, R);
-
-    # Compute the discriminant of the square-free part of p w.r.t. v
-    p_sqf_disc := expand(discrim(p_sqf, v));
-    
-    h_disc := p_sqf_disc*h;
-    
-    # Factorization when p_sqf_disc <> 0
-    result := monic_sqf_mod_rc_h(p, v, rc, h_disc, R);
-    
-    # Factorization when p_sqf_disc = 0
-    lrc := RC:-Intersect(p_sqf_disc, rc, R);
-    for rc_i in lrc do
-        result := [op(result), op(monic_sqf_mod_rc_h(p, v, rc_i, h, R))];
-    end do;
-    
-    return result;
-
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# monic_sqf_mod_rc_h                                                      #
-#                                                                         #
-# Computes the square-free factorization over a regular chain in with an  #
-# inequation constraint.                                                  #
+# Compute the square-free factorization of a polynomial given a regular   #
+# chain and a list of inequations that form a regular system.             #
 #                                                                         #
 # INPUT                                                                   #
 #   p .... Polynomial                                                     #
 #   v .... Variable                                                       #
 #   rc ... Regular chain                                                  #
-#   h .... Inequation                                                     #
+#   H .... List of polynomials representing inequations                   #
 #   R .... Polynomial ring                                                #
 #                                                                         #
 # OUTPUT                                                                  #
 #   Same as square_free_factorization_monic                               #
-#                                                                         #
-# ASSUMPTIONS                                                             #
-#   - p is expanded                                                       #
-#   - v is the greatest variable of R                                     #
-#   - deg(p, v) > 0                                                       #
-#   - p is a monic polynomial in v                                        #
 # ----------------------------------------------------------------------- #
-monic_sqf_mod_rc_h := proc(p, v, rc, h, R)
+sqf_mod_rs := proc(p::depends(polyInRing(R)), v::name, rc::TRDrc, H::list(polynom), R::TRDring, $)
+
+    local out, tasks, new_tasks, task, tmp_tasks, new_out;
     
-    local result :: list([list([polynom, posint]), TRDrs]),
-          sqf :: list([list([polynom, posint]), TRDrc]),
-          item :: [list([polynom, posint]), TRDrc],
-          lp :: list([polynom, posint]),
-          rcnew :: TRDrc,
-          reg :: TRDlrc,
-          rc_reg :: TRDrc,
-          rs :: TRDrs;
+    # Get the first task
+    tasks, out := getNewTasks(p, v, rc, H, R);
     
-    result := [];
-    
-    sqf := RC:-TRDsqf_mod_rc(p, v, rc, R);
-    
-    for item in sqf do
-        lp, rcnew := op(item);
-        
-        # h must be regular w.r.t. rcnew
-        if not RC:-TRDis_regular(h, rcnew, R) then
-            reg := RC_CT:-Regularize(h, rcnew, R)[1];
-            for rc_reg in reg do
-                rs := RC_CST:-RegularSystem(rc_reg, [h], R);
-                result := [op(result), [lp, rs]];
-            end do;
-        else
-            rs := RC_CST:-RegularSystem(rcnew, [h], R);
-            result := [op(result), [lp, rs]];
-        end if;
+    while nops(tasks) > 0 do
+        new_tasks := [];
+        for task in tasks do
+            tmp_tasks, new_out := getNewTasks(p, v, task, H, R); 
+            new_tasks := [op(new_tasks), op(tmp_tasks)];
+            out := `union`(out, new_out);
+        end do;
+        tasks := new_tasks;
+        tasks := LT:-MakeUnique(tasks, 1, proc (x, y) options operator, arrow; RC_CT:-EqualSaturatedIdeals(x, y, R) end proc);
     end do;
+    return convert(out, list);
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# getNewTasks                                                             #
+#                                                                         #
+# Compute one square-free factorization.                                  #
+#                                                                         #
+# INPUT                                                                   #
+#   p .... Polynomial                                                     #
+#   v .... Variable                                                       #
+#   rc ... Regular chain                                                  #
+#   H .... List of polynomials representing inequations                   #
+#   R .... Polynomial ring                                                #
+#                                                                         #
+# OUTPUT                                                                  #
+#   Two values:                                                           #
+#       tasks, out                                                        #
+#   - tasks is a list of regular chains that the square-free              #
+#     factorization of p is not continuous over.                          #
+#   - out is a set with elements of the form                              #
+#          [lp_i, rs_i]                                                   #
+#     where lp_i is a list with elements of the form                      #
+#       [p_j, m_j]                                                        #
+#    that gives the square-free factorization of p. The square-free       #
+#    factorization of p is continous over rs_i.                           #
+# ----------------------------------------------------------------------- #
+getNewTasks := proc(p::depends(polyInRing(R)), v::name, rc::TRDrc, H::list(polynom), R::TRDring, $)
     
-    return result;
-    
+    local out, tasks, sqf, item, lp_s, rc_s, Hs, h, rs, rc_h, rc_h_i, inRad, h_i;
+
+    out := {};
+    tasks := {};
+
+    sqf := RC:-TRDsqf_mod_rc(p, v, rc, R);
+
+    for item in sqf do
+        lp_s, rc_s := op(item);
+        Hs := `union`(getDiscrims(lp_s, v), getResultants(lp_s, v));
+        Hs := `minus`(Hs, {1});
+
+        rs := RC_CST:-RegularSystem(rc_s, Hs, R);
+        out := out union {[lp_s, rs]};
+        for h in Hs do
+            rc_h := RC:-Intersect(h, rc, R);
+            for rc_h_i in rc_h do
+                inRad := false;
+                for h_i in H do
+                    inRad := RC_CT:-IsInRadical(h_i, rc_h_i, R);
+                    if inRad then break end if;
+                end do;
+                if not inRad then
+                    tasks := `union`(tasks, {rc_h_i});
+                end if;
+            end do;
+        end do;
+    end do;
+    tasks := convert(tasks, list);
+    return tasks, out;
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# getNewTasks                                                             #
+#                                                                         #
+# Computes the discriminant of all polynomials in a list                  #
+#                                                                         #
+# INPUT                                                                   #
+#   lp ... List of pairs of the form                                      #
+#            [p, i]                                                       #
+#          where p is a polynomial and i is an integer.                   #
+#   v .... Variable                                                       #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A set containing the discriminants of all the polynomials p.          #
+# ----------------------------------------------------------------------- #
+getDiscrims := proc(lp::list([polynom, posint]), v::name, $)
+    return convert(map(x -> discrim(x[1], v), lp), set);
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# getNewTasks                                                             #
+#                                                                         #
+# Computes all pairwise resultants of the polynomials in a list           #
+#                                                                         #
+# INPUT                                                                   #
+#   lp ... List of pairs of the form                                      #
+#            [p, i]                                                       #
+#          where p is a polynomial and i is an integer.                   #
+#   v .... Variable                                                       #
+#                                                                         #
+# OUTPUT                                                                  #
+#   The set of all pairwise resultants the polynomials in the input list. #
+# ----------------------------------------------------------------------- #
+getResultants := proc(lp_in::list([polynom, posint]), v::name, $)
+    local lp, i, j, out;
+    out := {};
+    lp := map(x -> x[1], lp_in);
+    for i to nops(lp_in)-1 do
+        for j from i+1 to nops(lp_in) do
+            out := `union`(out, {resultant(lp[i], lp[j], v)});
+        end do;
+    end do;
+    return out;
 end proc;
 
 end module;

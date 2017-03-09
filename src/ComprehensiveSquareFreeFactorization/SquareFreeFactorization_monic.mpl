@@ -7,13 +7,13 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 29/2017                                                #
+# UPDATED ... Mar. 9/2017                                                 #
 #                                                                         #
 # Compute the square-free factorization of a parametric, univariate       #
-# polynomial that is monic in its main variable. The computation is can   #
-# return a complete case disussion such that each branch forms a          #
-# partition of the input regular system. Alternatively, the computation   #
-# can be done in the sense of kalkbrener.                                 #
+# polynomial that is monic in its main variable. A complete case          #
+# discussion forming a partition of the input reular system is returned.  #
+# The partition of the input regular system is such that over each branch #
+# the square-free factorization of the input polynomial is continuous.    #
 #                                                                         #
 # CALLING SEQUENCE                                                        #
 #   SquareFreeFactorization_monic(p, v, R, options)                       #
@@ -36,10 +36,6 @@
 #                      - Output will contain constructible sets           #
 #                  'RegularSystem' or 'RS':                               #
 #                      - Output will contain regular systems              #
-#   output ....... 'kalkbrener' (default):                                #
-#                      - The result will be in the sense of kalkbrener    #
-#                  'lazard':                                              #
-#                      - A full case discussion will be returned          #
 #                                                                         #
 # ASSUMPTIONS                                                             #
 #   degree(p, mvar(R)) > 0                                                #
@@ -214,7 +210,6 @@ end proc;
 #    A table with indices                                                 #
 #       output_CS                                                         #
 #       output_RS                                                         #
-#       opt_lazard                                                        #
 #    See SquareFreeFactorization_monic header for specifications.         #
 # ----------------------------------------------------------------------- #
 processOptions := proc(opts_in::set(equation), $) :: table;
@@ -228,7 +223,6 @@ processOptions := proc(opts_in::set(equation), $) :: table;
     # Default values
     opts['output_CS'] := true;
     opts['output_RS'] := false;
-    opts['opt_lazard'] := false;
     
     tab_opts := table();
     
@@ -255,18 +249,6 @@ processOptions := proc(opts_in::set(equation), $) :: table;
                     opts['output_RS'] := true;
                 else
                     error "incorrect option value: %1", opt;
-                end if;
-            elif opt_name = ('output') then
-                opt_value :=rhs(opt);
-                if not member(opt_value, ['lazard', 'kalkbrener']) then
-                    error "incorrect option value: %1", opt;
-                end if;
-                if opt_value = 'lazard' then
-                    opts['opt_lazard'] := true;
-                elif opt_value = 'kalkbrener' then
-                    opts['opt_lazard'] := false;
-                else
-                    error "incorrect option value %1", opt;
                 end if;
             else
                 error "unknown option";
@@ -459,7 +441,7 @@ implementation := proc(p_in::depends(polyInRing(R)), v::name, cs::TRDcs, R::TRDr
     # Call the algorithm
     lrs := RC_CST:-RepresentingRegularSystems(cs, R);
     for rs in lrs do
-        result := [op(result), op(square_free_factorization_monic(p, v, rs, R, opts['opt_lazard']))];
+        result := [op(result), op(square_free_factorization_monic(p, v, rs, R))];
     end do;
     
     if opts['output_CS'] then

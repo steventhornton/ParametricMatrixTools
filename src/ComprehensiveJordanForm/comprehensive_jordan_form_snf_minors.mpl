@@ -56,8 +56,8 @@ comprehensive_jordan_form_snf_minors := module()
         poly_to_JCF,
         getCharPolys;
 
-    ModuleApply := proc(A::~Matrix, cs::TRDcs, R::TRDring, opt_lazard::truefalse, $)
-        return implementation(A, cs, R, opt_lazard);
+    ModuleApply := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
+        return implementation(A, cs, R);
     end proc;
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -72,7 +72,7 @@ comprehensive_jordan_form_snf_minors := module()
 # INPUT/OUTPUT                                                            #
 #   Same as comprehensive_jordan_form_snf_minors                          #
 # ----------------------------------------------------------------------- #
-implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, opt_lazard::truefalse, $)
+implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, $)
 
     local FList;
     
@@ -80,7 +80,7 @@ implementation := proc(A::~Matrix, cs::TRDcs, R::TRDring, opt_lazard::truefalse,
     FList := ComprehensiveFrobeniusForm(A, cs, R, 'outputMatrices'='F', 'outputType'='CS', 'algorithm'='snf_minors');
     
     # For element of FList, compute the Jordan form
-    return map(x -> op(FNF_to_JCF(x[1], x[2], R, opt_lazard)), FList);
+    return map(x -> op(FNF_to_JCF(x[1], x[2], R)), FList);
 
 end proc;
 

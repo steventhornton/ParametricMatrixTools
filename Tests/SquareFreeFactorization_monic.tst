@@ -7,7 +7,14 @@ test := module()
           test2,
           test3,
           test4,
-          test5;
+          test5,
+          test6,
+          test7,
+          test8,
+          test9,
+          test10,
+          test11,
+          test12;
 
     uses ParametricMatrixTools, RegularChains, RegularChains:-ConstructibleSetTools, RegularChains:-ChainTools;
 
@@ -15,7 +22,9 @@ test := module()
 
         local passCount, failCount, test, testList, t; 
 
-        testList := ['test1', 'test2', 'test3', 'test4', 'test5'];
+        testList := ['test1', 'test2', 'test3', 'test4', 'test5',
+                     'test6', 'test7', 'test8', 'test9', 'test10',
+                     'test11', 'test12'];
 
         printf("Testing SquareFreeFactorization_monic\n");
 
@@ -45,7 +54,7 @@ test := module()
     
     verifyResult_rs := proc(p, v, rs, result, R)
         
-        local cs, cs_result, item, d1, d2, m, sqr, es, g, cs_zero, G, ds, i, j, g_item;
+        local cs, cs_result, item, d1, d2, m, sqr, es, g, cs_zero, G, ds, i, j, g_item, h, H;
         
         # Check that the union of the regular systems in result equal rs
         cs := ConstructibleSet([rs], R);
@@ -96,6 +105,19 @@ test := module()
             end do;
         end do;
         
+        # Check that each inequation in rs is non-zero over each regular
+        # system in the result
+        H := RepresentingInequations(rs, R);
+        for item in result do
+            sqr, es := op(item);
+            for h in H do
+                if not ParametricMatrixTools:-isNonZeroOverRS(h, es, R) then
+                    printf("Inequations of input system not non-zero in result\n");
+                    return false;
+                end if;
+            end do;
+        end do;
+        
         return true;
         
     end proc;
@@ -118,7 +140,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -155,7 +177,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -192,7 +214,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -229,7 +251,7 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
@@ -266,7 +288,268 @@ test := module()
         rs := RegularSystem(R);
         
         try
-            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'output'='lazard', 'outputType'='RS');
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    # ------------------------------------------------------------------- #
+    # TEST 6                                                              #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {a-1}                                                           #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test6 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([a-1], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    # ------------------------------------------------------------------- #
+    # TEST 7                                                              #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {b-1}                                                           #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test7 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([b-1], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    # ------------------------------------------------------------------- #
+    # TEST 8                                                              #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {a-b}                                                           #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test8 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([a-b], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    # ------------------------------------------------------------------- #
+    # TEST 9                                                              #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {a-1,b-1}                                                       #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test9 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([a-1,b-1], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    # ------------------------------------------------------------------- #
+    # TEST 10                                                             #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {a-1,a-b}                                                       #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test10 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([a-1,a-b], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    # ------------------------------------------------------------------- #
+    # TEST 11                                                             #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {b-1,a-b}                                                       #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test11 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([b-1,a-b], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
+        catch:
+            printf("\b\b\bFAIL: Error\n");
+            return false;
+        end try;
+    
+        correct := verifyResult_rs(p, 'x', rs, result, R);
+    
+        printf("\b\b\b");
+        if correct then
+            printf("Pass\n");
+            return true;
+        else
+            printf("FAIL: Incorrect result\n");
+            return false;
+        end if;
+    
+    end proc;
+    
+    
+    # ------------------------------------------------------------------- #
+    # TEST 12                                                             #
+    #                                                                     #
+    # p = (x+a)^3 * (x+b)^2 * (x+1)                                       #
+    # rc = {}                                                             #
+    # h = {a-1,b-1,a-b}                                                   #
+    # 'output'='lazard'                                                   #
+    # ------------------------------------------------------------------- #
+    test12 := proc($)
+    
+        local p, R, rs, result, correct;
+        
+        p := (x+a)^3 * (x+b)^2 * (x+1);
+        
+        R := PolynomialRing([x, a, b, c]);
+        rs := RegularSystem([a-1,b-1,a-b], R);
+        
+        try
+            result := SquareFreeFactorization_monic(p, 'x', rs, R, 'outputType'='RS');
         catch:
             printf("\b\b\bFAIL: Error\n");
             return false;
