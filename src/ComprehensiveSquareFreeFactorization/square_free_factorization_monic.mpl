@@ -174,19 +174,21 @@ end proc;
 getNewTasks := proc(p::depends(polyInRing(R)), v::name, rc::TRDrc, H::list(polynom), R::TRDring, $)
     
     local out, tasks, sqf, item, lp_s, rc_s, Hs, h, rs, rc_h, rc_h_i, inRad, h_i;
-
+    
     out := {};
     tasks := {};
 
     sqf := RC:-TRDsqf_mod_rc(p, v, rc, R);
-
+    
     for item in sqf do
         lp_s, rc_s := op(item);
         Hs := `union`(getDiscrims(lp_s, v), getResultants(lp_s, v));
         Hs := `minus`(Hs, {1});
-
-        rs := RC_CST:-RegularSystem(rc_s, Hs, R);
-        out := out union {[lp_s, rs]};
+        
+        rs := RC_CST:-RegularSystem(rc_s, `union`(Hs, convert(H,set)), R);
+        
+        out := `union`(out, {[lp_s, rs]});
+        
         for h in Hs do
             rc_h := RC:-Intersect(h, rc, R);
             for rc_h_i in rc_h do
