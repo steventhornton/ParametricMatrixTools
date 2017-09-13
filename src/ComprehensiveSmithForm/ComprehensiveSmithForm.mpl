@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Sept. 12/2017                                               #
 #                                                                         #
 # Computes the Smith normal form of a matrix where the entries are        #
 # parametric univariate polynomials. Computation is done modulo a         #
@@ -176,6 +176,8 @@ ComprehensiveSmithForm := module()
         checkInput,
         
         implementation,
+        
+        convertToRS,
         
         # ALGORITHMS
         comprehensive_smith_form_minors;
@@ -689,6 +691,11 @@ implementation := proc(AA::Matrix(square), v::name, cs::TRDcs, R::TRDring, opts:
         result := [op(result), op(comprehensive_smith_form_minors(AA, v, csCompute, R))];
     end if;
     
+    # Output options
+    if opts['output_RS'] then
+        result := convertToRS(result, R);
+    end if;
+    
     return result;
     
 end proc;
@@ -698,5 +705,6 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveSmithForm/comprehensive_smith_form_minors.mpl>
+$include <src/ComprehensiveSmithForm/convertToRS.mpl>
 
 end module;

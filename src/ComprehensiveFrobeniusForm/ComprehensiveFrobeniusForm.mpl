@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 10/2017                                                #
+# UPDATED ... Sept. 12/2017                                               #
 #                                                                         #
 # Computes the Frobenius (rational) normal form of a matrix where the     #
 # entries are multivariate polynomials. Computation is done modulo a      #
@@ -109,7 +109,9 @@ ComprehensiveFrobeniusForm := module()
         checkInput,
 
         implementation,
-
+        
+        convertToRS,
+        
         # ALGORITHMS
         comprehensive_frobenius_form_snf_minors;
         
@@ -569,6 +571,11 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
         result := [op(result), op(comprehensive_frobenius_form_snf_minors(AA, csCompute, R))];
     end if;
     
+    # Output options
+    if opts['output_RS'] then
+        result := convertToRS(result, R)
+    end if;
+    
     return result;
 
 end proc;
@@ -577,5 +584,6 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveFrobeniusForm/comprehensive_frobenius_form_snf_minors.mpl>
+$include <src/ComprehensiveFrobeniusForm/convertToRS.mpl>
 
 end module;

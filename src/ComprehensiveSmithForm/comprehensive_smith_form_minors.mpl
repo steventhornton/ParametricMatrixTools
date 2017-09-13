@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 9/2017                                                 #
+# UPDATED ... Sept. 12/2017                                               #
 #                                                                         #
 # Computes the Smith normal form of a matrix where the entries are        #
 # parametric univariate polynomials by computing gcd's of minors of the   #
@@ -100,7 +100,7 @@ implementation_cs := proc(A::Matrix(square), v::name, cs::TRDcs, R::TRDring, $)
     
     # Construct SNF for each entry of invariantFactors
     return convert(map(input -> [LA:-DiagonalMatrix(map(collect, input[1], v)), 
-                                 RC:-TRDrename_regular_system(input[2])], 
+                                 RC:-TRDconstructible_set([RC:-TRDrename_regular_system(input[2])], R)], 
                                  invariantFactors), list);
     
 end proc;

@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 29/2017                                                #
+# UPDATED ... Sept. 12/2017                                               #
 #                                                                         #
 # Computes the Jordan canonical form of a matrix where the entries are    #
 # mutlivariate polynomials. Computation is done modulo a regular system   #
@@ -107,7 +107,9 @@ ComprehensiveJordanForm := module()
         checkInput,
 
         implementation,
-
+        
+        convertToRS,
+        
         # ALGORITHMS
         comprehensive_jordan_form_snf_minors;
 
@@ -561,6 +563,11 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     elif opts['algorithm_snf_minors'] then
         result := [op(result), op(comprehensive_jordan_form_snf_minors(AA, csCompute, R))];
     end if;
+    
+    # Output options
+    if opts['output_RS'] then
+        result := convertToRS(result, R)
+    end if;
 
     return result;
 
@@ -570,5 +577,6 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveJordanForm/comprehensive_jordan_form_snf_minors.mpl>
+$include <src/ComprehensiveJordanForm/convertToRS.mpl>
 
 end module;
