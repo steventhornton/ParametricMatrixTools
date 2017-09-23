@@ -551,8 +551,7 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     end do;
 
     # Convert all regular systems in result list to constructible sets
-    result := map(input -> [RC_CST:-ConstructibleSet([input[-1]], R), 
-                            input[1..-2]], result);
+    result := map(input -> [op(input[1..-2]), RC_CST:-ConstructibleSet([input[-1]], R)], result);
     
     # Convert lrsCompute to a constructible set
     csCompute := RC_CST:-ConstructibleSet(lrsCompute, R);
