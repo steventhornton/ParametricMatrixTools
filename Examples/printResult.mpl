@@ -106,6 +106,34 @@ printResult_SFFm := proc(result, p, rs, R, opt_lazard, k)
 end proc:
 
 
+printResult_CR := proc(result, A, cs, R, k)
+
+    uses RegularChains, RegularChains:-ConstructibleSetTools;
+
+    local i, rc, eqn;
+
+    printf("============================================================\n");
+    printf("ComprehensiveRank - Example %d\n", k);
+    printf("============================================================\n\n");
+    
+    printf("\tA = %a\n\n", A);
+
+    if not IsEmpty(Complement(cs,R),R) then
+        printf("\tParameter constraints:\n");
+        print_rs(cs, R,1);
+    end if;
+
+    for i to nops(result) do
+        printf("Case %d:\n", i);
+        print(result[i][1]);
+        printf("\tRank: %d\n", result[i][1]);
+        printf("\tParameter constraints:\n");
+        print_rs(result[i][2], R, 2);
+    end do;
+
+end proc:
+
+
 print_rs := proc(rs, R, n)
     
     local rc, eqn;

@@ -10,6 +10,7 @@ From the `ParametricMatrixTools` directory, run `make mla`. This will create a M
 
 ## Methods
 
+- [ComprehensiveRank](Documentation/ComprehensiveRank.md)
 - [ComprehensiveSmithForm](Documentation/ComprehensiveSmithForm.md)
 - [ComprehensiveFrobeniusForm](Documentation/ComprehensiveFrobeniusForm.md)
 - [JordanForm](Documentation/JordanForm.md)

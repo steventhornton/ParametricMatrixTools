@@ -33,6 +33,7 @@ ParametricMatrixTools := module()
     export ComprehensiveFrobeniusForm,
            ComprehensiveGcd,
            ComprehensiveJordanForm,
+           ComprehensiveRank,
            ComprehensiveSmithForm,
            ComprehensiveSquareFreeFactorization,
            SquareFreeFactorization_monic,
@@ -101,6 +102,8 @@ $include "src/ComprehensiveFrobeniusForm/ComprehensiveFrobeniusForm.mpl"
 
 $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 $include "src/ComprehensiveGcd/ListComprehensiveGcd.mpl"
+
+$include "src/ComprehensiveRank/ComprehensiveRank.mpl"
 
 $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
