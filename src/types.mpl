@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Oct. 15/2016                                                #
+# UPDATED ... Sept. 29/2017                                               #
 #                                                                         #
 # Definitions of types used for type checking in functions. The loadTypes #
 # function is called when the ParametricMatrixTools module is loaded.     #
@@ -22,6 +22,9 @@
 #   TRDlrs                                                                #
 #   TRDlrc                                                                #
 #   TRDlcs                                                                #
+#   TRDrsas                                                               #
+#   TRDlrsas                                                              #
+#   TRDqff                                                                #
 # ======================================================================= #
 # ======================================================================= #
 loadTypes := proc()
@@ -116,5 +119,35 @@ loadTypes := proc()
     TypeTools:-AddType('TRDlrc', proc(lrc)
         type(lrc, list('TRDrc'));
     end proc);
-
+    
+    
+    # ------------------------------------------------------------------- #
+    # TRDrsas                                                             #
+    #                                                                     #
+    # Check if rsas is a valid regular semi-algebraic system.             #
+    # ------------------------------------------------------------------- #
+    TypeTools:-AddType('TRDrsas', proc(rsas)
+        RC:-TRDis_regular_semi_algebraic_system(rsas);
+    end proc);
+    
+    
+    # ------------------------------------------------------------------- #
+    # TRDlrsas                                                            #
+    #                                                                     #
+    # Check if lrsas is a valid list of regular semi-algebraic systems.   #
+    # ------------------------------------------------------------------- #
+    TypeTools:-AddType('TRDlrsas', proc(lrsas)
+        type(lrsas, list('TRDrsas'));
+    end proc);
+    
+    
+    # ------------------------------------------------------------------- #
+    # TRDqff                                                              #
+    #                                                                     #
+    # Check if qff is a valid list of quantifier-free formula             #
+    # ------------------------------------------------------------------- #
+    TypeTools:-AddType('TRDqff', proc(qff)
+        RC:-TRDis_quantifier_free_formula(qff);
+    end proc);
+    
 end proc:

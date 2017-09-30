@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Sept. 21/2017                                               #
+# UPDATED ... Sept. 30/2017                                               #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -217,11 +217,6 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
         if nops(tab[i]) > 0 then
             rank[i] := [linearProjection(convert(tab[i],list), nParams, R)];
         end if;
-        # for j from 1 to nops(tab[i]) do
-        #     rank[i] := rank[i] union {linearProjection(tab[i][j], nParams, R)};
-        # end do;
-        # # Convert to a list
-        # rank[i] := [op(rank[i])];
     end do;
 
     return rank;
@@ -277,7 +272,7 @@ end proc;
 
 
 # ----------------------------------------------------------------------- #
-# complexRank/convertRankList                                             #
+# convertRankList                                                         #
 #                                                                         #
 # Converts a table where table[r] = CS where r is the computed rank and   #
 # CS is a constructible set to a list with elements of the form [r, CS].  #
@@ -366,21 +361,19 @@ linearProjection := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
 end proc;
 
 
-#-----------------------------------------------------------------------
-#
-# PROCEDURE: SuggestVariableOrderWithParameters
-#
-# Gives a variable ordering suggestion ensuring the 
-# parameters are less than any other variables.
-#
-# INPUT:
-#   lp ....... list of polynomials
-#   params ... list of parameters
-#
-# OUTPUT:
-#   A list of variables.
-#
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------- #
+# SuggestVariableOrderWithParameters                                      #
+#                                                                         #
+# Gives a variable ordering suggestion ensuring the parameters are less   #
+# than any other variables.                                               #
+#                                                                         #
+# INPUT                                                                   #
+#   lp ....... List of polynomials                                        #
+#   params ... List of parameters                                         #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A list of variables.                                                  #
+# ----------------------------------------------------------------------- #
 SuggestVariableOrderWithParameters := proc(lp::list(polynom), params::list(name), $)
     
     local y::list(name), v::name;
@@ -396,22 +389,20 @@ SuggestVariableOrderWithParameters := proc(lp::list(polynom), params::list(name)
 end proc;
 
 
-#-----------------------------------------------------------------------
-#
-# PROCEDURE: add_list_polys_to_cs
-#
-# Adds the polynomials from a list (where each poly is = 0)
-# to a constructible set.
-#
-# INPUT:
-#   lp ... list of polynomials
-#   CS ... Constructible set
-#   R .... Polynomial Ring
-#
-# OUTPUT:
-#   Intersection(V(lp), CS)
-#
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------- #
+# add_list_polys_to_cs                                                    #
+#                                                                         #
+# Adds the polynomials from a list (where each poly is = 0)               #
+# to a constructible set.                                                 #
+#                                                                         #
+# INPUT                                                                   #
+#   lp ... List of polynomials                                            #
+#   CS ... Constructible set                                              #
+#   R .... Polynomial ring                                                #
+#                                                                         #
+# OUTPUT                                                                  #
+#   Intersection(V(lp), CS)                                               #
+# ----------------------------------------------------------------------- #
 add_list_polys_to_cs := proc(lp::{list,set}, CS, R)
 
     local lrs, rs, lcs, rc, ieqs;
@@ -427,50 +418,49 @@ add_list_polys_to_cs := proc(lp::{list,set}, CS, R)
 
     return ListUnion([lcs], R);
 
-end proc:
+end proc;
 
-#-----------------------------------------------------------------------
-#
-# PROCEDURE: Dimension
-#
-# Computed the dimension (i.e. number of equations containing the 
-# unknowns) in a regular system.
-#
-# INPUT:
-#   rs ...... a regular system
-#   nVars ... number of variables
-#   R ...... polynomial ring
-#
-# OUTPUT:
-#   Returns a positive integer corresponding to the dimension of 
-#	the input rs
-#
-#-----------------------------------------------------------------------
-getDimension := proc(rs, nVars, R)
 
-    local info, i, x, j;
+# ----------------------------------------------------------------------- #
+# getDimension                                                            #
+#                                                                         #
+# Computed the dimension (i.e. number of equations containing the         #
+# unknowns) in a regular system.                                          #
+#                                                                         #
+# INPUT                                                                   #
+#   rs ...... Regular system                                              #
+#   nVars ... Number of variables                                         #
+#   R ....... Polynomial ring                                             #
+#                                                                         #
+# OUTPUT                                                                  #
+#   Returns a positive integer corresponding to the dimension of the      #
+#   input rs.                                                             #
+# ----------------------------------------------------------------------- #
+getDimension := proc(rs::TRDrs, nVars::nonnegint, R::TRDring, $)
+
+    local x :: set(name),
+          rc :: TRDrc,
+          eqns :: list(polynom),
+          eqn :: polynom,
+          i :: nonnegint;
 
     # Get the variables
     x := {op((R['variables'])[1..nVars])};
 
-    ## FIX
-    info := RegularChains:-Info(rs, R);
+    # Get the equations of the regular system
+    rc := RC_CST:-RepresentingChain(rs, R);
+    eqns := RC:-Equations(rc, R);
     
     i := nVars;
     
-    for j from 1 to nops(info[1]) do
-        # if nops(indets(info[1][j])) <> 0 and evalb(info[1][j] <> 0) then
-        if not evalb(nops(indets(info[1][j]) intersect x) = 0) and not evalb(info[1][j] = 0) then
+    for eqn in eqns do
+        if not evalb(nops(indets(eqn) intersect x) = 0) and not evalb(eqn = 0) then
             i := i - 1;
         end if;
     end do;
-    # for j from 1 to nops(info[2]) do
-    #     if not evalb(nops(indets(info[2][j]) intersect x) = 0) and not evalb(info[2][j] = 1) then
-    #         i := i - 1;
-    #     end if;
-    # end do;
+    
     return i;
-
-end proc:
+    
+end proc;
 
 end module;

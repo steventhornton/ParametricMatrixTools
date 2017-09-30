@@ -34,6 +34,7 @@ ParametricMatrixTools := module()
            ComprehensiveGcd,
            ComprehensiveJordanForm,
            ComprehensiveRank,
+           RealComprehensiveRank,
            ComprehensiveSmithForm,
            ComprehensiveSquareFreeFactorization,
            SquareFreeFactorization_monic,
@@ -51,8 +52,12 @@ ParametricMatrixTools := module()
           isUnder,
           isZeroMatrixOverCS,
           isZeroMatrixOverRS,
+          isZeroMatrixOverRSAS,
+          isZeroMatrixOverLRSAS,
           isZeroOverCS,
           isZeroOverRS,
+          isZeroOverRSAS,
+          isZeroOverLRSAS,
           ListIntersection,
           ListUnion,
           TRDdifference_intersect_cs_p,
@@ -89,8 +94,12 @@ $include "src/Extra/isNonZeroOverCS.mpl"
 $include "src/Extra/isNonZeroOverRS.mpl"
 $include "src/Extra/isZeroMatrixOverCS.mpl"
 $include "src/Extra/isZeroMatrixOverRS.mpl"
+$include "src/Extra/isZeroMatrixOverRSAS.mpl"
+$include "src/Extra/isZeroMatrixOverLRSAS.mpl"
 $include "src/Extra/isZeroOverCS.mpl"
 $include "src/Extra/isZeroOverRS.mpl"
+$include "src/Extra/isZeroOverRSAS.mpl"
+$include "src/Extra/isZeroOverLRSAS.mpl"
 $include "src/Extra/ListIntersection.mpl"
 $include "src/Extra/ListUnion.mpl"
 $include "src/Extra/TRDdifference_intersect_cs_p.mpl"
@@ -104,6 +113,7 @@ $include "src/ComprehensiveGcd/ComprehensiveGcd.mpl"
 $include "src/ComprehensiveGcd/ListComprehensiveGcd.mpl"
 
 $include "src/ComprehensiveRank/ComprehensiveRank.mpl"
+$include "src/RealComprehensiveRank/RealComprehensiveRank.mpl"
 
 $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
