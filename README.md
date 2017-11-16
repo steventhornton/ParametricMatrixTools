@@ -19,6 +19,6 @@ From the `ParametricMatrixTools` directory, run `make mla`. This will create a M
 - [ListComprehensiveGcd](Documentation/ListComprehensiveGcd.md)
 - [ComprehensiveSquareFreeFactorization](Documentation/ComprehensiveSquareFreeFactorization.md)
 
-Detailed descriptions of each of these methods can be found in the [Documentation](Documentation) directory. An Maple worksheet [Examples.mw](Examples.mw) contains numerous examples of each of the above methods in use.
+Detailed descriptions of each of these methods can be found in the [Documentation](Documentation) directory. A Maple worksheet [Examples.mw](Examples.mw) contains numerous examples of each of the above methods.
 
 __This package is being actively developed and likely contains bugs :bug:__
