@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Sept. 29/2017                                               #
+# UPDATED ... Nov. 24/2017                                                #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -331,7 +331,7 @@ implementation := proc(AA::Matrix, lrsas::TRDlrsas, R::TRDring, $)
     
     local rsas :: TRDrsas,
           rc :: TRDrc,
-          A :: 'Matrix'(square),
+          A :: Matrix,
           r :: nonnegint,
           result := [],
           lrsasCompute :: TRDlrsas := [];

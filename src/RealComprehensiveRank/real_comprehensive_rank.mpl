@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Sept. 29/2017                                               #
+# UPDATED ... Nov. 24/2017                                                #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -57,7 +57,6 @@ real_comprehensive_rank := module()
         convertRankList,
         linearProjection_lrsas,
         linearProjection_rsas,
-        SuggestVariableOrderWithParameters,
         add_list_polys_to_lrsas,
         getRealDimension;
     
@@ -80,21 +79,17 @@ real_comprehensive_rank := module()
 # ----------------------------------------------------------------------- #
 implementation_lrsas := proc(A::Matrix, lrsas::TRDlrsas, R::TRDring, $)
 
-    local n :: posint,
-          m :: posint,
+    local m :: posint,
           y,
-          lp,
+          lp :: list(polynom),
           R_Union :: TRDring,
-          lrsas_Int,
-          rankTable,
-          d,
-          lrsas_singular,
-          lrsas_nonsingular,
-          out,
-          i;
+          lrsas_linear :: TRDlrsas,
+          rankTable :: table,
+          out :: list([nonnegint, TRDlrsas]),
+          i :: posint;
     
     # Get size of input matrix
-    n, m := op(1,A);
+    m := LA:-ColumnDimension(A);
     
     # Temporary variables for matrix
     y := seq('x'[i], i=1..m);
@@ -103,35 +98,15 @@ implementation_lrsas := proc(A::Matrix, lrsas::TRDlrsas, R::TRDring, $)
     lp := convert(A.Vector([y]), list);
     
     # Use suggest variable order for improved performance
-    R_Union := RC:-PolynomialRing(SuggestVariableOrderWithParameters(lp, R['variables']));
-    
-    # Pre-condition for case where A is singular
-    d := LA:-Determinant(A);
-    
-    # Parameter values where A is singular
-    lrsas_singular := add_list_polys_to_lrsas([d], lrsas, R);
-    
-    # If the matrix is non-singular for all parameter values
-    # return the input conditions with full rank
-    if nops(lrsas_singular) = 0 then
-        return [[n, lrsas]];
-    end if;
-    
-    # Parameter values where A is non-singular
-    lrsas_nonsingular := RC_SAST:-Difference(lrsas, lrsas_singular, R);
+    R_Union := RC:-PolynomialRing([y, op(R['variables'])]);
     
     # Add the equations from the matrix
-    lrsas_Int := add_list_polys_to_lrsas(lp, lrsas_singular, R_Union);
+    lrsas_linear := add_list_polys_to_lrsas(lp, lrsas, R_Union);
     
     # Call method to get rank
-    rankTable := getRank(lrsas_Int, nops(R['variables']), R_Union);
+    rankTable := getRank(lrsas_linear, nops(R['variables']), R_Union);
     
-    #return rankTable;
     out := convertRankList(rankTable);
-    
-    if nops(lrsas_nonsingular) <> 0 then
-        out := [op(out), [n, lrsas_nonsingular]];
-    end if;
     
     return out;
     
@@ -156,7 +131,7 @@ end proc;
 # ----------------------------------------------------------------------- #
 getRank := proc(lrsas, nParams, R::TRDring, $)
 
-    local nVars, dim, j, i, rank, tab, lrsasNew, lrsas2;
+    local nVars, dim, i, rank, tab, lrsasNew, lrsas2, perm :: list(posint);
 
     # Get the number of variables
     nVars := nops(R['variables']) - nParams;
@@ -165,15 +140,8 @@ getRank := proc(lrsas, nParams, R::TRDring, $)
     dim := map(getRealDimension, lrsas, nVars, R);
 
     # arrange lrsas in order of least dimension to greatest dimension
-    lrsasNew := NULL;
-    for j from 0 to nVars do
-        for i from 1 to nops(dim) do
-            if evalb(dim[i] = j) then
-                lrsasNew := lrsasNew, lrsas[i];
-            end if;
-        end do;
-    end do;
-    lrsasNew := [lrsasNew];
+    perm := sort(dim, 'output' = 'permutation');
+    lrsasNew := lrsas[perm];
 
     # Compute Differences of all rsas with all rsas of greater of equal dimension
     lrsas2 := {};
@@ -187,10 +155,7 @@ getRank := proc(lrsas, nParams, R::TRDring, $)
     tab := constructTable(lrsas2, nParams, R);
 
     # initialize rank table
-    rank := table();
-    for i from 0 to nVars do
-        rank[i] := {};
-    end do;
+    rank := table([seq(i = {}, i = 0..nVars)]);
 
     # project variables onto parameter space
     for i from 0 to nVars do
@@ -386,36 +351,6 @@ linearProjection_rsas := proc(rsas::TRDrsas, nParams::nonnegint, R::TRDring, $)
 
     return RC:-TRDmake_regular_semi_algebraic_system(qff, rc, ineqs, R_params);
 
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# SuggestVariableOrderWithParameters                                      #
-#                                                                         #
-# Gives a variable ordering suggestion ensuring the parameters are less   #
-# than any other variables.                                               #
-#                                                                         #
-# INPUT                                                                   #
-#   lp ....... list of polynomials                                        #
-#   params ... list of parameters                                         #
-#                                                                         #
-# OUTPUT                                                                  #
-#   A list of variables.                                                  #
-# ----------------------------------------------------------------------- #
-SuggestVariableOrderWithParameters := proc(lp::list(polynom), params::list(name), $)
-    
-    local y :: list(name), v :: name;
-    
-    # Call standard suggest variable order
-    y := RC:-SuggestVariableOrder(lp, params);
-    
-    # Make sure parameters are least variables
-    for v in params do
-        y := remove(x -> evalb(x=v), y);
-    end do;
-    
-    return [op(LT:-Reverse(y)), op(params)];
-    
 end proc;
 
 
