@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Sept. 30/2017                                               #
+# UPDATED ... Nov. 24/2017                                                #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -54,7 +54,6 @@ comprehensive_rank := module()
         constructTable,
         convertRankList,
         linearProjection,
-        SuggestVariableOrderWithParameters,
         add_list_polys_to_cs,
         getDimension;
     
@@ -77,22 +76,18 @@ comprehensive_rank := module()
 # ----------------------------------------------------------------------- #
 implementation_cs := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
 
-    local n :: posint,
-          m :: posint,
+    local m :: posint,
           y,
-          lp,
-          R_Union,
-          CS_Int,
-          lrs,
-          rankTable,
-          d,
-          cs_singular,
-          cs_nonsingular,
-          out,
-          i;
+          lp :: list(polynom),
+          R_Union :: TRDring,
+          cs_linear :: TRDcs,
+          lrs :: TRDlrs,
+          rankTable :: table,
+          out :: list([nonnegint, TRDcs]),
+          i :: posint;
 
-    # Get size of input matrix
-    n, m := op(1,A);
+    # Get number of columns of A
+    m := LA:-ColumnDimension(A);
 
     # Temporary variables for matrix
     y := seq('x'[i], i=1..m);
@@ -101,38 +96,18 @@ implementation_cs := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
     lp := convert(A.Vector([y]), list);
 
     # Join the parameters with the new variables.
-    # Use suggest variable order for improved performance
-    R_Union := RC:-PolynomialRing(SuggestVariableOrderWithParameters(lp, R['variables']));
-
-    # Pre-condition for case where A is singular
-    d := LA:-Determinant(A);
-    
-    # Parameter values where A is singular
-    cs_singular := add_list_polys_to_cs([d], cs, R);
-    
-    # If the matrix is non-singular for all parameter values
-    # return the input conditions with full rank
-    if RC:-TRDAlgebraicIsEmpty(cs_singular, R) then
-        return [[n, cs]];
-    end if;
-    
-    # Parameter values where A is non-singular
-    cs_nonsingular := RC:-TRDAlgebraicDifference(cs, cs_singular, R);
+    R_Union := RC:-PolynomialRing([y, op(R['variables'])]);
     
     # Add the equations from the matrix
-    CS_Int := add_list_polys_to_cs(lp, cs_singular, R_Union);
+    cs_linear := add_list_polys_to_cs(lp, cs, R_Union);
 
     # Convert to list of regular systems
-    lrs := RC:-TRDregular_systems(CS_Int, R_Union);
+    lrs := RC:-TRDregular_systems(cs_linear, R_Union);
 
     # Call method to get rank
     rankTable := getRank(lrs, nops(R['variables']), R_Union);
     
     out := convertRankList(rankTable, R);
-    
-    if not RC:-TRDAlgebraicIsEmpty(cs_nonsingular, R) then
-        out := [op(out), [n, cs_nonsingular]];
-    end if;
     
     return out;
     
@@ -162,60 +137,45 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
           j :: nonnegint,
           i :: posint,
           lcs :: TRDlcs,
-          CS_tmp :: TRDcs,
-          rank :: table,
           lrs2 :: TRDlrs,
-          tab :: table;
-
+          rank :: table,
+          tab :: table,
+          perm :: list(posint);
+          
     # Get the number of variables
     nVars := nops(R['variables']) - nParams;
 
     # Get the dimension of each regular system
-    dim := map(getDimension, lrs, nVars, R);
-    
-    # arrange in order of least dimension to greatest
-    lrs_local := [];
-    for j from 0 to nVars do
-        for i from 1 to nops(dim) do
-            if evalb(dim[i] = j) then
-                lrs_local := [op(lrs_local), lrs[i]];
-            end if;
-        end do;
-    end do;
+    dim := map(getDimension, map(RC_CST:-RepresentingChain, lrs, R), nVars, R);
 
+    # arrange in order of least dimension to greatest
+    perm := sort(dim, 'output' = 'permutation');
+    lrs_local := lrs[perm];
+
+    # Convert each regular system to a constructible set
     lcs := map(RC:-TRDconstructible_set, map(`[]`, lrs_local),R);
 
     # Compute differences
-    lrs2 := [];
-    for i from 1 to nops(lrs_local) - 1 do
-
-        # Create temporary constructible set
-        CS_tmp := RC:-TRDconstructible_set([lrs_local[i]],R);
-
-        # Compute difference with all regular systems later in the list
-        for j from i+1 to nops(lrs_local) do
-            CS_tmp := RC:-TRDAlgebraicDifference(CS_tmp, lcs[j], R);
+    for i from 1 to nops(lcs) - 1 do
+        # Compute difference with all constructible sets of higher dimension
+        for j from i+1 to nops(lcs) do
+            lcs[i] := RC:-TRDAlgebraicDifference(lcs[i], lcs[j], R);
         end do;
-
-        # append to list of regular systems
-         lrs2 := [op(lrs2), op(RC_CST:-RepresentingRegularSystems(CS_tmp, R))];
-
     end do;
-    lrs2 := [op(lrs2), lrs_local[-1]];
+
+    # Convert all constructible sets to regular systems
+    lrs2 := map(x->op(RC_CST:-RepresentingRegularSystems(x, R)), lcs);
 
     # Construct the table with rank and regular systems (pre-projection)
     tab := constructTable(lrs2, nParams, R);
-    
-    # initialize rank table
-    rank := table();
-    for i from 0 to nVars do
-        rank[i] := {};
-    end do;
 
-    # project variables onto parameter space
+    # Initialize rank table
+    rank := table([seq(i = {}, i = 0..nVars)]);
+
+    # Project variables onto parameter space
     for i from 0 to nVars do
         if nops(tab[i]) > 0 then
-            rank[i] := [linearProjection(convert(tab[i],list), nParams, R)];
+            rank[i] := [linearProjection(convert(tab[i], list), nParams, R)];
         end if;
     end do;
 
@@ -258,7 +218,8 @@ constructTable := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
 
     # Compute dimension and add to table
     for rs in lrs do
-        d := getDimension(rs, nVars, R);
+        d := getDimension(RC_CST:-RepresentingChain(rs, R), nVars, R);
+        
         tab[nVars - d] := tab[nVars - d] union {rs};
     end do;
 
@@ -362,34 +323,6 @@ end proc;
 
 
 # ----------------------------------------------------------------------- #
-# SuggestVariableOrderWithParameters                                      #
-#                                                                         #
-# Gives a variable ordering suggestion ensuring the parameters are less   #
-# than any other variables.                                               #
-#                                                                         #
-# INPUT                                                                   #
-#   lp ....... List of polynomials                                        #
-#   params ... List of parameters                                         #
-#                                                                         #
-# OUTPUT                                                                  #
-#   A list of variables.                                                  #
-# ----------------------------------------------------------------------- #
-SuggestVariableOrderWithParameters := proc(lp::list(polynom), params::list(name), $)
-    
-    local y::list(name), v::name;
-    
-    # Call standard suggest variable order
-    y := RC:-SuggestVariableOrder(lp, params);
-    
-    # Make sure parameters are least variables
-    for v in params do
-        y := remove(x -> evalb(x=v), y);
-    end do;
-    return [op(LT:-Reverse(y)), op(params)];
-end proc;
-
-
-# ----------------------------------------------------------------------- #
 # add_list_polys_to_cs                                                    #
 #                                                                         #
 # Adds the polynomials from a list (where each poly is = 0)               #
@@ -424,33 +357,34 @@ end proc;
 # ----------------------------------------------------------------------- #
 # getDimension                                                            #
 #                                                                         #
-# Computed the dimension (i.e. number of equations containing the         #
-# unknowns) in a regular system.                                          #
+# Compute the dimension of a regular chain. The dimension is              #
+# nVars - (# of equations containing one or more of the largest nVars     #
+# variables of R). The input regular chain is assumed to be linear in     #
+# each of the nVars largest variables of R.                               #
 #                                                                         #
 # INPUT                                                                   #
-#   rs ...... Regular system                                              #
+#   rc ...... Regular chain                                               #
 #   nVars ... Number of variables                                         #
 #   R ....... Polynomial ring                                             #
 #                                                                         #
 # OUTPUT                                                                  #
 #   Returns a positive integer corresponding to the dimension of the      #
-#   input rs.                                                             #
+#   input regular chain.                                                  #
 # ----------------------------------------------------------------------- #
-getDimension := proc(rs::TRDrs, nVars::nonnegint, R::TRDring, $)
-
+getDimension := proc(rc::TRDrc, nVars::nonnegint, R::TRDring, $)
+    
     local x :: set(name),
-          rc :: TRDrc,
           eqns :: list(polynom),
           eqn :: polynom,
           i :: nonnegint;
-
-    # Get the variables
+    
+    # Get the largest 'nVars' variables or R
     x := {op((R['variables'])[1..nVars])};
 
-    # Get the equations of the regular system
-    rc := RC_CST:-RepresentingChain(rs, R);
+    # Get the equations
     eqns := RC:-Equations(rc, R);
     
+    # Initialize the dimension at nVars
     i := nVars;
     
     for eqn in eqns do
