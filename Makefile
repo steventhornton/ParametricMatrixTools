@@ -2,6 +2,8 @@ SRCS = src/ParametricMatrixTools.mpl
 MLAFILE = ParametricMatrixTools.mla
 ASSERTLEVEL = 2
 
+.PHONY: clean mint test mla
+
 all: mla
 
 mint: 
