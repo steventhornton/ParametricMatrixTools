@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Jan. 9/2017                                                 #
+# UPDATED ... Nov. 24/2017                                                #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -39,7 +39,8 @@ ParametricMatrixTools := module()
            ComprehensiveSquareFreeFactorization,
            SquareFreeFactorization_monic,
            JordanForm,
-           ListComprehensiveGcd;
+           ListComprehensiveGcd,
+           ComprehensiveMinimalPolynomial;
     
     local ModuleLoad,
           loadTypes,
@@ -119,6 +120,8 @@ $include "src/ComprehensiveSmithForm/ComprehensiveSmithForm.mpl"
 
 $include "src/ComprehensiveSquareFreeFactorization/ComprehensiveSquareFreeFactorization.mpl"
 $include "src/ComprehensiveSquareFreeFactorization/SquareFreeFactorization_monic.mpl"
+
+$include "src/ComprehensiveMinimalPolynomial/ComprehensiveMinimalPolynomial.mpl"
 
 $include "src/ComprehensiveJordanForm/JordanForm.mpl"
 $include "src/ComprehensiveJordanForm/ComprehensiveJordanForm.mpl"
