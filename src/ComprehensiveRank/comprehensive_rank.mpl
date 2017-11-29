@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 24/2017                                                #
+# UPDATED ... Nov. 28/2017                                                #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -51,9 +51,7 @@ comprehensive_rank := module()
     local
         implementation_cs,
         getRank,
-        constructTable,
-        convertRankList,
-        linearProjection,
+        convertRankTable,
         add_list_polys_to_cs,
         getDimension;
     
@@ -78,13 +76,13 @@ implementation_cs := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
 
     local m :: posint,
           y,
+          i :: posint,
           lp :: list(polynom),
+          yOrd :: list,
           R_Union :: TRDring,
           cs_linear :: TRDcs,
           lrs :: TRDlrs,
-          rankTable :: table,
-          out :: list([nonnegint, TRDcs]),
-          i :: posint;
+          rankTable :: table;
 
     # Get number of columns of A
     m := LA:-ColumnDimension(A);
@@ -92,24 +90,54 @@ implementation_cs := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
     # Temporary variables for matrix
     y := seq('x'[i], i=1..m);
     
-    # Get linear equations from matrix
-    lp := convert(A.Vector([y]), list);
-
-    # Join the parameters with the new variables.
-    R_Union := RC:-PolynomialRing([y, op(R['variables'])]);
+    # Get the equations from A
+    lp := map(lhs, LA:-GenerateEquations(A, [y]));
     
-    # Add the equations from the matrix
+    # Use SuggestVariableOrder huristics to pick the order of y
+    yOrd := remove(a -> a in convert(R['variables'], set), RC:-SuggestVariableOrder(lp));
+    
+    # Join the parameters with the linear variables.
+    R_Union := RC:-PolynomialRing([op(yOrd), op(R['variables'])]);
+    
+    # Add the equations from the matrix to the input constructible set
     cs_linear := add_list_polys_to_cs(lp, cs, R_Union);
-
-    # Convert to list of regular systems
+    
+    # Convert to a list of regular systems
     lrs := RC:-TRDregular_systems(cs_linear, R_Union);
-
-    # Call method to get rank
+    
+    # Compute the rank
     rankTable := getRank(lrs, nops(R['variables']), R_Union);
     
-    out := convertRankList(rankTable, R);
+    return convertRankTable(rankTable, nops(yOrd));
     
-    return out;
+end proc;
+
+
+# ----------------------------------------------------------------------- #
+# convertRankTable                                                        #
+#                                                                         #
+# INPUT                                                                   #
+#   t ... A table with non-negative integer indices and entries that are  #
+#         constructible sets.                                             #
+#   n ... Positive integer                                                #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A list with entries                                                   #
+#       [i, cs]                                                           #
+#   where i is n-idx where idx is the index of t where cs occurs.         #
+# ----------------------------------------------------------------------- #
+convertRankTable := proc(t, n)
+    
+    local out,
+    i;
+    
+    out := NULL;
+    
+    for i in [indices(t, 'nolist')] do
+        out := out, [n - i, t[i]];
+    end do;
+    
+    return([out]);
     
 end proc;
 
@@ -132,193 +160,59 @@ end proc;
 getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
 
     local nVars :: posint,
-          dim :: list(nonnegint),
-          lrs_local :: TRDlrs,
-          j :: nonnegint,
-          i :: posint,
-          lcs :: TRDlcs,
-          lrs2 :: TRDlrs,
-          rank :: table,
-          tab :: table,
-          perm :: list(posint);
+          rankTable :: table,
+          rs :: TRDrs,
+          H :: list(polynom),
+          T :: TRDrc,
+          dim :: nonnegint,
+          i :: nonnegint,
+          j :: nonnegint;
           
     # Get the number of variables
     nVars := nops(R['variables']) - nParams;
-
-    # Get the dimension of each regular system
-    dim := map(getDimension, map(RC_CST:-RepresentingChain, lrs, R), nVars, R);
-
-    # arrange in order of least dimension to greatest
-    perm := sort(dim, 'output' = 'permutation');
-    lrs_local := lrs[perm];
-
-    # Convert each regular system to a constructible set
-    lcs := map(RC:-TRDconstructible_set, map(`[]`, lrs_local),R);
-
+    
+    rankTable := table();
+    
+    for rs in lrs do
+        # Extract the regular chain and set of inequations from the regular 
+        # system
+        H := RC_CST:-RepresentingInequations(rs, R);
+        T := RC_CST:-RepresentingChain(rs, R);
+        
+        # Compute the dimension
+        dim := getDimension(T, nVars, R);
+        
+        # Remove any equations containing the linear variables
+        T := RC_CT:-Under(R['variables'][nVars], T, R);
+        
+        # Reconstruct a regular system
+        rs := RC_CST:-RegularSystem(T, H, R);
+        
+        # Add to the rank table
+        if not dim in [indices(rankTable, 'nolist')] then
+            rankTable[dim] := {rs}
+        else
+            rankTable[dim] := `union`(rankTable[dim], {rs});
+        end if;
+        
+    end do;
+    
+    # Convert each set in rankTable to a constructible set
+    for i in [indices(rankTable, 'nolist')] do
+        rankTable[i] := RC_CST:-ConstructibleSet(convert(rankTable[i], 'list'), R);
+    end do;
+    
     # Compute differences
-    for i from 1 to nops(lcs) - 1 do
-        # Compute difference with all constructible sets of higher dimension
-        for j from i+1 to nops(lcs) do
-            lcs[i] := RC:-TRDAlgebraicDifference(lcs[i], lcs[j], R);
+    for i from 0 to nVars-1 do
+        if not i in [indices(rankTable, 'nolist')] then next end if;
+        for j from i+1 to nVars do
+            if not j in [indices(rankTable, 'nolist')] then next end if;
+            rankTable[i] := RC:-TRDAlgebraicDifference(rankTable[i], rankTable[j], R);
         end do;
     end do;
-
-    # Convert all constructible sets to regular systems
-    lrs2 := map(x->op(RC_CST:-RepresentingRegularSystems(x, R)), lcs);
-
-    # Construct the table with rank and regular systems (pre-projection)
-    tab := constructTable(lrs2, nParams, R);
-
-    # Initialize rank table
-    rank := table([seq(i = {}, i = 0..nVars)]);
-
-    # Project variables onto parameter space
-    for i from 0 to nVars do
-        if nops(tab[i]) > 0 then
-            rank[i] := [linearProjection(convert(tab[i], list), nParams, R)];
-        end if;
-    end do;
-
-    return rank;
-
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# constructTable                                                          #
-#                                                                         #
-# Constructs a table such that table[r] corresponds to all regular        #
-# systems of rank r from the input list.                                  #
-#                                                                         #
-# INPUT                                                                   #
-#   lrs ....... a list of regular_systems                                 #
-#   nParams ... number of parameters                                      #
-#   R ......... polynomial ring                                           #
-#                                                                         #
-# OUTPUT                                                                  #
-#   Returns a table where table[r] contains a set of regular_systems      #
-#   corresponding to a rank of r.                                         #
-# ----------------------------------------------------------------------- #
-constructTable := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
-
-    local nVars :: posint,
-          tab :: table,
-          rs :: TRDrs,
-          d :: nonnegint,
-          i :: posint;
-
-    # number of variables
-    nVars := nops(R['variables']) - nParams;
-
-    # initialize table
-    tab := table();
-    for i from 0 to nVars do
-        tab[i] := {};
-    end do;
-
-    # Compute dimension and add to table
-    for rs in lrs do
-        d := getDimension(RC_CST:-RepresentingChain(rs, R), nVars, R);
-        
-        tab[nVars - d] := tab[nVars - d] union {rs};
-    end do;
-
-    for i from 1 to nVars do
-        tab[i] := [op(tab[i])];
-    end do;
     
-    return tab;
-
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# convertRankList                                                         #
-#                                                                         #
-# Converts a table where table[r] = CS where r is the computed rank and   #
-# CS is a constructible set to a list with elements of the form [r, CS].  #
-#                                                                         #
-# INPUT                                                                   #
-#    rankTable ... Table to convert                                       #
-#    R ........... Polynomial ring                                        #
-#                                                                         #
-# OUTPUT                                                                  #
-#   List with elements indicating the rank                                #
-# ----------------------------------------------------------------------- #
-convertRankList := proc(rankTable::table, R::TRDring, $)
-
-    local idx :: list(nonnegint),
-          i :: posint,
-          outList :: list([nonnegint, TRDcs]);
-
-    idx := sort([indices(rankTable,'nolist')]);
-
-    outList := [];
-    for i from 1 to nops(idx) do
-
-        if nops(rankTable[idx[i]]) > 0 then
-            outList := [op(outList), [idx[i], ListUnion(rankTable[idx[i]],R)]];
-        end if;
-
-    end do;
-
-    return outList;
-
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# linearProjection                                                        #
-#                                                                         #
-# Projects a list of regular systems onto the parameter space where all   #
-# entries of lrs are linear in the unknown variables.                     #
-#                                                                         #
-# INPUT                                                                   #
-#   lrs ....... a list of regular systems                                 #
-#   nParams ... number of parameters                                      #
-#   R ......... polynomial ring                                           #
-#                                                                         #
-# OUTPUT                                                                  #
-#   A constructible set without the equations containing the unknowns.    #
-# ----------------------------------------------------------------------- #
-linearProjection := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
-
-    local nVars :: posint,
-          R_params :: TRDring,
-          ieqs,
-          rc :: TRDrc,
-          rs :: TRDrs,
-          lrsUnder :: TRDlrs,
-          rsUnder :: TRDrs,
-          CS :: TRDcs;
-
-    nVars := nops(R['variables']) - nParams;
-
-    # new polynomial ring without variables
-    R_params := RC:-PolynomialRing(R['variables'][nVars+1..-1]);
-
-    # Under for a regular system
-    lrsUnder := [];
-    for rs in lrs do
-
-        rc := RC_CST:-RepresentingChain(rs, R);
-
-        ieqs := RC_CST:-RepresentingInequations(rs, R);
-
-        rc := RC_CT:-Under(R['variables'][nVars], rc, R);
-
-        rsUnder := RC_CST:-RegularSystem(rc, ieqs, R_params);
-
-        lrsUnder := [op(lrsUnder), rsUnder];
-
-    end do;
+    return(rankTable);
     
-    lrsUnder := lrsUnder;
-
-    CS := RC_CST:-ConstructibleSet(lrsUnder, R_params);
-
-    return CS;
-
 end proc;
 
 
