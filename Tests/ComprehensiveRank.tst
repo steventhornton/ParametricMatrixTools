@@ -49,15 +49,6 @@ test := module()
         local rsList :: TRDlrs,
               csList :: TRDlcs, m, item;
         
-        # Check that the regular systems in the result list form a 
-        # partition of cs
-        # rsList := map(x -> x[-1], result);
-        # csList := map(x -> ConstructibleSet([x], R), rsList);
-        # if not ParametricMatrixTools:-TRDis_partition_cs(csList, cs, R) then
-        #     printf("Not a partition!");
-        #     return false;
-        # end if;
-        
         # Check that the ranks are non-negative integers no greater than
         # the number of rows of A
         m := LinearAlgebra:-RowDimension(A);
@@ -304,7 +295,6 @@ test := module()
         end try;
         
         for i from 1 to 4 do
-            print(i);
             correct := verifyResult_cs(A, cs1, results[i], R);
             if not correct then
                 printf("FAIL: Incorrect result\n");
@@ -312,7 +302,6 @@ test := module()
             end if;
         end do;
         for i from 5 to 7 do
-            print(i);
             correct := verifyResult_cs(A, cs2, results[i], R);
             if not correct then
                 printf("\b\b\b");
@@ -321,7 +310,6 @@ test := module()
             end if;
         end do;
         for i from 8 to 11 do
-            print(i);
             correct := verifyResult_rs(A, cs1, results[i], R);
             if not correct then
                 printf("FAIL: Incorrect result\n");
@@ -329,7 +317,6 @@ test := module()
             end if;
         end do;
         for i from 12 to 14 do
-            print(i);
             correct := verifyResult_rs(A, cs2, results[i], R);
             if not correct then
                 printf("\b\b\b");
