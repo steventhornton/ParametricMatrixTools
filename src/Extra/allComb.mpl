@@ -23,20 +23,6 @@
 #          [[1,a,x], [1,a,y], [1,b,x], [1,b,y], [1,c,x], [1,c,y], ...     #
 #           [2,a,x], [2,a,y], [2,b,x], [2,b,y], [2,c,x], [2,c,y], ...     #
 #           [3,a,x], [3,a,y], [3,b,x], [3,b,y], [3,c,x], [3,c,y]]         #
-#                                                                         #
-# LICENSE                                                                 #
-#   This program is free software: you can redistribute it and/or modify  #
-#   it under the terms of the GNU General Public License as published by  #
-#   the Free Software Foundation, either version 3 of the License, or     #
-#   any later version.                                                    #
-#                                                                         #
-#   This program is distributed in the hope that it will be useful,       #
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
-#   GNU General Public License for more details.                          #
-#                                                                         #
-#   You should have received a copy of the GNU General Public License     #
-#   along with this program.  If not, see http://www.gnu.org/licenses/.   #
 # ======================================================================= #
 # ======================================================================= #
 allComb := module()

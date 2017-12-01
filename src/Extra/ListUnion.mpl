@@ -1,15 +1,25 @@
-# ----------------------------------------------------------------------- #
-# ListUnion
-#
-# Computes the union of all elements in a list or set of  constructible sets.
-#
-# INPUT:
-#   lcs ... List or set of constructible sets
-#   R ..... Polynomial ring
-#
-# OUTPUT:
-#   A constructible set representing the union of all input sets
-# ----------------------------------------------------------------------- #
+# ======================================================================= #
+# ======================================================================= #
+#                                                                         #
+# ListUnion.mpl                                                           #
+#                                                                         #
+# AUTHOR .... Steven E. Thornton                                          #
+#                Under the supervision of                                 #
+#                Robert M. Corless & Marc Moreno Maza                     #
+# EMAIL ..... sthornt7@uwo.ca                                             #
+# UPDATED ... Dec. 1/2017                                                 #
+#                                                                         #
+# Computes the union of all elements in a list or set of  constructible   #
+# sets.                                                                   #
+#                                                                         #
+# INPUT                                                                   #
+#   lcs ... List or set of constructible sets                             #
+#   R ..... Polynomial ring                                               #
+#                                                                         #
+# OUTPUT                                                                  #
+#   A constructible set representing the union of all input sets          #
+# ======================================================================= #
+# ======================================================================= #
 ListUnion := proc(lcs::{list(TRDcs), set(TRDcs)}, R::TRDring, $) :: TRDcs;
 
     local n::nonnegint,
