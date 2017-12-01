@@ -54,8 +54,7 @@ real_comprehensive_rank := module()
         implementation_lrsas,
         getRank,
         convertRankTable,
-        add_list_polys_to_lrsas,
-        getDimension;
+        add_list_polys_to_lrsas;
     
     ModuleApply := proc(A::Matrix, lrsas::TRDlrsas, R::TRDring, $)
         return implementation_lrsas(A, lrsas, R);
@@ -152,7 +151,7 @@ getRank := proc(lrsas, nParams, R::TRDring, $)
         list_p := RC_SAST:-PositiveInequalities(rsas, R);
         
         # Compute the dimension of the regular chain
-        dim := getDimension(rc, nVars, R);
+        dim := regularChainDimension(rc, nVars, R);
         
         # Remove any equations containing the linear variables
         rc := RC_CT:-Under(R['variables'][nVars], rc, R);
@@ -214,193 +213,6 @@ convertRankTable := proc(t, n)
 end proc;
 
 
-
-# 
-# # ----------------------------------------------------------------------- #
-# # constructTable                                                          #
-# #                                                                         #
-# # Constructs a table such that table[r] corresponds to all regular        #
-# # semi-algebraic systems of rank r from the input list.                   #
-# #                                                                         #
-# # INPUT                                                                   #
-# #   lrsas ... List of regular_semi_algebraic_systems                      #
-# #   n ....... Number of parameters                                        #
-# #   R ....... Polynomial ring                                             #
-# #                                                                         #
-# # OUTPUT                                                                  #
-# #   Returns a table where table[r] contains a set of                      #
-# #   regular semi-algebraic systems corresponding to a rank of r.          #
-# # ----------------------------------------------------------------------- #
-# constructTable := proc(lrsas::TRDlrsas, n::nonnegint, R::TRDring, $)
-# 
-#     local nVars::nonnegint,
-#     tab :: table,
-#     rsas :: TRDrsas,
-#     d :: nonnegint,
-#     i :: nonnegint;
-# 
-#     # number of unknowns (x's)
-#     nVars := nops(R['variables']) - n;
-# 
-#     # initialize table to empty sets at each entry
-#     tab := table();
-#     for i from 0 to nVars do
-#         tab[i] := {};
-#     end do;
-# 
-#     # Compute the dimension of each rsas, add to table at
-#     # correct place
-#     for rsas in lrsas do
-#         d := getRealDimension(rsas, nVars, R);
-#         tab[nVars - d] := tab[nVars - d] union {rsas};
-#     end do;
-# 
-#     return tab;
-# 
-# end proc;
-# 
-# 
-# # ----------------------------------------------------------------------- #
-# # convertRankList                                                         #
-# #                                                                         #
-# # Converts a table where table[r] = lrsas where r is the computed rank    #
-# # and lrsas is a list of regular semi-algeraic systems to a list with     #
-# # elements of the form [r, lrsas].                                        #
-# #                                                                         #
-# # INPUT                                                                   #
-# #   rankTable ... Table to convert                                        #
-# #   R ........... Polynomial ring                                         #
-# #                                                                         #
-# # OUTPUT                                                                  #
-# #   List with elements indicating the rank                                #
-# # ----------------------------------------------------------------------- #
-# convertRankList := proc(rankTable::table, $)
-# 
-#     local idx :: list(nonnegint),
-#           i :: posint,
-#           outList :: list([nonnegint, TRDlrsas]);
-# 
-#     idx := sort([indices(rankTable,'nolist')]);
-# 
-#     outList := [];
-#     for i from 1 to nops(idx) do
-#         if nops(rankTable[idx[i]]) > 0 then
-#             outList := [op(outList), [idx[i], op(rankTable[idx[i]])]];
-#         end if;
-#     end do;
-#     
-#     return outList;
-#     
-# end proc;
-# 
-# 
-# # ----------------------------------------------------------------------- #
-# # getRealDimension                                                        #
-# #                                                                         #
-# # Computed the dimension (i.e. number of equations that do not contain    #
-# # the variables) in a regular semi-algebraic system.                      #
-# #                                                                         #
-# # INPUT                                                                   #
-# #   rsas ... Regular semi-algebraic system                                #
-# #   m ...... Number of unknowns                                           #
-# #   R ...... Polynomial ring                                              #
-# #                                                                         #
-# # OUTPUT                                                                  #
-# #   Returns a positive integer corresponding to the dimension of the      #
-# #   input rsas.                                                           #
-# # ----------------------------------------------------------------------- #
-# # getRealDimension := proc(rsas, nVars, R, $)
-# # 
-# #     local x :: set(name),
-# #           rc :: TRDrc,
-# #           eqns :: list(polynom),
-# #           eqn :: polynom,
-# #           i :: nonnegint;
-# #     
-# #     # Get the variables
-# #     x := {op((R['variables'])[1..nVars])};
-# #     
-# #     # Get the equations of rsas
-# #     rc := RC_SAST:-RepresentingChain(rsas, R);
-# #     eqns := RC:-Equations(rc, R);
-# #     
-# #     i := nVars;
-# # 
-# #     for eqn in eqns do
-# #         if not evalb(nops(indets(eqn) intersect x) = 0) and not evalb(eqn = 0) then
-# #             i := i - 1;
-# #         end if;
-# #     end do;
-# # 
-# #     return i;
-# # 
-# # end proc;
-# 
-# 
-# # ----------------------------------------------------------------------- #
-# # linearProjection_lrsas                                                  #
-# #                                                                         #
-# # Projects a list of regular semi-algebraic system onto the parameter     #
-# # space where all entries of lrsas are linear in the unknown variables.   #
-# #                                                                         #
-# # INPUT                                                                   #
-# #   rsas ... Regular semi-algebraic system                                #
-# #   n ...... Number of parameters                                         #
-# #   R ...... Polynomial ring                                              #
-# #                                                                         #
-# # OUTPUT                                                                  #
-# #   A lrsas without the equations containing the unknowns.                #
-# # ----------------------------------------------------------------------- #
-# linearProjection_lrsas := proc(lrsas, nParams, R)
-#     map(linearProjection_rsas, lrsas, nParams, R);
-# end proc;
-# 
-# 
-# # ----------------------------------------------------------------------- #
-# # linearProjection_rsas                                                   #
-# #                                                                         #
-# # Projects a regular semi-algebraic system onto the parameter space where #
-# # all entries of rsas are linear in the unknown variables.                #
-# #                                                                         #
-# # INPUT                                                                   #
-# #   rsas ... Regular semi-algebraic system                                #
-# #   n ...... Number of parameters                                         #
-# #   R ...... Polynomial ring                                              #
-# #                                                                         #
-# # OUTPUT                                                                  #
-# #   A rsas without the equations containing the unknowns.                 #
-# # ----------------------------------------------------------------------- #
-# linearProjection_rsas := proc(rsas::TRDrsas, nParams::nonnegint, R::TRDring, $)
-# 
-#     local R_params :: TRDring,
-#           nVars :: posint,
-#           ineqs :: list(polynom),
-#           qff :: TRDqff,
-#           rc :: TRDrc;
-#     
-#     nVars := nops(R['variables']) - nParams;
-#     
-#     # new polynomial ring without variables
-#     R_params := RC:-PolynomialRing(R['variables'][nVars+1..-1]);
-#     
-#     # list of inequalities
-#     ineqs := op(rsas)['PositiveInequalities'];
-#     
-#     # if there are no inequalities, make the empty list (Maple error!)
-#     if not type(ineqs, list) then
-#         ineqs := [];
-#     end if;
-# 
-#     qff := (op(rsas))['QuantifierFreeFormula'];
-#     rc := (op(rsas))['RegularChain'];
-#     
-#     rc := RC_CT:-Under(R['variables'][nVars], rc, R);
-# 
-#     return RC:-TRDmake_regular_semi_algebraic_system(qff, rc, ineqs, R_params);
-# 
-# end proc;
-
-
 # ----------------------------------------------------------------------- #
 # add_list_polys_to_lrsas                                                 #
 #                                                                         #
@@ -424,50 +236,6 @@ add_list_polys_to_lrsas := proc(lp::{list(polynom),set(polynom)}, lrsas::TRDlrsa
     
     return RC_SAST:-Intersection(lrsas, lrsas_lp, R);
     
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# getDimension                                                            #
-#                                                                         #
-# Compute the dimension of a regular chain. The dimension is              #
-# nVars - (# of equations containing one or more of the largest nVars     #
-# variables of R). The input regular chain is assumed to be linear in     #
-# each of the nVars largest variables of R.                               #
-#                                                                         #
-# INPUT                                                                   #
-#   rc ...... Regular chain                                               #
-#   nVars ... Number of variables                                         #
-#   R ....... Polynomial ring                                             #
-#                                                                         #
-# OUTPUT                                                                  #
-#   Returns a positive integer corresponding to the dimension of the      #
-#   input regular chain.                                                  #
-# ----------------------------------------------------------------------- #
-getDimension := proc(rc::TRDrc, nVars::nonnegint, R::TRDring, $)
-
-    local x :: set(name),
-          eqns :: list(polynom),
-          eqn :: polynom,
-          i :: nonnegint;
-
-    # Get the largest 'nVars' variables or R
-    x := {op((R['variables'])[1..nVars])};
-
-    # Get the equations
-    eqns := RC:-Equations(rc, R);
-
-    # Initialize the dimension at nVars
-    i := nVars;
-
-    for eqn in eqns do
-        if not evalb(nops(indets(eqn) intersect x) = 0) and not evalb(eqn = 0) then
-            i := i - 1;
-        end if;
-    end do;
-
-    return i;
-
 end proc;
 
 end module;

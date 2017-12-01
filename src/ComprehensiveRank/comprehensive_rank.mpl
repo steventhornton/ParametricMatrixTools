@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 28/2017                                                #
+# UPDATED ... Dec. 1/2017                                                 #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -52,8 +52,7 @@ comprehensive_rank := module()
         implementation_cs,
         getRank,
         convertRankTable,
-        add_list_polys_to_cs,
-        getDimension;
+        add_list_polys_to_cs;
     
     ModuleApply := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
         return implementation_cs(A, cs, R);
@@ -182,7 +181,7 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
         T := RC_CST:-RepresentingChain(rs, R);
         
         # Compute the dimension of the regular chain
-        dim := getDimension(T, nVars, R);
+        dim := regularChainDimension(T, nVars, R);
         
         # Remove any equations containing the linear variables
         T := RC_CT:-Under(R['variables'][nVars], T, R);
@@ -247,50 +246,6 @@ add_list_polys_to_cs := proc(lp::{list,set}, CS, R)
 
     return ListUnion([lcs], R);
 
-end proc;
-
-
-# ----------------------------------------------------------------------- #
-# getDimension                                                            #
-#                                                                         #
-# Compute the dimension of a regular chain. The dimension is              #
-# nVars - (# of equations containing one or more of the largest nVars     #
-# variables of R). The input regular chain is assumed to be linear in     #
-# each of the nVars largest variables of R.                               #
-#                                                                         #
-# INPUT                                                                   #
-#   rc ...... Regular chain                                               #
-#   nVars ... Number of variables                                         #
-#   R ....... Polynomial ring                                             #
-#                                                                         #
-# OUTPUT                                                                  #
-#   Returns a positive integer corresponding to the dimension of the      #
-#   input regular chain.                                                  #
-# ----------------------------------------------------------------------- #
-getDimension := proc(rc::TRDrc, nVars::nonnegint, R::TRDring, $)
-    
-    local x :: set(name),
-          eqns :: list(polynom),
-          eqn :: polynom,
-          i :: nonnegint;
-    
-    # Get the largest 'nVars' variables or R
-    x := {op((R['variables'])[1..nVars])};
-
-    # Get the equations
-    eqns := RC:-Equations(rc, R);
-    
-    # Initialize the dimension at nVars
-    i := nVars;
-    
-    for eqn in eqns do
-        if not evalb(nops(indets(eqn) intersect x) = 0) and not evalb(eqn = 0) then
-            i := i - 1;
-        end if;
-    end do;
-    
-    return i;
-    
 end proc;
 
 end module;

@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 24/2017                                                #
+# UPDATED ... Dec. 1/2017                                                 #
 #                                                                         #
 # A module for computations on parametric matrices.                       #
 #                                                                         #
@@ -45,6 +45,7 @@ ParametricMatrixTools := module()
     local ModuleLoad,
           loadTypes,
           allComb,
+          regularChainDimension,
           isConstant,
           isConstantMatrix,
           isGreatestVariable,
@@ -87,6 +88,7 @@ $define LT ListTools
 $include "src/types.mpl"
 
 $include "src/Extra/allComb.mpl"
+$include "src/Extra/regularChainDimension.mpl"
 $include "src/Extra/isConstant.mpl"
 $include "src/Extra/isConstantMatrix.mpl"
 $include "src/Extra/isGreatestVariable.mpl"
