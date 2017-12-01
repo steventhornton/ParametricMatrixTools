@@ -134,7 +134,9 @@ convertRankTable := proc(t, n)
     out := NULL;
     
     for i in [indices(t, 'nolist')] do
-        out := out, [n - i, t[i]];
+        if nops(t[i]) > 0 then
+            out := out, [n - i, t[i]];
+        end if;
     end do;
     
     return([out]);
@@ -179,7 +181,7 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
         H := RC_CST:-RepresentingInequations(rs, R);
         T := RC_CST:-RepresentingChain(rs, R);
         
-        # Compute the dimension
+        # Compute the dimension of the regular chain
         dim := getDimension(T, nVars, R);
         
         # Remove any equations containing the linear variables
