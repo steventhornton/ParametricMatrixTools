@@ -60,7 +60,7 @@ A := Matrix([[1, a, 0, 0, 0],
              [0, 0, 0, 0, 1]]:
 
 # Compute the Jordan form of A
-result := ComprehensiveJordanForm(A, [], R)
+result := ComprehensiveJordanForm(A, R):
 
 # Print the result
 result[1][1], Display(result[1][2], R);
