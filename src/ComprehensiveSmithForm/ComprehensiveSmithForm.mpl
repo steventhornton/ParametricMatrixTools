@@ -163,8 +163,6 @@ ComprehensiveSmithForm := module()
         
         implementation,
         
-        convertToRS,
-        
         # ALGORITHMS
         comprehensive_smith_form_minors;
     
@@ -678,7 +676,7 @@ implementation := proc(AA::Matrix(square), v::name, cs::TRDcs, R::TRDring, opts:
     
     # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R);
+        result := convertListWithCSToListWithRS(result, 2, R);
     end if;
     
     return result;
@@ -690,6 +688,5 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveSmithForm/comprehensive_smith_form_minors.mpl>
-$include <src/ComprehensiveSmithForm/convertToRS.mpl>
 
 end module;

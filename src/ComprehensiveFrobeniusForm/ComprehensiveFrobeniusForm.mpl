@@ -97,8 +97,6 @@ ComprehensiveFrobeniusForm := module()
 
         implementation,
         
-        convertToRS,
-        
         # ALGORITHMS
         comprehensive_frobenius_form_snf_minors;
         
@@ -559,7 +557,7 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     
     # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R)
+        result := convertListWithCSToListWithRS(result, 2, R);
     end if;
     
     return result;
@@ -570,6 +568,5 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveFrobeniusForm/comprehensive_frobenius_form_snf_minors.mpl>
-$include <src/ComprehensiveFrobeniusForm/convertToRS.mpl>
 
 end module;

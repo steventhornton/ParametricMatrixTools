@@ -31,7 +31,7 @@ ParametricMatrixTools := module()
     local ModuleLoad,
           loadTypes,
           allComb,
-          regularChainDimension,
+          convertListWithCSToListWithRS,
           isConstant,
           isConstantMatrix,
           isGreatestVariable,
@@ -48,6 +48,7 @@ ParametricMatrixTools := module()
           isZeroOverLRSAS,
           ListIntersection,
           ListUnion,
+          regularChainDimension,
           TRDdifference_intersect_cs_p,
           TRDequal_cs,
           TRDis_disjoint_lcs,
@@ -74,7 +75,7 @@ $define LT ListTools
 $include "src/types.mpl"
 
 $include "src/Extra/allComb.mpl"
-$include "src/Extra/regularChainDimension.mpl"
+$include "src/Extra/convertListWithCSToListWithRS.mpl"
 $include "src/Extra/isConstant.mpl"
 $include "src/Extra/isConstantMatrix.mpl"
 $include "src/Extra/isGreatestVariable.mpl"
@@ -91,6 +92,7 @@ $include "src/Extra/isZeroOverRSAS.mpl"
 $include "src/Extra/isZeroOverLRSAS.mpl"
 $include "src/Extra/ListIntersection.mpl"
 $include "src/Extra/ListUnion.mpl"
+$include "src/Extra/regularChainDimension.mpl"
 $include "src/Extra/TRDdifference_intersect_cs_p.mpl"
 $include "src/Extra/TRDequal_cs.mpl"
 $include "src/Extra/TRDis_disjoint_lcs.mpl"

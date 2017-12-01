@@ -69,8 +69,6 @@ ComprehensiveRank := module()
         
         implementation,
         
-        convertToRS,
-        
         # ALGORITHMS
         comprehensive_rank;
     
@@ -453,7 +451,7 @@ implementation := proc(AA::Matrix, cs::TRDcs, R::TRDring, opts::table, $)
     
     # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R);
+        result := convertListWithCSToListWithRS(result, 2, R);
     end if;
     
     return result;
@@ -465,6 +463,5 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveRank/comprehensive_rank.mpl>
-$include <src/ComprehensiveRank/convertToRS.mpl>
 
 end module;

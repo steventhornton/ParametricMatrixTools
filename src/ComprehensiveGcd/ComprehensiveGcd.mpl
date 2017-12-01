@@ -95,7 +95,6 @@ ComprehensiveGcd := module()
         checkInput,
         implementation,
         comprehensive_gcd_src,
-        convertToRS,
         cleanRS,
         cleanRS_cofactors,
         cleanCS,
@@ -478,12 +477,11 @@ implementation := proc(p1_in::depends(polyInRing(R)), p2_in::depends(polyInRing(
 
     # Output options
     if opts['output_RS'] then
+        result := convertListWithCSToListWithRS(result, 2, R);
         if opts['cofactors'] then
-            result := convertToRS(result, R);
             result := compute_cofactors_rs_list(p1, p2, result, v, R);
             result := cleanRS_cofactors(result, v, R);
         else
-            result := convertToRS(result, R);
             result := cleanRS(result, v, R);
         end if;
     else
@@ -548,6 +546,5 @@ $include <src/ComprehensiveGcd/pseudo_cofactor.mpl>
 $include <src/ComprehensiveGcd/cleanRS.mpl>
 $include <src/ComprehensiveGcd/cleanRS_cofactors.mpl>
 $include <src/ComprehensiveGcd/cleanCS.mpl>
-$include <src/ComprehensiveGcd/convertToRS.mpl>
 
 end module;

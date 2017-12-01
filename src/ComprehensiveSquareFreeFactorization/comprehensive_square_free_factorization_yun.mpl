@@ -128,7 +128,7 @@ csff_gcd := proc(p1, p2, v, cs, R)
     
     ASSERT(RC:-TRDis_empty_constructible_set(cs_zero, R));
     
-    result := ComprehensiveGcd:-convertToRS(result, R);
+    result := convertListWithCSToListWithRS(result, 2, R);
     
     # Compute the cofactors
     out := [];

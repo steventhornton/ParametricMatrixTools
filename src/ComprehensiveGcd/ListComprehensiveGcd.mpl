@@ -70,7 +70,6 @@ ListComprehensiveGcd := module()
         checkInput,
         implementation,
         list_comprehensive_gcd_src,
-        convertToRS,
         cleanRS,
         cleanCS;
 
@@ -427,7 +426,7 @@ implementation := proc(lp_in::depends(list(polyInRing(R))), v::name, cs::TRDcs, 
 
     # Convert to regular systems
     if opts['output_RS'] then
-        result := convertToRS(result, R);
+        result := convertListWithCSToListWithRS(result, 2, R);
         result := cleanRS(result, v, R);
     else
         result := cleanCS(result, R);
@@ -449,6 +448,5 @@ end proc;
 $include <src/ComprehensiveGcd/list_comprehensive_gcd_src.mpl>
 $include <src/ComprehensiveGcd/cleanRS.mpl>
 $include <src/ComprehensiveGcd/cleanCS.mpl>
-$include <src/ComprehensiveGcd/convertToRS.mpl>
 
 end module;

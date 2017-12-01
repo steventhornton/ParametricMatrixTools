@@ -95,8 +95,6 @@ ComprehensiveJordanForm := module()
 
         implementation,
         
-        convertToRS,
-        
         # ALGORITHMS
         comprehensive_jordan_form_snf_minors;
 
@@ -493,21 +491,16 @@ end proc;
 implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $)
 
     local rs :: TRDrs,
-          rc :: TRDrc,
           A :: 'Matrix'(square),
           J :: 'Matrix'(square),
           result := [],
           lrsCompute :: TRDlrs := [],
           csCompute :: TRDcs;
 
-
+    A := copy(AA);
+    
     # Check for zero or constant matrices for each regular system in cs
     for rs in RC_CST:-RepresentingRegularSystems(cs, R) do
-        
-        # Map SparsePseudoRemainder to A
-        #rc := RC_CST:-RepresentingChain(rs, R);
-        #A := map(RC:-SparsePseudoRemainder, AA, rc, R);
-        A := copy(AA);
         
         # Check if A is either a constant matrix
         if isConstantMatrix(A, R) then
@@ -552,7 +545,7 @@ implementation := proc(AA::Matrix(square), cs::TRDcs, R::TRDring, opts::table, $
     
     # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R)
+        result := convertListWithCSToListWithRS(result, 2, R)
     end if;
 
     return result;
@@ -563,6 +556,5 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveJordanForm/comprehensive_jordan_form_snf_minors.mpl>
-$include <src/ComprehensiveJordanForm/convertToRS.mpl>
 
 end module;

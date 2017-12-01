@@ -67,8 +67,6 @@ ComprehensiveMinimalPolynomial := module()
         
         implementation,
         
-        convertToRS,
-        
         # ALGORITHMS
         comprehensive_minimal_polynomial_snf;
     
@@ -474,7 +472,7 @@ implementation := proc(AA::Matrix, v::name, cs::TRDcs, R::TRDring, opts::table, 
     
     # Output options
     if opts['output_RS'] then
-        result := convertToRS(result, R);
+        result := convertListWithCSToListWithRS(result, 2, R);
     end if;
     
     return result;
@@ -486,6 +484,5 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveMinimalPolynomial/comprehensive_minimal_polynomial_snf.mpl>
-$include <src/ComprehensiveMinimalPolynomial/convertToRS.mpl>
 
 end module;
