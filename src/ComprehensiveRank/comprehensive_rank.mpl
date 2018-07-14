@@ -81,6 +81,7 @@ implementation_cs := proc(A::Matrix, cs::TRDcs, R::TRDring, $)
     
     # Use SuggestVariableOrder huristics to pick the order of y
     yOrd := remove(a -> a in convert(R['variables'], set), RC:-SuggestVariableOrder(lp));
+    yOrd := LT:-Reverse(yOrd);
     
     # Join the parameters with the linear variables.
     R_Union := RC:-PolynomialRing([op(yOrd), op(R['variables'])]);
@@ -154,7 +155,9 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
           T :: TRDrc,
           dim :: nonnegint,
           i :: nonnegint,
-          j :: nonnegint;
+          j :: nonnegint,
+          lcs :: TRDlcs,
+          cs_j :: TRDcs;
           
     # Get the number of variables
     nVars := nops(R['variables']) - nParams;
@@ -178,27 +181,55 @@ getRank := proc(lrs::TRDlrs, nParams::posint, R::TRDring, $)
         
         # Add to the rank table
         if not dim in [indices(rankTable, 'nolist')] then
-            rankTable[dim] := {rs}
+            rankTable[dim] := [rs]
         else
-            rankTable[dim] := `union`(rankTable[dim], {rs});
+            rankTable[dim] := [op(rankTable[dim]), rs];
         end if;
         
     end do;
     
     # Convert each set in rankTable to a constructible set
     for i in [indices(rankTable, 'nolist')] do
-        rankTable[i] := RC_CST:-ConstructibleSet(convert(rankTable[i], 'list'), R);
+        rankTable[i] := RC_CST:-ConstructibleSet(rankTable[i], R);
     end do;
     
     # Compute differences
+    
+    # Union
     for i from 0 to nVars-1 do
         if not i in [indices(rankTable, 'nolist')] then next end if;
+        
+        # Union of all constructible sets of higher rank
+        lcs := [];
         for j from i+1 to nVars do
             if not j in [indices(rankTable, 'nolist')] then next end if;
-            rankTable[i] := RC:-TRDAlgebraicDifference(rankTable[i], rankTable[j], R);
+            lcs := [op(lcs), rankTable[j]]
         end do;
+        if nops(lcs) = 0 then next end if;
+        cs_j := ListUnion(lcs, R);
+        
+        # Compute Difference
+        rankTable[i] := RC:-TRDAlgebraicDifference(rankTable[i], cs_j, R);
     end do;
     
+    # FF
+    # for i from 0 to nVars-1 do
+    #     if not i in [indices(rankTable, 'nolist')] then next end if;
+    #     for j from i+1 to nVars do
+    #         if not j in [indices(rankTable, 'nolist')] then next end if;
+    #         rankTable[i] := RC:-TRDAlgebraicDifference(rankTable[i], rankTable[j], R);
+    #     end do;
+    # end do;
+    
+    # FR
+    # for i from 0 to nVars-1 do
+    #     if not i in [indices(rankTable, 'nolist')] then next end if;
+    #     for j from nVars to i+1 by -1 do
+    #         if not j in [indices(rankTable, 'nolist')] then next end if;
+    #         rankTable[i] := RC:-TRDAlgebraicDifference(rankTable[i], rankTable[j], R);
+    #     end do;
+    # end do;
+    # 
     return(rankTable);
     
 end proc;
