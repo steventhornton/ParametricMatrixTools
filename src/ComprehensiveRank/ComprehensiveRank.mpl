@@ -7,7 +7,7 @@
 #                Under the supervision of                                 #
 #                Robert M. Corless & Marc Moreno Maza                     #
 # EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 24/2017                                                #
+# UPDATED ... Aug. 3/2018                                                 #
 #                                                                         #
 # Computes a complete case discussion of the rank of a matrix where the   #
 # entries are multivariate polynomials whose indeterminants are treated   #
@@ -35,6 +35,18 @@
 #                         - Output will contain constructible sets        #
 #                      RegularSystem or RS:                               #
 #                           - Output will contain regular systems         #
+#   algorithm ........ Default = nctd                                     #
+#                      nctd:                                              #
+#                         - An implementation of the algorithm discussed  #
+#                           in our paper "Comprehensive Rank Computation  #
+#                           for Matrices Depending on Parameters" that    #
+#                           computes the rank without computing a         #
+#                           comprehensive triangular decomposition of the #
+#                           linear system.                                #
+#                      ctd:                                               #
+#                         - An implementation that computes the rank by   #
+#                           computing a comprehensive triangular          #
+#                           decomposition of the linear system.           #
 #                                                                         #
 # OUTPUT                                                                  #
 #   A list with elements in one of the following forms:                   #
@@ -70,6 +82,7 @@ ComprehensiveRank := module()
         implementation,
         
         # ALGORITHMS
+        ctd_comprehensive_rank,
         comprehensive_rank;
     
     ModuleApply := proc()
@@ -97,7 +110,7 @@ init := proc()
     # Check the number of arguments
     if nargs < 2 then
         error "Insufficient number of arguments";
-    elif nargs > 5 then
+    elif nargs > 6 then
         error "To many arguments";
     end if;
 
@@ -185,6 +198,8 @@ end proc;
 #   A table with indices                                                  #
 #       output_CS                                                         #
 #       output_RS                                                         #
+#       algorithm_nctd                                                    #
+#       algorithm_ctd                                                     #
 #   See ComprehensiveRank header for specifications.                      #
 # ----------------------------------------------------------------------- #
 processOptions := proc(opts_in::set(equation), $) :: table;
@@ -198,6 +213,8 @@ processOptions := proc(opts_in::set(equation), $) :: table;
     # Default values
     opts['output_CS'] := true;
     opts['output_RS'] := false;
+    opts['algorithm_nctd'] := true;
+    opts['algorithm_ctd'] := true;
     
     tab_opts := table();
     
@@ -222,6 +239,20 @@ processOptions := proc(opts_in::set(equation), $) :: table;
                 elif member(opt_value, ['RS', 'RegularSystem']) then
                     opts['output_CS'] := false;
                     opts['output_RS'] := true;
+                else
+                    error "incorrect option value: %1", opt;
+                end if;
+            elif opt_name = ('algorithm') then
+                opt_value := rhs(opt);
+                if not member(opt_value, ['nctd', 'ctd']) then
+                    error "incorrect option value: %1", opt;
+                end if;
+                if opt_value = 'nctd' then
+                    opts['algorithm_nctd'] := true;
+                    opts['algorithm_ctd'] := false;
+                elif opt_value = 'ctd' then
+                    opts['algorithm_nctd'] := false;
+                    opts['algorithm_ctd'] := true;
                 else
                     error "incorrect option value: %1", opt;
                 end if;
@@ -428,7 +459,7 @@ implementation := proc(AA::Matrix, cs::TRDcs, R::TRDring, opts::table, $)
         if isConstantMatrix(A, R) then
             r := LA:-Rank(A);
             result := [op(result), [r, rs]];
-            
+        
         # Check if A is a zero matrix over rs
         elif isZeroMatrixOverRS(A, rs, R) then
             result := [op(result), [0, rs]];
@@ -446,7 +477,11 @@ implementation := proc(AA::Matrix, cs::TRDcs, R::TRDring, opts::table, $)
     
     # Call the algorithm
     if not RC_CST:-IsEmpty(csCompute, R) then
-        result := [op(result), op(comprehensive_rank(AA, csCompute, R))];
+        if opts['algorithm_nctd'] then
+            result := [op(result), op(comprehensive_rank(AA, csCompute, R))];
+        elif opts['algorithm_ctd'] then
+            result := [op(result), op(ctd_comprehensive_rank(AA, csCompute, R))];
+        end if;
     end if;
     
     # Output options
@@ -463,5 +498,6 @@ end proc;
 # EXTERNAL FILES
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $include <src/ComprehensiveRank/comprehensive_rank.mpl>
+$include <src/ComprehensiveRank/ctd_comprehensive_rank.mpl>
 
 end module;
