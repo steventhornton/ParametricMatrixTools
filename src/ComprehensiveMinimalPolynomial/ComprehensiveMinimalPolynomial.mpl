@@ -1,13 +1,7 @@
 # ======================================================================= #
 # ======================================================================= #
 #                                                                         #
-# ComprehensiveMinimalPolynomial.mpl                                      #
-#                                                                         #
-# AUTHOR .... Steven E. Thornton                                          #
-#                Under the supervision of                                 #
-#                Robert M. Corless & Marc Moreno Maza                     #
-# EMAIL ..... sthornt7@uwo.ca                                             #
-# UPDATED ... Nov. 24/2017                                                #
+
 #                                                                         #
 # Computes a complete case discussion for the minimal polynomial of a     #
 # matrix where the entries are multivariate polynomials whose             #
